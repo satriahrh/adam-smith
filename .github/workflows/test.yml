@@ -13,12 +13,16 @@ jobs:
           MYSQL_DATABASE: adam_smith
         ports:
           - 3306
-      goose:
-        image: artsafin/goose-migrations
     env:
       DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127:0:0:1:3306)/adam_smith?parseTime=true
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.15'
+      - name: 'Setup'
+        run: |
+          make setup
       - name: 'Migrate the DB'
         run: |
           make goose up
