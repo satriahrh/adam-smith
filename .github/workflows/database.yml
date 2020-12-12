@@ -15,5 +15,12 @@ jobs:
     env:
       DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127:0:0:1:3306)/adam_smith?parseTime=true
     steps:
-      - run: make goose up
-      - run: make goose status
+      - name: 'Setup'
+        run: |
+          make setup
+      - name: 'Migrate the DB'
+        run: |
+          make goose up
+      - name: 'Dump the migration status'
+        run: |
+          make goose status
