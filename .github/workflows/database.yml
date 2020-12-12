@@ -1,7 +1,7 @@
 name: "Database"
+on: push
 jobs:
   migration-test:
-    on: push
     runs-on: ubuntu-18.04
     services:
       mysql:
