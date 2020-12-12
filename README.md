@@ -9,3 +9,4 @@ Resource management for Savan
 ### Tech Stack
 
 1. Go1.15
+2. MySQL 5.7
