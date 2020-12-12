@@ -13,9 +13,6 @@ jobs:
           MYSQL_DATABASE: adam_smith
         ports:
           - 3306
-    env:
-      DATABASE_MYSQL_HOST: ${{ job.services.mysql.ports[3306] }}
-      DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127.0.0.1:${DATABASE_MYSQL_HOST})/adam_smith?parseTime=true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -27,6 +24,11 @@ jobs:
       - name: 'Migrate the DB'
         run: |
           make goose up
+        env:
+          DATABASE_MYSQL_HOST: ${{ job.services.mysql.ports[3306] }}
+          DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127.0.0.1:${DATABASE_MYSQL_HOST})/adam_smith?parseTime=true
       - name: 'Dump the migration status'
         run: |
           make goose status
+        DATABASE_MYSQL_HOST: ${{ job.services.mysql.ports[3306] }}
+        DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127.0.0.1:${DATABASE_MYSQL_HOST})/adam_smith?parseTime=true
