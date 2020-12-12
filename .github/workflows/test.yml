@@ -30,5 +30,6 @@ jobs:
       - name: 'Dump the migration status'
         run: |
           make goose status
-        DATABASE_MYSQL_HOST: ${{ job.services.mysql.ports[3306] }}
-        DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127.0.0.1:${DATABASE_MYSQL_HOST})/adam_smith?parseTime=true
+        env:
+          DATABASE_MYSQL_HOST: ${{ job.services.mysql.ports[3306] }}
+          DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127.0.0.1:${DATABASE_MYSQL_HOST})/adam_smith?parseTime=true
