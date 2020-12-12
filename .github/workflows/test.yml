@@ -10,7 +10,7 @@ jobs:
         env:
           MYSQL_USERNAME: root
           MYSQL_PASSWORD: rootpw
-          MYSQL_DATABASE: adam_smith_test
+          MYSQL_DATABASE: adam_smith
         ports:
           - 3306
     env:
