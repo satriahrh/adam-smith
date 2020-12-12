@@ -11,10 +11,8 @@ jobs:
           MYSQL_USERNAME: root
           MYSQL_PASSWORD: rootpw
           MYSQL_DATABASE: adam_smith
-        ports:
-          - 3306
     env:
-      DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(mysql:3306)/adam_smith?parseTime=true
+      DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(mysql:${{ job.services.mysql.ports['3306'] }})/adam_smith?parseTime=true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
