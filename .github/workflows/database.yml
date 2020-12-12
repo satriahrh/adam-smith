@@ -5,12 +5,12 @@ jobs:
     services:
       mysql:
         image: mysql:5.7
-          env:
-            MYSQL_USERNAME: root
-            MYSQL_PASSWORD: rootpw
-            MYSQL_DATABASE: adam_smith_test
-          ports:
-            - 3306
+        env:
+          MYSQL_USERNAME: root
+          MYSQL_PASSWORD: rootpw
+          MYSQL_DATABASE: adam_smith_test
+        ports:
+          - 3306
     env:
       DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127:0:0:1:3306)/adam_smith?parseTime=true
     steps:
