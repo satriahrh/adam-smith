@@ -14,7 +14,7 @@ jobs:
         ports:
           - 3306:3306
     env:
-      DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(mysql:3306)/adam_smith?parseTime=true
+      DATABASE_MYSQL_DBSTRING: root:rootpw@tcp(127.0.0.1:3306)/adam_smith?parseTime=true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
