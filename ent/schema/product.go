@@ -33,6 +33,8 @@ type ProductImages struct {
 // Fields of the Product.
 func (Product) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("sku").
+			Unique().Immutable(),
 		field.String("name"),
 		field.JSON("descriptions", []ProductDescription{}),
 		field.JSON("images", ProductImages{}),
@@ -45,6 +47,6 @@ func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("brand", Brand.Type).
 			Ref("products"),
-		edge.To("variations", ProductVariant.Type),
+		edge.To("variations", Variation.Type),
 	}
 }

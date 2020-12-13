@@ -23,7 +23,7 @@ func (v Variant) Fields() []ent.Field {
 // Edges of the Variant.
 func (Variant) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("variant_uses", ProductVariant.Type),
+		edge.To("variant_uses", Variation.Type),
 	}
 }
 
