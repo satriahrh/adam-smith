@@ -37,6 +37,6 @@ func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("brand", Brand.Type).
 			Ref("products"),
-		edge.To("variants", ProductVariant.Type),
+		edge.To("variations", ProductVariant.Type),
 	}
 }

@@ -28,7 +28,7 @@ func (ProductVariant) Edges() []ent.Edge {
 			From("parent").
 			Unique(),
 		edge.From("product", Product.Type).
-			Ref("variants"),
+			Ref("variations"),
 		edge.From("variant", Variant.Type).
 			Ref("variant_uses"),
 	}
