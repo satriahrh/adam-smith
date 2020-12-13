@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/satriahrh/adam-smith/ent/brand"
 	"github.com/satriahrh/adam-smith/ent/predicate"
 	"github.com/satriahrh/adam-smith/ent/product"
 
@@ -22,8 +23,395 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeBrand   = "Brand"
 	TypeProduct = "Product"
 )
+
+// BrandMutation represents an operation that mutate the Brands
+// nodes in the graph.
+type BrandMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	name            *string
+	clearedFields   map[string]struct{}
+	products        map[int]struct{}
+	removedproducts map[int]struct{}
+	clearedproducts bool
+	done            bool
+	oldValue        func(context.Context) (*Brand, error)
+	predicates      []predicate.Brand
+}
+
+var _ ent.Mutation = (*BrandMutation)(nil)
+
+// brandOption allows to manage the mutation configuration using functional options.
+type brandOption func(*BrandMutation)
+
+// newBrandMutation creates new mutation for Brand.
+func newBrandMutation(c config, op Op, opts ...brandOption) *BrandMutation {
+	m := &BrandMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBrand,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBrandID sets the id field of the mutation.
+func withBrandID(id int) brandOption {
+	return func(m *BrandMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Brand
+		)
+		m.oldValue = func(ctx context.Context) (*Brand, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Brand.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBrand sets the old Brand of the mutation.
+func withBrand(node *Brand) brandOption {
+	return func(m *BrandMutation) {
+		m.oldValue = func(context.Context) (*Brand, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BrandMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BrandMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *BrandMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetName sets the name field.
+func (m *BrandMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the name value in the mutation.
+func (m *BrandMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old name value of the Brand.
+// If the Brand object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *BrandMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldName is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName reset all changes of the "name" field.
+func (m *BrandMutation) ResetName() {
+	m.name = nil
+}
+
+// AddProductIDs adds the products edge to Product by ids.
+func (m *BrandMutation) AddProductIDs(ids ...int) {
+	if m.products == nil {
+		m.products = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.products[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProducts clears the products edge to Product.
+func (m *BrandMutation) ClearProducts() {
+	m.clearedproducts = true
+}
+
+// ProductsCleared returns if the edge products was cleared.
+func (m *BrandMutation) ProductsCleared() bool {
+	return m.clearedproducts
+}
+
+// RemoveProductIDs removes the products edge to Product by ids.
+func (m *BrandMutation) RemoveProductIDs(ids ...int) {
+	if m.removedproducts == nil {
+		m.removedproducts = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedproducts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProducts returns the removed ids of products.
+func (m *BrandMutation) RemovedProductsIDs() (ids []int) {
+	for id := range m.removedproducts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProductsIDs returns the products ids in the mutation.
+func (m *BrandMutation) ProductsIDs() (ids []int) {
+	for id := range m.products {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProducts reset all changes of the "products" edge.
+func (m *BrandMutation) ResetProducts() {
+	m.products = nil
+	m.clearedproducts = false
+	m.removedproducts = nil
+}
+
+// Op returns the operation name.
+func (m *BrandMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Brand).
+func (m *BrandMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *BrandMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.name != nil {
+		fields = append(fields, brand.FieldName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *BrandMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case brand.FieldName:
+		return m.Name()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *BrandMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case brand.FieldName:
+		return m.OldName(ctx)
+	}
+	return nil, fmt.Errorf("unknown Brand field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *BrandMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case brand.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Brand field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *BrandMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *BrandMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *BrandMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Brand numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *BrandMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *BrandMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BrandMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Brand nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *BrandMutation) ResetField(name string) error {
+	switch name {
+	case brand.FieldName:
+		m.ResetName()
+		return nil
+	}
+	return fmt.Errorf("unknown Brand field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *BrandMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.products != nil {
+		edges = append(edges, brand.EdgeProducts)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *BrandMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case brand.EdgeProducts:
+		ids := make([]ent.Value, 0, len(m.products))
+		for id := range m.products {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *BrandMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedproducts != nil {
+		edges = append(edges, brand.EdgeProducts)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *BrandMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case brand.EdgeProducts:
+		ids := make([]ent.Value, 0, len(m.removedproducts))
+		for id := range m.removedproducts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *BrandMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedproducts {
+		edges = append(edges, brand.EdgeProducts)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *BrandMutation) EdgeCleared(name string) bool {
+	switch name {
+	case brand.EdgeProducts:
+		return m.clearedproducts
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *BrandMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Brand unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *BrandMutation) ResetEdge(name string) error {
+	switch name {
+	case brand.EdgeProducts:
+		m.ResetProducts()
+		return nil
+	}
+	return fmt.Errorf("unknown Brand edge %s", name)
+}
 
 // ProductMutation represents an operation that mutate the Products
 // nodes in the graph.
@@ -50,6 +438,9 @@ type ProductMutation struct {
 	prices        *[]uint
 	stocks        *[]uint
 	clearedFields map[string]struct{}
+	brand         map[int]struct{}
+	removedbrand  map[int]struct{}
+	clearedbrand  bool
 	done          bool
 	oldValue      func(context.Context) (*Product, error)
 	predicates    []predicate.Product
@@ -389,6 +780,59 @@ func (m *ProductMutation) ResetStocks() {
 	m.stocks = nil
 }
 
+// AddBrandIDs adds the brand edge to Brand by ids.
+func (m *ProductMutation) AddBrandIDs(ids ...int) {
+	if m.brand == nil {
+		m.brand = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.brand[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBrand clears the brand edge to Brand.
+func (m *ProductMutation) ClearBrand() {
+	m.clearedbrand = true
+}
+
+// BrandCleared returns if the edge brand was cleared.
+func (m *ProductMutation) BrandCleared() bool {
+	return m.clearedbrand
+}
+
+// RemoveBrandIDs removes the brand edge to Brand by ids.
+func (m *ProductMutation) RemoveBrandIDs(ids ...int) {
+	if m.removedbrand == nil {
+		m.removedbrand = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedbrand[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBrand returns the removed ids of brand.
+func (m *ProductMutation) RemovedBrandIDs() (ids []int) {
+	for id := range m.removedbrand {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BrandIDs returns the brand ids in the mutation.
+func (m *ProductMutation) BrandIDs() (ids []int) {
+	for id := range m.brand {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBrand reset all changes of the "brand" edge.
+func (m *ProductMutation) ResetBrand() {
+	m.brand = nil
+	m.clearedbrand = false
+	m.removedbrand = nil
+}
+
 // Op returns the operation name.
 func (m *ProductMutation) Op() Op {
 	return m.op
@@ -600,45 +1044,76 @@ func (m *ProductMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *ProductMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.brand != nil {
+		edges = append(edges, product.EdgeBrand)
+	}
 	return edges
 }
 
 // AddedIDs returns all ids (to other nodes) that were added for
 // the given edge name.
 func (m *ProductMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case product.EdgeBrand:
+		ids := make([]ent.Value, 0, len(m.brand))
+		for id := range m.brand {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *ProductMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedbrand != nil {
+		edges = append(edges, product.EdgeBrand)
+	}
 	return edges
 }
 
 // RemovedIDs returns all ids (to other nodes) that were removed for
 // the given edge name.
 func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case product.EdgeBrand:
+		ids := make([]ent.Value, 0, len(m.removedbrand))
+		for id := range m.removedbrand {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *ProductMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedbrand {
+		edges = append(edges, product.EdgeBrand)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean indicates if this edge was
 // cleared in this mutation.
 func (m *ProductMutation) EdgeCleared(name string) bool {
+	switch name {
+	case product.EdgeBrand:
+		return m.clearedbrand
+	}
 	return false
 }
 
 // ClearEdge clears the value for the given name. It returns an
 // error if the edge name is not defined in the schema.
 func (m *ProductMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Product unique edge %s", name)
 }
 
@@ -646,5 +1121,10 @@ func (m *ProductMutation) ClearEdge(name string) error {
 // given edge name. It returns an error if the edge is not
 // defined in the schema.
 func (m *ProductMutation) ResetEdge(name string) error {
+	switch name {
+	case product.EdgeBrand:
+		m.ResetBrand()
+		return nil
+	}
 	return fmt.Errorf("unknown Product edge %s", name)
 }

@@ -20,8 +20,16 @@ const (
 	// FieldStocks holds the string denoting the stocks field in the database.
 	FieldStocks = "stocks"
 
+	// EdgeBrand holds the string denoting the brand edge name in mutations.
+	EdgeBrand = "brand"
+
 	// Table holds the table name of the product in the database.
 	Table = "products"
+	// BrandTable is the table the holds the brand relation/edge. The primary key declared below.
+	BrandTable = "brand_products"
+	// BrandInverseTable is the table name for the Brand entity.
+	// It exists in this package in order to avoid circular dependency with the "brand" package.
+	BrandInverseTable = "brands"
 )
 
 // Columns holds all SQL columns for product fields.
@@ -34,6 +42,12 @@ var Columns = []string{
 	FieldPrices,
 	FieldStocks,
 }
+
+var (
+	// BrandPrimaryKey and BrandColumn2 are the table columns denoting the
+	// primary key for the brand relation (M2M).
+	BrandPrimaryKey = []string{"brand_id", "product_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

@@ -9,10 +9,12 @@ import (
 
 	"github.com/satriahrh/adam-smith/ent/migrate"
 
+	"github.com/satriahrh/adam-smith/ent/brand"
 	"github.com/satriahrh/adam-smith/ent/product"
 
 	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/dialect/sql"
+	"github.com/facebook/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -20,6 +22,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Brand is the client for interacting with the Brand builders.
+	Brand *BrandClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 }
@@ -35,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Brand = NewBrandClient(c.config)
 	c.Product = NewProductClient(c.config)
 }
 
@@ -68,6 +73,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:     ctx,
 		config:  cfg,
+		Brand:   NewBrandClient(cfg),
 		Product: NewProductClient(cfg),
 	}, nil
 }
@@ -84,6 +90,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := config{driver: &txDriver{tx: tx, drv: c.driver}, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
 		config:  cfg,
+		Brand:   NewBrandClient(cfg),
 		Product: NewProductClient(cfg),
 	}, nil
 }
@@ -91,7 +98,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Product.
+//		Brand.
 //		Query().
 //		Count(ctx)
 //
@@ -113,7 +120,112 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Brand.Use(hooks...)
 	c.Product.Use(hooks...)
+}
+
+// BrandClient is a client for the Brand schema.
+type BrandClient struct {
+	config
+}
+
+// NewBrandClient returns a client for the Brand from the given config.
+func NewBrandClient(c config) *BrandClient {
+	return &BrandClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `brand.Hooks(f(g(h())))`.
+func (c *BrandClient) Use(hooks ...Hook) {
+	c.hooks.Brand = append(c.hooks.Brand, hooks...)
+}
+
+// Create returns a create builder for Brand.
+func (c *BrandClient) Create() *BrandCreate {
+	mutation := newBrandMutation(c.config, OpCreate)
+	return &BrandCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Brand entities.
+func (c *BrandClient) CreateBulk(builders ...*BrandCreate) *BrandCreateBulk {
+	return &BrandCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Brand.
+func (c *BrandClient) Update() *BrandUpdate {
+	mutation := newBrandMutation(c.config, OpUpdate)
+	return &BrandUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BrandClient) UpdateOne(b *Brand) *BrandUpdateOne {
+	mutation := newBrandMutation(c.config, OpUpdateOne, withBrand(b))
+	return &BrandUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BrandClient) UpdateOneID(id int) *BrandUpdateOne {
+	mutation := newBrandMutation(c.config, OpUpdateOne, withBrandID(id))
+	return &BrandUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Brand.
+func (c *BrandClient) Delete() *BrandDelete {
+	mutation := newBrandMutation(c.config, OpDelete)
+	return &BrandDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *BrandClient) DeleteOne(b *Brand) *BrandDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *BrandClient) DeleteOneID(id int) *BrandDeleteOne {
+	builder := c.Delete().Where(brand.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BrandDeleteOne{builder}
+}
+
+// Query returns a query builder for Brand.
+func (c *BrandClient) Query() *BrandQuery {
+	return &BrandQuery{config: c.config}
+}
+
+// Get returns a Brand entity by its id.
+func (c *BrandClient) Get(ctx context.Context, id int) (*Brand, error) {
+	return c.Query().Where(brand.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BrandClient) GetX(ctx context.Context, id int) *Brand {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryProducts queries the products edge of a Brand.
+func (c *BrandClient) QueryProducts(b *Brand) *ProductQuery {
+	query := &ProductQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(brand.Table, brand.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, brand.ProductsTable, brand.ProductsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BrandClient) Hooks() []Hook {
+	return c.hooks.Brand
 }
 
 // ProductClient is a client for the Product schema.
@@ -197,6 +309,22 @@ func (c *ProductClient) GetX(ctx context.Context, id int) *Product {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryBrand queries the brand edge of a Product.
+func (c *ProductClient) QueryBrand(pr *Product) *BrandQuery {
+	query := &BrandQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, id),
+			sqlgraph.To(brand.Table, brand.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, product.BrandTable, product.BrandPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

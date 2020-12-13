@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -11,6 +12,7 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"github.com/satriahrh/adam-smith/ent/brand"
 	"github.com/satriahrh/adam-smith/ent/predicate"
 	"github.com/satriahrh/adam-smith/ent/product"
 )
@@ -22,6 +24,8 @@ type ProductQuery struct {
 	offset     *int
 	order      []OrderFunc
 	predicates []predicate.Product
+	// eager-loading edges.
+	withBrand *BrandQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -49,6 +53,28 @@ func (pq *ProductQuery) Offset(offset int) *ProductQuery {
 func (pq *ProductQuery) Order(o ...OrderFunc) *ProductQuery {
 	pq.order = append(pq.order, o...)
 	return pq
+}
+
+// QueryBrand chains the current query on the brand edge.
+func (pq *ProductQuery) QueryBrand() *BrandQuery {
+	query := &BrandQuery{config: pq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery()
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, selector),
+			sqlgraph.To(brand.Table, brand.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, product.BrandTable, product.BrandPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Product entity in the query. Returns *NotFoundError when no product was found.
@@ -226,10 +252,22 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		offset:     pq.offset,
 		order:      append([]OrderFunc{}, pq.order...),
 		predicates: append([]predicate.Product{}, pq.predicates...),
+		withBrand:  pq.withBrand.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
 	}
+}
+
+//  WithBrand tells the query-builder to eager-loads the nodes that are connected to
+// the "brand" edge. The optional arguments used to configure the query builder of the edge.
+func (pq *ProductQuery) WithBrand(opts ...func(*BrandQuery)) *ProductQuery {
+	query := &BrandQuery{config: pq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withBrand = query
+	return pq
 }
 
 // GroupBy used to group vertices by one or more fields/columns.
@@ -296,8 +334,11 @@ func (pq *ProductQuery) prepareQuery(ctx context.Context) error {
 
 func (pq *ProductQuery) sqlAll(ctx context.Context) ([]*Product, error) {
 	var (
-		nodes = []*Product{}
-		_spec = pq.querySpec()
+		nodes       = []*Product{}
+		_spec       = pq.querySpec()
+		loadedTypes = [1]bool{
+			pq.withBrand != nil,
+		}
 	)
 	_spec.ScanValues = func() []interface{} {
 		node := &Product{config: pq.config}
@@ -310,6 +351,7 @@ func (pq *ProductQuery) sqlAll(ctx context.Context) ([]*Product, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(values...)
 	}
 	if err := sqlgraph.QueryNodes(ctx, pq.driver, _spec); err != nil {
@@ -318,6 +360,71 @@ func (pq *ProductQuery) sqlAll(ctx context.Context) ([]*Product, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := pq.withBrand; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		ids := make(map[int]*Product, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Brand = []*Brand{}
+		}
+		var (
+			edgeids []int
+			edges   = make(map[int][]*Product)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: true,
+				Table:   product.BrandTable,
+				Columns: product.BrandPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(product.BrandPrimaryKey[1], fks...))
+			},
+
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*sql.NullInt64)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int(eout.Int64)
+				inValue := int(ein.Int64)
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				edgeids = append(edgeids, inValue)
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, pq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "brand": %v`, err)
+		}
+		query.Where(brand.IDIn(edgeids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := edges[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected "brand" node returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Brand = append(nodes[i].Edges.Brand, n)
+			}
+		}
+	}
+
 	return nodes, nil
 }
 

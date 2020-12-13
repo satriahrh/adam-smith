@@ -39,6 +39,27 @@ type Product struct {
 	Prices []uint `json:"prices,omitempty"`
 	// Stocks holds the value of the "stocks" field.
 	Stocks []uint `json:"stocks,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ProductQuery when eager-loading is set.
+	Edges ProductEdges `json:"edges"`
+}
+
+// ProductEdges holds the relations/edges for other nodes in the graph.
+type ProductEdges struct {
+	// Brand holds the value of the brand edge.
+	Brand []*Brand
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// BrandOrErr returns the Brand value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProductEdges) BrandOrErr() ([]*Brand, error) {
+	if e.loadedTypes[0] {
+		return e.Brand, nil
+	}
+	return nil, &NotLoadedError{edge: "brand"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -112,6 +133,11 @@ func (pr *Product) assignValues(values ...interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryBrand queries the brand edge of the Product.
+func (pr *Product) QueryBrand() *BrandQuery {
+	return (&ProductClient{config: pr.config}).QueryBrand(pr)
 }
 
 // Update returns a builder for updating this Product.

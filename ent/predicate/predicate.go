@@ -6,5 +6,8 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 )
 
+// Brand is the predicate function for brand builders.
+type Brand func(*sql.Selector)
+
 // Product is the predicate function for product builders.
 type Product func(*sql.Selector)

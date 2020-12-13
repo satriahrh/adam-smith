@@ -9,6 +9,7 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"github.com/satriahrh/adam-smith/ent/brand"
 	"github.com/satriahrh/adam-smith/ent/predicate"
 	"github.com/satriahrh/adam-smith/ent/product"
 )
@@ -73,9 +74,45 @@ func (pu *ProductUpdate) SetStocks(u []uint) *ProductUpdate {
 	return pu
 }
 
+// AddBrandIDs adds the brand edge to Brand by ids.
+func (pu *ProductUpdate) AddBrandIDs(ids ...int) *ProductUpdate {
+	pu.mutation.AddBrandIDs(ids...)
+	return pu
+}
+
+// AddBrand adds the brand edges to Brand.
+func (pu *ProductUpdate) AddBrand(b ...*Brand) *ProductUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return pu.AddBrandIDs(ids...)
+}
+
 // Mutation returns the ProductMutation object of the builder.
 func (pu *ProductUpdate) Mutation() *ProductMutation {
 	return pu.mutation
+}
+
+// ClearBrand clears all "brand" edges to type Brand.
+func (pu *ProductUpdate) ClearBrand() *ProductUpdate {
+	pu.mutation.ClearBrand()
+	return pu
+}
+
+// RemoveBrandIDs removes the brand edge to Brand by ids.
+func (pu *ProductUpdate) RemoveBrandIDs(ids ...int) *ProductUpdate {
+	pu.mutation.RemoveBrandIDs(ids...)
+	return pu
+}
+
+// RemoveBrand removes brand edges to Brand.
+func (pu *ProductUpdate) RemoveBrand(b ...*Brand) *ProductUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return pu.RemoveBrandIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -189,6 +226,60 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: product.FieldStocks,
 		})
 	}
+	if pu.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedBrandIDs(); len(nodes) > 0 && !pu.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.BrandIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{product.Label}
@@ -254,9 +345,45 @@ func (puo *ProductUpdateOne) SetStocks(u []uint) *ProductUpdateOne {
 	return puo
 }
 
+// AddBrandIDs adds the brand edge to Brand by ids.
+func (puo *ProductUpdateOne) AddBrandIDs(ids ...int) *ProductUpdateOne {
+	puo.mutation.AddBrandIDs(ids...)
+	return puo
+}
+
+// AddBrand adds the brand edges to Brand.
+func (puo *ProductUpdateOne) AddBrand(b ...*Brand) *ProductUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return puo.AddBrandIDs(ids...)
+}
+
 // Mutation returns the ProductMutation object of the builder.
 func (puo *ProductUpdateOne) Mutation() *ProductMutation {
 	return puo.mutation
+}
+
+// ClearBrand clears all "brand" edges to type Brand.
+func (puo *ProductUpdateOne) ClearBrand() *ProductUpdateOne {
+	puo.mutation.ClearBrand()
+	return puo
+}
+
+// RemoveBrandIDs removes the brand edge to Brand by ids.
+func (puo *ProductUpdateOne) RemoveBrandIDs(ids ...int) *ProductUpdateOne {
+	puo.mutation.RemoveBrandIDs(ids...)
+	return puo
+}
+
+// RemoveBrand removes brand edges to Brand.
+func (puo *ProductUpdateOne) RemoveBrand(b ...*Brand) *ProductUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return puo.RemoveBrandIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -367,6 +494,60 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Value:  value,
 			Column: product.FieldStocks,
 		})
+	}
+	if puo.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedBrandIDs(); len(nodes) > 0 && !puo.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.BrandIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Product{config: puo.config}
 	_spec.Assign = _node.assignValues

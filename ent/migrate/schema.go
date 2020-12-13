@@ -8,6 +8,18 @@ import (
 )
 
 var (
+	// BrandsColumns holds the columns for the "brands" table.
+	BrandsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+	}
+	// BrandsTable holds the schema information for the "brands" table.
+	BrandsTable = &schema.Table{
+		Name:        "brands",
+		Columns:     BrandsColumns,
+		PrimaryKey:  []*schema.Column{BrandsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -25,11 +37,42 @@ var (
 		PrimaryKey:  []*schema.Column{ProductsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// BrandProductsColumns holds the columns for the "brand_products" table.
+	BrandProductsColumns = []*schema.Column{
+		{Name: "brand_id", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt},
+	}
+	// BrandProductsTable holds the schema information for the "brand_products" table.
+	BrandProductsTable = &schema.Table{
+		Name:       "brand_products",
+		Columns:    BrandProductsColumns,
+		PrimaryKey: []*schema.Column{BrandProductsColumns[0], BrandProductsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "brand_products_brand_id",
+				Columns: []*schema.Column{BrandProductsColumns[0]},
+
+				RefColumns: []*schema.Column{BrandsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:  "brand_products_product_id",
+				Columns: []*schema.Column{BrandProductsColumns[1]},
+
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		BrandsTable,
 		ProductsTable,
+		BrandProductsTable,
 	}
 )
 
 func init() {
+	BrandProductsTable.ForeignKeys[0].RefTable = BrandsTable
+	BrandProductsTable.ForeignKeys[1].RefTable = ProductsTable
 }

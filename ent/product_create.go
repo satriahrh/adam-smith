@@ -9,6 +9,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"github.com/satriahrh/adam-smith/ent/brand"
 	"github.com/satriahrh/adam-smith/ent/product"
 )
 
@@ -64,6 +65,21 @@ func (pc *ProductCreate) SetPrices(u []uint) *ProductCreate {
 func (pc *ProductCreate) SetStocks(u []uint) *ProductCreate {
 	pc.mutation.SetStocks(u)
 	return pc
+}
+
+// AddBrandIDs adds the brand edge to Brand by ids.
+func (pc *ProductCreate) AddBrandIDs(ids ...int) *ProductCreate {
+	pc.mutation.AddBrandIDs(ids...)
+	return pc
+}
+
+// AddBrand adds the brand edges to Brand.
+func (pc *ProductCreate) AddBrand(b ...*Brand) *ProductCreate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return pc.AddBrandIDs(ids...)
 }
 
 // Mutation returns the ProductMutation object of the builder.
@@ -209,6 +225,25 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Column: product.FieldStocks,
 		})
 		_node.Stocks = value
+	}
+	if nodes := pc.mutation.BrandIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: product.BrandPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
