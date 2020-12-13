@@ -1,0 +1,17 @@
+name: Test
+on: push
+jobs:
+  go-vet:
+    name: Go Vet
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - name: Setup
+        run: |
+          make setup
+      - name: The vet
+        run: |
+          go vet ./...
