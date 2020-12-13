@@ -29,8 +29,6 @@ func (Product) Fields() []ent.Field {
 			Shopee    string `json:"shopee"`
 			Bukalapak string `json:"bukalapak"`
 		}{}),
-		field.JSON("prices", []uint{}),
-		field.JSON("stocks", []uint{}),
 	}
 }
 
@@ -39,5 +37,6 @@ func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("brand", Brand.Type).
 			Ref("products"),
+		edge.To("variants", ProductVariant.Type),
 	}
 }
