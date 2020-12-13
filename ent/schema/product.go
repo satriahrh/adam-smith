@@ -19,15 +19,15 @@ type ProductDescription struct {
 
 // ProductMarketplace marketplace details of the product being sold
 type ProductMarketplace struct {
-	Tokopedia string `json:"tokopedia"`
-	Shopee    string `json:"shopee"`
-	Bukalapak string `json:"bukalapak"`
+	Tokopedia string `json:"tokopedia,omitempty"`
+	Shopee    string `json:"shopee,omitempty"`
+	Bukalapak string `json:"bukalapak,omitempty"`
 }
 
 // ProductImages detail images of the product
 type ProductImages struct {
-	Thumbnail string   `json:"thumbnail"`
-	Displays  []string `json:"displays"`
+	Thumbnail string   `json:"thumbnail,omitempty"`
+	Displays  []string `json:"displays,omitempty"`
 }
 
 // Fields of the Product.
