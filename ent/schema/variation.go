@@ -14,9 +14,8 @@ type Variation struct {
 // Fields of the Variation.
 func (Variation) Fields() []ent.Field {
 	return []ent.Field{
-		field.Uint8("level").
-			Default(0),
-		field.Strings("images"),
+		field.Strings("images").
+			Optional(),
 		field.Uint8("stock").
 			Default(0),
 		field.Uint("price").

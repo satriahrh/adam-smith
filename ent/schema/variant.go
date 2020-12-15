@@ -4,6 +4,7 @@ import (
 	"github.com/facebook/ent"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
+	"github.com/facebook/ent/schema/index"
 )
 
 // Variant holds the schema definition for the Variant entity.
@@ -24,6 +25,13 @@ func (v Variant) Fields() []ent.Field {
 func (Variant) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("variant_uses", Variation.Type),
+	}
+}
+
+// Indexes of the Variant.
+func (Variant) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("value"),
 	}
 }
 
