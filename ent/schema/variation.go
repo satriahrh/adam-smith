@@ -33,5 +33,7 @@ func (Variation) Edges() []ent.Edge {
 			Ref("variations"),
 		edge.From("variant", Variant.Type).
 			Ref("variant_uses"),
+		edge.From("deals", OutboundDeal.Type).
+			Ref("variation"),
 	}
 }
