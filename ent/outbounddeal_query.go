@@ -26,8 +26,9 @@ type OutboundDealQuery struct {
 	order      []OrderFunc
 	predicates []predicate.OutboundDeal
 	// eager-loading edges.
-	withVariant     *VariationQuery
+	withVariation   *VariationQuery
 	withTransaction *OutboundTransactionQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,8 +58,8 @@ func (odq *OutboundDealQuery) Order(o ...OrderFunc) *OutboundDealQuery {
 	return odq
 }
 
-// QueryVariant chains the current query on the variant edge.
-func (odq *OutboundDealQuery) QueryVariant() *VariationQuery {
+// QueryVariation chains the current query on the variation edge.
+func (odq *OutboundDealQuery) QueryVariation() *VariationQuery {
 	query := &VariationQuery{config: odq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := odq.prepareQuery(ctx); err != nil {
@@ -71,7 +72,7 @@ func (odq *OutboundDealQuery) QueryVariant() *VariationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, selector),
 			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, outbounddeal.VariantTable, outbounddeal.VariantPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, outbounddeal.VariationTable, outbounddeal.VariationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(odq.driver.Dialect(), step)
 		return fromU, nil
@@ -276,7 +277,7 @@ func (odq *OutboundDealQuery) Clone() *OutboundDealQuery {
 		offset:          odq.offset,
 		order:           append([]OrderFunc{}, odq.order...),
 		predicates:      append([]predicate.OutboundDeal{}, odq.predicates...),
-		withVariant:     odq.withVariant.Clone(),
+		withVariation:   odq.withVariation.Clone(),
 		withTransaction: odq.withTransaction.Clone(),
 		// clone intermediate query.
 		sql:  odq.sql.Clone(),
@@ -284,14 +285,14 @@ func (odq *OutboundDealQuery) Clone() *OutboundDealQuery {
 	}
 }
 
-//  WithVariant tells the query-builder to eager-loads the nodes that are connected to
-// the "variant" edge. The optional arguments used to configure the query builder of the edge.
-func (odq *OutboundDealQuery) WithVariant(opts ...func(*VariationQuery)) *OutboundDealQuery {
+//  WithVariation tells the query-builder to eager-loads the nodes that are connected to
+// the "variation" edge. The optional arguments used to configure the query builder of the edge.
+func (odq *OutboundDealQuery) WithVariation(opts ...func(*VariationQuery)) *OutboundDealQuery {
 	query := &VariationQuery{config: odq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	odq.withVariant = query
+	odq.withVariation = query
 	return odq
 }
 
@@ -371,16 +372,26 @@ func (odq *OutboundDealQuery) prepareQuery(ctx context.Context) error {
 func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, error) {
 	var (
 		nodes       = []*OutboundDeal{}
+		withFKs     = odq.withFKs
 		_spec       = odq.querySpec()
 		loadedTypes = [2]bool{
-			odq.withVariant != nil,
+			odq.withVariation != nil,
 			odq.withTransaction != nil,
 		}
 	)
+	if odq.withVariation != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, outbounddeal.ForeignKeys...)
+	}
 	_spec.ScanValues = func() []interface{} {
 		node := &OutboundDeal{config: odq.config}
 		nodes = append(nodes, node)
 		values := node.scanValues()
+		if withFKs {
+			values = append(values, node.fkValues()...)
+		}
 		return values
 	}
 	_spec.Assign = func(values ...interface{}) error {
@@ -398,66 +409,27 @@ func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, erro
 		return nodes, nil
 	}
 
-	if query := odq.withVariant; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*OutboundDeal, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Variant = []*Variation{}
+	if query := odq.withVariation; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*OutboundDeal)
+		for i := range nodes {
+			if fk := nodes[i].outbound_deal_variation; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*OutboundDeal)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   outbounddeal.VariantTable,
-				Columns: outbounddeal.VariantPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(outbounddeal.VariantPrimaryKey[1], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, odq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "variant": %v`, err)
-		}
-		query.Where(variation.IDIn(edgeids...))
+		query.Where(variation.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "variant" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_variation" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Variant = append(nodes[i].Edges.Variant, n)
+				nodes[i].Edges.Variation = n
 			}
 		}
 	}

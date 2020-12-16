@@ -389,7 +389,7 @@ func HasOutboundDeals() predicate.Variation {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(OutboundDealsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, OutboundDealsTable, OutboundDealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, OutboundDealsTable, OutboundDealsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -401,7 +401,7 @@ func HasOutboundDealsWith(preds ...predicate.OutboundDeal) predicate.Variation {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(OutboundDealsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, OutboundDealsTable, OutboundDealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, OutboundDealsTable, OutboundDealsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/satriahrh/adam-smith/ent/outbounddeal"
+	"github.com/satriahrh/adam-smith/ent/variation"
 )
 
 // OutboundDeal is the model entity for the OutboundDeal schema.
@@ -21,13 +22,14 @@ type OutboundDeal struct {
 	Amount uint `json:"amount,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OutboundDealQuery when eager-loading is set.
-	Edges OutboundDealEdges `json:"edges"`
+	Edges                   OutboundDealEdges `json:"edges"`
+	outbound_deal_variation *int
 }
 
 // OutboundDealEdges holds the relations/edges for other nodes in the graph.
 type OutboundDealEdges struct {
-	// Variant holds the value of the variant edge.
-	Variant []*Variation
+	// Variation holds the value of the variation edge.
+	Variation *Variation
 	// Transaction holds the value of the transaction edge.
 	Transaction []*OutboundTransaction
 	// loadedTypes holds the information for reporting if a
@@ -35,13 +37,18 @@ type OutboundDealEdges struct {
 	loadedTypes [2]bool
 }
 
-// VariantOrErr returns the Variant value or an error if the edge
-// was not loaded in eager-loading.
-func (e OutboundDealEdges) VariantOrErr() ([]*Variation, error) {
+// VariationOrErr returns the Variation value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OutboundDealEdges) VariationOrErr() (*Variation, error) {
 	if e.loadedTypes[0] {
-		return e.Variant, nil
+		if e.Variation == nil {
+			// The edge variation was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: variation.Label}
+		}
+		return e.Variation, nil
 	}
-	return nil, &NotLoadedError{edge: "variant"}
+	return nil, &NotLoadedError{edge: "variation"}
 }
 
 // TransactionOrErr returns the Transaction value or an error if the edge
@@ -59,6 +66,13 @@ func (*OutboundDeal) scanValues() []interface{} {
 		&sql.NullInt64{}, // id
 		&sql.NullInt64{}, // quantity
 		&sql.NullInt64{}, // amount
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*OutboundDeal) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // outbound_deal_variation
 	}
 }
 
@@ -84,12 +98,21 @@ func (od *OutboundDeal) assignValues(values ...interface{}) error {
 	} else if value.Valid {
 		od.Amount = uint(value.Int64)
 	}
+	values = values[2:]
+	if len(values) == len(outbounddeal.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field outbound_deal_variation", value)
+		} else if value.Valid {
+			od.outbound_deal_variation = new(int)
+			*od.outbound_deal_variation = int(value.Int64)
+		}
+	}
 	return nil
 }
 
-// QueryVariant queries the variant edge of the OutboundDeal.
-func (od *OutboundDeal) QueryVariant() *VariationQuery {
-	return (&OutboundDealClient{config: od.config}).QueryVariant(od)
+// QueryVariation queries the variation edge of the OutboundDeal.
+func (od *OutboundDeal) QueryVariation() *VariationQuery {
+	return (&OutboundDealClient{config: od.config}).QueryVariation(od)
 }
 
 // QueryTransaction queries the transaction edge of the OutboundDeal.

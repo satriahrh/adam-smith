@@ -338,10 +338,10 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 	}
 	if nodes := vc.mutation.OutboundDealsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -164,7 +164,7 @@ func (vq *VariationQuery) QueryOutboundDeals() *OutboundDealQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variation.Table, variation.FieldID, selector),
 			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, variation.OutboundDealsTable, variation.OutboundDealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, variation.OutboundDealsTable, variation.OutboundDealsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -663,65 +663,30 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 
 	if query := vq.withOutboundDeals; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Variation, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.OutboundDeals = []*OutboundDeal{}
+		nodeids := make(map[int]*Variation)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.OutboundDeals = []*OutboundDeal{}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Variation)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   variation.OutboundDealsTable,
-				Columns: variation.OutboundDealsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(variation.OutboundDealsPrimaryKey[0], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, vq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "outbound_deals": %v`, err)
-		}
-		query.Where(outbounddeal.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.OutboundDeal(func(s *sql.Selector) {
+			s.Where(sql.InValues(variation.OutboundDealsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.outbound_deal_variation
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "outbound_deal_variation" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "outbound_deals" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_variation" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.OutboundDeals = append(nodes[i].Edges.OutboundDeals, n)
-			}
+			node.Edges.OutboundDeals = append(node.Edges.OutboundDeals, n)
 		}
 	}
 

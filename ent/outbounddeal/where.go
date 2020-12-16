@@ -257,25 +257,25 @@ func AmountLTE(v uint) predicate.OutboundDeal {
 	})
 }
 
-// HasVariant applies the HasEdge predicate on the "variant" edge.
-func HasVariant() predicate.OutboundDeal {
+// HasVariation applies the HasEdge predicate on the "variation" edge.
+func HasVariation() predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariantTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, VariantTable, VariantPrimaryKey...),
+			sqlgraph.To(VariationTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasVariantWith applies the HasEdge predicate on the "variant" edge with a given conditions (other predicates).
-func HasVariantWith(preds ...predicate.Variation) predicate.OutboundDeal {
+// HasVariationWith applies the HasEdge predicate on the "variation" edge with a given conditions (other predicates).
+func HasVariationWith(preds ...predicate.Variation) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariantInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, VariantTable, VariantPrimaryKey...),
+			sqlgraph.To(VariationInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

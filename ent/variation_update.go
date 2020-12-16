@@ -536,10 +536,10 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if vu.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -552,10 +552,10 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.RemovedOutboundDealsIDs(); len(nodes) > 0 && !vu.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -571,10 +571,10 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.OutboundDealsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1111,10 +1111,10 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 	}
 	if vuo.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1127,10 +1127,10 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 	}
 	if nodes := vuo.mutation.RemovedOutboundDealsIDs(); len(nodes) > 0 && !vuo.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1146,10 +1146,10 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 	}
 	if nodes := vuo.mutation.OutboundDealsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variation.OutboundDealsTable,
-			Columns: variation.OutboundDealsPrimaryKey,
+			Columns: []string{variation.OutboundDealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

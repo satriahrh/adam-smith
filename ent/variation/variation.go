@@ -47,11 +47,13 @@ const (
 	// VariantInverseTable is the table name for the Variant entity.
 	// It exists in this package in order to avoid circular dependency with the "variant" package.
 	VariantInverseTable = "variants"
-	// OutboundDealsTable is the table the holds the outbound_deals relation/edge. The primary key declared below.
-	OutboundDealsTable = "variation_outbound_deals"
+	// OutboundDealsTable is the table the holds the outbound_deals relation/edge.
+	OutboundDealsTable = "outbound_deals"
 	// OutboundDealsInverseTable is the table name for the OutboundDeal entity.
 	// It exists in this package in order to avoid circular dependency with the "outbounddeal" package.
 	OutboundDealsInverseTable = "outbound_deals"
+	// OutboundDealsColumn is the table column denoting the outbound_deals relation/edge.
+	OutboundDealsColumn = "outbound_deal_variation"
 )
 
 // Columns holds all SQL columns for variation fields.
@@ -72,9 +74,6 @@ var (
 	// VariantPrimaryKey and VariantColumn2 are the table columns denoting the
 	// primary key for the variant relation (M2M).
 	VariantPrimaryKey = []string{"variant_id", "variation_id"}
-	// OutboundDealsPrimaryKey and OutboundDealsColumn2 are the table columns denoting the
-	// primary key for the outbound_deals relation (M2M).
-	OutboundDealsPrimaryKey = []string{"variation_id", "outbound_deal_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

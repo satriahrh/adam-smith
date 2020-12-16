@@ -34,6 +34,7 @@ func (Variation) Edges() []ent.Edge {
 			Unique(),
 		edge.From("variant", Variant.Type).
 			Ref("variations"),
-		edge.To("outbound_deals", OutboundDeal.Type),
+		edge.From("outbound_deals", OutboundDeal.Type).
+			Ref("variation"),
 	}
 }

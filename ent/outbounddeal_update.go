@@ -54,19 +54,23 @@ func (odu *OutboundDealUpdate) AddAmount(u uint) *OutboundDealUpdate {
 	return odu
 }
 
-// AddVariantIDs adds the variant edge to Variation by ids.
-func (odu *OutboundDealUpdate) AddVariantIDs(ids ...int) *OutboundDealUpdate {
-	odu.mutation.AddVariantIDs(ids...)
+// SetVariationID sets the variation edge to Variation by id.
+func (odu *OutboundDealUpdate) SetVariationID(id int) *OutboundDealUpdate {
+	odu.mutation.SetVariationID(id)
 	return odu
 }
 
-// AddVariant adds the variant edges to Variation.
-func (odu *OutboundDealUpdate) AddVariant(v ...*Variation) *OutboundDealUpdate {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
+// SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
+func (odu *OutboundDealUpdate) SetNillableVariationID(id *int) *OutboundDealUpdate {
+	if id != nil {
+		odu = odu.SetVariationID(*id)
 	}
-	return odu.AddVariantIDs(ids...)
+	return odu
+}
+
+// SetVariation sets the variation edge to Variation.
+func (odu *OutboundDealUpdate) SetVariation(v *Variation) *OutboundDealUpdate {
+	return odu.SetVariationID(v.ID)
 }
 
 // AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
@@ -89,25 +93,10 @@ func (odu *OutboundDealUpdate) Mutation() *OutboundDealMutation {
 	return odu.mutation
 }
 
-// ClearVariant clears all "variant" edges to type Variation.
-func (odu *OutboundDealUpdate) ClearVariant() *OutboundDealUpdate {
-	odu.mutation.ClearVariant()
+// ClearVariation clears the "variation" edge to type Variation.
+func (odu *OutboundDealUpdate) ClearVariation() *OutboundDealUpdate {
+	odu.mutation.ClearVariation()
 	return odu
-}
-
-// RemoveVariantIDs removes the variant edge to Variation by ids.
-func (odu *OutboundDealUpdate) RemoveVariantIDs(ids ...int) *OutboundDealUpdate {
-	odu.mutation.RemoveVariantIDs(ids...)
-	return odu
-}
-
-// RemoveVariant removes variant edges to Variation.
-func (odu *OutboundDealUpdate) RemoveVariant(v ...*Variation) *OutboundDealUpdate {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return odu.RemoveVariantIDs(ids...)
 }
 
 // ClearTransaction clears all "transaction" edges to type OutboundTransaction.
@@ -228,12 +217,12 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: outbounddeal.FieldAmount,
 		})
 	}
-	if odu.mutation.VariantCleared() {
+	if odu.mutation.VariationCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.VariantTable,
-			Columns: outbounddeal.VariantPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   outbounddeal.VariationTable,
+			Columns: []string{outbounddeal.VariationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -244,31 +233,12 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := odu.mutation.RemovedVariantIDs(); len(nodes) > 0 && !odu.mutation.VariantCleared() {
+	if nodes := odu.mutation.VariationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.VariantTable,
-			Columns: outbounddeal.VariantPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := odu.mutation.VariantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.VariantTable,
-			Columns: outbounddeal.VariantPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   outbounddeal.VariationTable,
+			Columns: []string{outbounddeal.VariationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -380,19 +350,23 @@ func (oduo *OutboundDealUpdateOne) AddAmount(u uint) *OutboundDealUpdateOne {
 	return oduo
 }
 
-// AddVariantIDs adds the variant edge to Variation by ids.
-func (oduo *OutboundDealUpdateOne) AddVariantIDs(ids ...int) *OutboundDealUpdateOne {
-	oduo.mutation.AddVariantIDs(ids...)
+// SetVariationID sets the variation edge to Variation by id.
+func (oduo *OutboundDealUpdateOne) SetVariationID(id int) *OutboundDealUpdateOne {
+	oduo.mutation.SetVariationID(id)
 	return oduo
 }
 
-// AddVariant adds the variant edges to Variation.
-func (oduo *OutboundDealUpdateOne) AddVariant(v ...*Variation) *OutboundDealUpdateOne {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
+// SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
+func (oduo *OutboundDealUpdateOne) SetNillableVariationID(id *int) *OutboundDealUpdateOne {
+	if id != nil {
+		oduo = oduo.SetVariationID(*id)
 	}
-	return oduo.AddVariantIDs(ids...)
+	return oduo
+}
+
+// SetVariation sets the variation edge to Variation.
+func (oduo *OutboundDealUpdateOne) SetVariation(v *Variation) *OutboundDealUpdateOne {
+	return oduo.SetVariationID(v.ID)
 }
 
 // AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
@@ -415,25 +389,10 @@ func (oduo *OutboundDealUpdateOne) Mutation() *OutboundDealMutation {
 	return oduo.mutation
 }
 
-// ClearVariant clears all "variant" edges to type Variation.
-func (oduo *OutboundDealUpdateOne) ClearVariant() *OutboundDealUpdateOne {
-	oduo.mutation.ClearVariant()
+// ClearVariation clears the "variation" edge to type Variation.
+func (oduo *OutboundDealUpdateOne) ClearVariation() *OutboundDealUpdateOne {
+	oduo.mutation.ClearVariation()
 	return oduo
-}
-
-// RemoveVariantIDs removes the variant edge to Variation by ids.
-func (oduo *OutboundDealUpdateOne) RemoveVariantIDs(ids ...int) *OutboundDealUpdateOne {
-	oduo.mutation.RemoveVariantIDs(ids...)
-	return oduo
-}
-
-// RemoveVariant removes variant edges to Variation.
-func (oduo *OutboundDealUpdateOne) RemoveVariant(v ...*Variation) *OutboundDealUpdateOne {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return oduo.RemoveVariantIDs(ids...)
 }
 
 // ClearTransaction clears all "transaction" edges to type OutboundTransaction.
@@ -552,12 +511,12 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Column: outbounddeal.FieldAmount,
 		})
 	}
-	if oduo.mutation.VariantCleared() {
+	if oduo.mutation.VariationCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.VariantTable,
-			Columns: outbounddeal.VariantPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   outbounddeal.VariationTable,
+			Columns: []string{outbounddeal.VariationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -568,31 +527,12 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := oduo.mutation.RemovedVariantIDs(); len(nodes) > 0 && !oduo.mutation.VariantCleared() {
+	if nodes := oduo.mutation.VariationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.VariantTable,
-			Columns: outbounddeal.VariantPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := oduo.mutation.VariantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.VariantTable,
-			Columns: outbounddeal.VariantPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   outbounddeal.VariationTable,
+			Columns: []string{outbounddeal.VariationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
