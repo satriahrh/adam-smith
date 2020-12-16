@@ -39,19 +39,19 @@ func (vu *VariantUpdate) SetValue(s string) *VariantUpdate {
 	return vu
 }
 
-// AddVariantUseIDs adds the variant_uses edge to Variation by ids.
-func (vu *VariantUpdate) AddVariantUseIDs(ids ...int) *VariantUpdate {
-	vu.mutation.AddVariantUseIDs(ids...)
+// AddVariationIDs adds the variations edge to Variation by ids.
+func (vu *VariantUpdate) AddVariationIDs(ids ...int) *VariantUpdate {
+	vu.mutation.AddVariationIDs(ids...)
 	return vu
 }
 
-// AddVariantUses adds the variant_uses edges to Variation.
-func (vu *VariantUpdate) AddVariantUses(v ...*Variation) *VariantUpdate {
+// AddVariations adds the variations edges to Variation.
+func (vu *VariantUpdate) AddVariations(v ...*Variation) *VariantUpdate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vu.AddVariantUseIDs(ids...)
+	return vu.AddVariationIDs(ids...)
 }
 
 // Mutation returns the VariantMutation object of the builder.
@@ -59,25 +59,25 @@ func (vu *VariantUpdate) Mutation() *VariantMutation {
 	return vu.mutation
 }
 
-// ClearVariantUses clears all "variant_uses" edges to type Variation.
-func (vu *VariantUpdate) ClearVariantUses() *VariantUpdate {
-	vu.mutation.ClearVariantUses()
+// ClearVariations clears all "variations" edges to type Variation.
+func (vu *VariantUpdate) ClearVariations() *VariantUpdate {
+	vu.mutation.ClearVariations()
 	return vu
 }
 
-// RemoveVariantUseIDs removes the variant_uses edge to Variation by ids.
-func (vu *VariantUpdate) RemoveVariantUseIDs(ids ...int) *VariantUpdate {
-	vu.mutation.RemoveVariantUseIDs(ids...)
+// RemoveVariationIDs removes the variations edge to Variation by ids.
+func (vu *VariantUpdate) RemoveVariationIDs(ids ...int) *VariantUpdate {
+	vu.mutation.RemoveVariationIDs(ids...)
 	return vu
 }
 
-// RemoveVariantUses removes variant_uses edges to Variation.
-func (vu *VariantUpdate) RemoveVariantUses(v ...*Variation) *VariantUpdate {
+// RemoveVariations removes variations edges to Variation.
+func (vu *VariantUpdate) RemoveVariations(v ...*Variation) *VariantUpdate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vu.RemoveVariantUseIDs(ids...)
+	return vu.RemoveVariationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -179,12 +179,12 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: variant.FieldValue,
 		})
 	}
-	if vu.mutation.VariantUsesCleared() {
+	if vu.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -195,12 +195,12 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.RemovedVariantUsesIDs(); len(nodes) > 0 && !vu.mutation.VariantUsesCleared() {
+	if nodes := vu.mutation.RemovedVariationsIDs(); len(nodes) > 0 && !vu.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -214,12 +214,12 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.VariantUsesIDs(); len(nodes) > 0 {
+	if nodes := vu.mutation.VariationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -263,19 +263,19 @@ func (vuo *VariantUpdateOne) SetValue(s string) *VariantUpdateOne {
 	return vuo
 }
 
-// AddVariantUseIDs adds the variant_uses edge to Variation by ids.
-func (vuo *VariantUpdateOne) AddVariantUseIDs(ids ...int) *VariantUpdateOne {
-	vuo.mutation.AddVariantUseIDs(ids...)
+// AddVariationIDs adds the variations edge to Variation by ids.
+func (vuo *VariantUpdateOne) AddVariationIDs(ids ...int) *VariantUpdateOne {
+	vuo.mutation.AddVariationIDs(ids...)
 	return vuo
 }
 
-// AddVariantUses adds the variant_uses edges to Variation.
-func (vuo *VariantUpdateOne) AddVariantUses(v ...*Variation) *VariantUpdateOne {
+// AddVariations adds the variations edges to Variation.
+func (vuo *VariantUpdateOne) AddVariations(v ...*Variation) *VariantUpdateOne {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vuo.AddVariantUseIDs(ids...)
+	return vuo.AddVariationIDs(ids...)
 }
 
 // Mutation returns the VariantMutation object of the builder.
@@ -283,25 +283,25 @@ func (vuo *VariantUpdateOne) Mutation() *VariantMutation {
 	return vuo.mutation
 }
 
-// ClearVariantUses clears all "variant_uses" edges to type Variation.
-func (vuo *VariantUpdateOne) ClearVariantUses() *VariantUpdateOne {
-	vuo.mutation.ClearVariantUses()
+// ClearVariations clears all "variations" edges to type Variation.
+func (vuo *VariantUpdateOne) ClearVariations() *VariantUpdateOne {
+	vuo.mutation.ClearVariations()
 	return vuo
 }
 
-// RemoveVariantUseIDs removes the variant_uses edge to Variation by ids.
-func (vuo *VariantUpdateOne) RemoveVariantUseIDs(ids ...int) *VariantUpdateOne {
-	vuo.mutation.RemoveVariantUseIDs(ids...)
+// RemoveVariationIDs removes the variations edge to Variation by ids.
+func (vuo *VariantUpdateOne) RemoveVariationIDs(ids ...int) *VariantUpdateOne {
+	vuo.mutation.RemoveVariationIDs(ids...)
 	return vuo
 }
 
-// RemoveVariantUses removes variant_uses edges to Variation.
-func (vuo *VariantUpdateOne) RemoveVariantUses(v ...*Variation) *VariantUpdateOne {
+// RemoveVariations removes variations edges to Variation.
+func (vuo *VariantUpdateOne) RemoveVariations(v ...*Variation) *VariantUpdateOne {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vuo.RemoveVariantUseIDs(ids...)
+	return vuo.RemoveVariationIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -401,12 +401,12 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 			Column: variant.FieldValue,
 		})
 	}
-	if vuo.mutation.VariantUsesCleared() {
+	if vuo.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -417,12 +417,12 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.RemovedVariantUsesIDs(); len(nodes) > 0 && !vuo.mutation.VariantUsesCleared() {
+	if nodes := vuo.mutation.RemovedVariationsIDs(); len(nodes) > 0 && !vuo.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -436,12 +436,12 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.VariantUsesIDs(); len(nodes) > 0 {
+	if nodes := vuo.mutation.VariationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

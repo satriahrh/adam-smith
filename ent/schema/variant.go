@@ -24,7 +24,7 @@ func (v Variant) Fields() []ent.Field {
 // Edges of the Variant.
 func (Variant) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("variant_uses", Variation.Type),
+		edge.To("variations", Variation.Type),
 	}
 }
 

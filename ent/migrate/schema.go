@@ -199,27 +199,27 @@ var (
 			},
 		},
 	}
-	// VariantVariantUsesColumns holds the columns for the "variant_variant_uses" table.
-	VariantVariantUsesColumns = []*schema.Column{
+	// VariantVariationsColumns holds the columns for the "variant_variations" table.
+	VariantVariationsColumns = []*schema.Column{
 		{Name: "variant_id", Type: field.TypeInt},
 		{Name: "variation_id", Type: field.TypeInt},
 	}
-	// VariantVariantUsesTable holds the schema information for the "variant_variant_uses" table.
-	VariantVariantUsesTable = &schema.Table{
-		Name:       "variant_variant_uses",
-		Columns:    VariantVariantUsesColumns,
-		PrimaryKey: []*schema.Column{VariantVariantUsesColumns[0], VariantVariantUsesColumns[1]},
+	// VariantVariationsTable holds the schema information for the "variant_variations" table.
+	VariantVariationsTable = &schema.Table{
+		Name:       "variant_variations",
+		Columns:    VariantVariationsColumns,
+		PrimaryKey: []*schema.Column{VariantVariationsColumns[0], VariantVariationsColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:  "variant_variant_uses_variant_id",
-				Columns: []*schema.Column{VariantVariantUsesColumns[0]},
+				Symbol:  "variant_variations_variant_id",
+				Columns: []*schema.Column{VariantVariationsColumns[0]},
 
 				RefColumns: []*schema.Column{VariantsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:  "variant_variant_uses_variation_id",
-				Columns: []*schema.Column{VariantVariantUsesColumns[1]},
+				Symbol:  "variant_variations_variation_id",
+				Columns: []*schema.Column{VariantVariationsColumns[1]},
 
 				RefColumns: []*schema.Column{VariationsColumns[0]},
 				OnDelete:   schema.Cascade,
@@ -264,7 +264,7 @@ var (
 		VariationsTable,
 		OutboundTransactionShippingTable,
 		OutboundTransactionDealsTable,
-		VariantVariantUsesTable,
+		VariantVariationsTable,
 		VariationOutboundDealsTable,
 	}
 )
@@ -277,8 +277,8 @@ func init() {
 	OutboundTransactionShippingTable.ForeignKeys[1].RefTable = OutboundShippingsTable
 	OutboundTransactionDealsTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
 	OutboundTransactionDealsTable.ForeignKeys[1].RefTable = OutboundDealsTable
-	VariantVariantUsesTable.ForeignKeys[0].RefTable = VariantsTable
-	VariantVariantUsesTable.ForeignKeys[1].RefTable = VariationsTable
+	VariantVariationsTable.ForeignKeys[0].RefTable = VariantsTable
+	VariantVariationsTable.ForeignKeys[1].RefTable = VariationsTable
 	VariationOutboundDealsTable.ForeignKeys[0].RefTable = VariationsTable
 	VariationOutboundDealsTable.ForeignKeys[1].RefTable = OutboundDealsTable
 }

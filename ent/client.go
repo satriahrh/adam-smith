@@ -810,15 +810,15 @@ func (c *VariantClient) GetX(ctx context.Context, id int) *Variant {
 	return obj
 }
 
-// QueryVariantUses queries the variant_uses edge of a Variant.
-func (c *VariantClient) QueryVariantUses(v *Variant) *VariationQuery {
+// QueryVariations queries the variations edge of a Variant.
+func (c *VariantClient) QueryVariations(v *Variant) *VariationQuery {
 	query := &VariationQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variant.Table, variant.FieldID, id),
 			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, variant.VariantUsesTable, variant.VariantUsesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, variant.VariationsTable, variant.VariationsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil

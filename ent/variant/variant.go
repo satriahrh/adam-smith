@@ -16,16 +16,16 @@ const (
 	// FieldValue holds the string denoting the value field in the database.
 	FieldValue = "value"
 
-	// EdgeVariantUses holds the string denoting the variant_uses edge name in mutations.
-	EdgeVariantUses = "variant_uses"
+	// EdgeVariations holds the string denoting the variations edge name in mutations.
+	EdgeVariations = "variations"
 
 	// Table holds the table name of the variant in the database.
 	Table = "variants"
-	// VariantUsesTable is the table the holds the variant_uses relation/edge. The primary key declared below.
-	VariantUsesTable = "variant_variant_uses"
-	// VariantUsesInverseTable is the table name for the Variation entity.
+	// VariationsTable is the table the holds the variations relation/edge. The primary key declared below.
+	VariationsTable = "variant_variations"
+	// VariationsInverseTable is the table name for the Variation entity.
 	// It exists in this package in order to avoid circular dependency with the "variation" package.
-	VariantUsesInverseTable = "variations"
+	VariationsInverseTable = "variations"
 )
 
 // Columns holds all SQL columns for variant fields.
@@ -36,9 +36,9 @@ var Columns = []string{
 }
 
 var (
-	// VariantUsesPrimaryKey and VariantUsesColumn2 are the table columns denoting the
-	// primary key for the variant_uses relation (M2M).
-	VariantUsesPrimaryKey = []string{"variant_id", "variation_id"}
+	// VariationsPrimaryKey and VariationsColumn2 are the table columns denoting the
+	// primary key for the variations relation (M2M).
+	VariationsPrimaryKey = []string{"variant_id", "variation_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

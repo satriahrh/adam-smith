@@ -43,7 +43,7 @@ const (
 	// ProductColumn is the table column denoting the product relation/edge.
 	ProductColumn = "product_variations"
 	// VariantTable is the table the holds the variant relation/edge. The primary key declared below.
-	VariantTable = "variant_variant_uses"
+	VariantTable = "variant_variations"
 	// VariantInverseTable is the table name for the Variant entity.
 	// It exists in this package in order to avoid circular dependency with the "variant" package.
 	VariantInverseTable = "variants"

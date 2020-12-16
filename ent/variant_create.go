@@ -32,19 +32,19 @@ func (vc *VariantCreate) SetValue(s string) *VariantCreate {
 	return vc
 }
 
-// AddVariantUseIDs adds the variant_uses edge to Variation by ids.
-func (vc *VariantCreate) AddVariantUseIDs(ids ...int) *VariantCreate {
-	vc.mutation.AddVariantUseIDs(ids...)
+// AddVariationIDs adds the variations edge to Variation by ids.
+func (vc *VariantCreate) AddVariationIDs(ids ...int) *VariantCreate {
+	vc.mutation.AddVariationIDs(ids...)
 	return vc
 }
 
-// AddVariantUses adds the variant_uses edges to Variation.
-func (vc *VariantCreate) AddVariantUses(v ...*Variation) *VariantCreate {
+// AddVariations adds the variations edges to Variation.
+func (vc *VariantCreate) AddVariations(v ...*Variation) *VariantCreate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vc.AddVariantUseIDs(ids...)
+	return vc.AddVariationIDs(ids...)
 }
 
 // Mutation returns the VariantMutation object of the builder.
@@ -152,12 +152,12 @@ func (vc *VariantCreate) createSpec() (*Variant, *sqlgraph.CreateSpec) {
 		})
 		_node.Value = value
 	}
-	if nodes := vc.mutation.VariantUsesIDs(); len(nodes) > 0 {
+	if nodes := vc.mutation.VariationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   variant.VariantUsesTable,
-			Columns: variant.VariantUsesPrimaryKey,
+			Table:   variant.VariationsTable,
+			Columns: variant.VariationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

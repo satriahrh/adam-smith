@@ -3304,18 +3304,18 @@ func (m *ProductMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type VariantMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	_type               *variant.Type
-	value               *string
-	clearedFields       map[string]struct{}
-	variant_uses        map[int]struct{}
-	removedvariant_uses map[int]struct{}
-	clearedvariant_uses bool
-	done                bool
-	oldValue            func(context.Context) (*Variant, error)
-	predicates          []predicate.Variant
+	op                Op
+	typ               string
+	id                *int
+	_type             *variant.Type
+	value             *string
+	clearedFields     map[string]struct{}
+	variations        map[int]struct{}
+	removedvariations map[int]struct{}
+	clearedvariations bool
+	done              bool
+	oldValue          func(context.Context) (*Variant, error)
+	predicates        []predicate.Variant
 }
 
 var _ ent.Mutation = (*VariantMutation)(nil)
@@ -3471,57 +3471,57 @@ func (m *VariantMutation) ResetValue() {
 	m.value = nil
 }
 
-// AddVariantUseIDs adds the variant_uses edge to Variation by ids.
-func (m *VariantMutation) AddVariantUseIDs(ids ...int) {
-	if m.variant_uses == nil {
-		m.variant_uses = make(map[int]struct{})
+// AddVariationIDs adds the variations edge to Variation by ids.
+func (m *VariantMutation) AddVariationIDs(ids ...int) {
+	if m.variations == nil {
+		m.variations = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.variant_uses[ids[i]] = struct{}{}
+		m.variations[ids[i]] = struct{}{}
 	}
 }
 
-// ClearVariantUses clears the variant_uses edge to Variation.
-func (m *VariantMutation) ClearVariantUses() {
-	m.clearedvariant_uses = true
+// ClearVariations clears the variations edge to Variation.
+func (m *VariantMutation) ClearVariations() {
+	m.clearedvariations = true
 }
 
-// VariantUsesCleared returns if the edge variant_uses was cleared.
-func (m *VariantMutation) VariantUsesCleared() bool {
-	return m.clearedvariant_uses
+// VariationsCleared returns if the edge variations was cleared.
+func (m *VariantMutation) VariationsCleared() bool {
+	return m.clearedvariations
 }
 
-// RemoveVariantUseIDs removes the variant_uses edge to Variation by ids.
-func (m *VariantMutation) RemoveVariantUseIDs(ids ...int) {
-	if m.removedvariant_uses == nil {
-		m.removedvariant_uses = make(map[int]struct{})
+// RemoveVariationIDs removes the variations edge to Variation by ids.
+func (m *VariantMutation) RemoveVariationIDs(ids ...int) {
+	if m.removedvariations == nil {
+		m.removedvariations = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.removedvariant_uses[ids[i]] = struct{}{}
+		m.removedvariations[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedVariantUses returns the removed ids of variant_uses.
-func (m *VariantMutation) RemovedVariantUsesIDs() (ids []int) {
-	for id := range m.removedvariant_uses {
+// RemovedVariations returns the removed ids of variations.
+func (m *VariantMutation) RemovedVariationsIDs() (ids []int) {
+	for id := range m.removedvariations {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// VariantUsesIDs returns the variant_uses ids in the mutation.
-func (m *VariantMutation) VariantUsesIDs() (ids []int) {
-	for id := range m.variant_uses {
+// VariationsIDs returns the variations ids in the mutation.
+func (m *VariantMutation) VariationsIDs() (ids []int) {
+	for id := range m.variations {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetVariantUses reset all changes of the "variant_uses" edge.
-func (m *VariantMutation) ResetVariantUses() {
-	m.variant_uses = nil
-	m.clearedvariant_uses = false
-	m.removedvariant_uses = nil
+// ResetVariations reset all changes of the "variations" edge.
+func (m *VariantMutation) ResetVariations() {
+	m.variations = nil
+	m.clearedvariations = false
+	m.removedvariations = nil
 }
 
 // Op returns the operation name.
@@ -3657,8 +3657,8 @@ func (m *VariantMutation) ResetField(name string) error {
 // mutation.
 func (m *VariantMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.variant_uses != nil {
-		edges = append(edges, variant.EdgeVariantUses)
+	if m.variations != nil {
+		edges = append(edges, variant.EdgeVariations)
 	}
 	return edges
 }
@@ -3667,9 +3667,9 @@ func (m *VariantMutation) AddedEdges() []string {
 // the given edge name.
 func (m *VariantMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case variant.EdgeVariantUses:
-		ids := make([]ent.Value, 0, len(m.variant_uses))
-		for id := range m.variant_uses {
+	case variant.EdgeVariations:
+		ids := make([]ent.Value, 0, len(m.variations))
+		for id := range m.variations {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3681,8 +3681,8 @@ func (m *VariantMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *VariantMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedvariant_uses != nil {
-		edges = append(edges, variant.EdgeVariantUses)
+	if m.removedvariations != nil {
+		edges = append(edges, variant.EdgeVariations)
 	}
 	return edges
 }
@@ -3691,9 +3691,9 @@ func (m *VariantMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *VariantMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case variant.EdgeVariantUses:
-		ids := make([]ent.Value, 0, len(m.removedvariant_uses))
-		for id := range m.removedvariant_uses {
+	case variant.EdgeVariations:
+		ids := make([]ent.Value, 0, len(m.removedvariations))
+		for id := range m.removedvariations {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3705,8 +3705,8 @@ func (m *VariantMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *VariantMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedvariant_uses {
-		edges = append(edges, variant.EdgeVariantUses)
+	if m.clearedvariations {
+		edges = append(edges, variant.EdgeVariations)
 	}
 	return edges
 }
@@ -3715,8 +3715,8 @@ func (m *VariantMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *VariantMutation) EdgeCleared(name string) bool {
 	switch name {
-	case variant.EdgeVariantUses:
-		return m.clearedvariant_uses
+	case variant.EdgeVariations:
+		return m.clearedvariations
 	}
 	return false
 }
@@ -3734,8 +3734,8 @@ func (m *VariantMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *VariantMutation) ResetEdge(name string) error {
 	switch name {
-	case variant.EdgeVariantUses:
-		m.ResetVariantUses()
+	case variant.EdgeVariations:
+		m.ResetVariations()
 		return nil
 	}
 	return fmt.Errorf("unknown Variant edge %s", name)

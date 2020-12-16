@@ -26,20 +26,20 @@ type Variant struct {
 
 // VariantEdges holds the relations/edges for other nodes in the graph.
 type VariantEdges struct {
-	// VariantUses holds the value of the variant_uses edge.
-	VariantUses []*Variation
+	// Variations holds the value of the variations edge.
+	Variations []*Variation
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// VariantUsesOrErr returns the VariantUses value or an error if the edge
+// VariationsOrErr returns the Variations value or an error if the edge
 // was not loaded in eager-loading.
-func (e VariantEdges) VariantUsesOrErr() ([]*Variation, error) {
+func (e VariantEdges) VariationsOrErr() ([]*Variation, error) {
 	if e.loadedTypes[0] {
-		return e.VariantUses, nil
+		return e.Variations, nil
 	}
-	return nil, &NotLoadedError{edge: "variant_uses"}
+	return nil, &NotLoadedError{edge: "variations"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -76,9 +76,9 @@ func (v *Variant) assignValues(values ...interface{}) error {
 	return nil
 }
 
-// QueryVariantUses queries the variant_uses edge of the Variant.
-func (v *Variant) QueryVariantUses() *VariationQuery {
-	return (&VariantClient{config: v.config}).QueryVariantUses(v)
+// QueryVariations queries the variations edge of the Variant.
+func (v *Variant) QueryVariations() *VariationQuery {
+	return (&VariantClient{config: v.config}).QueryVariations(v)
 }
 
 // Update returns a builder for updating this Variant.
