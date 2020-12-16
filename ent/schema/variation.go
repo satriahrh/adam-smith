@@ -30,7 +30,8 @@ func (Variation) Edges() []ent.Edge {
 			From("parent").
 			Unique(),
 		edge.From("product", Product.Type).
-			Ref("variations"),
+			Ref("variations").
+			Unique(),
 		edge.From("variant", Variant.Type).
 			Ref("variant_uses"),
 		edge.To("outbound_deals", OutboundDeal.Type),

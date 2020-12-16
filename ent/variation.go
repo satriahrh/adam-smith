@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/facebook/ent/dialect/sql"
+	"github.com/satriahrh/adam-smith/ent/product"
 	"github.com/satriahrh/adam-smith/ent/variation"
 )
 
@@ -25,6 +26,7 @@ type Variation struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VariationQuery when eager-loading is set.
 	Edges              VariationEdges `json:"edges"`
+	product_variations *int
 	variation_children *int
 }
 
@@ -35,7 +37,7 @@ type VariationEdges struct {
 	// Children holds the value of the children edge.
 	Children []*Variation
 	// Product holds the value of the product edge.
-	Product []*Product
+	Product *Product
 	// Variant holds the value of the variant edge.
 	Variant []*Variant
 	// OutboundDeals holds the value of the outbound_deals edge.
@@ -69,9 +71,14 @@ func (e VariationEdges) ChildrenOrErr() ([]*Variation, error) {
 }
 
 // ProductOrErr returns the Product value or an error if the edge
-// was not loaded in eager-loading.
-func (e VariationEdges) ProductOrErr() ([]*Product, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e VariationEdges) ProductOrErr() (*Product, error) {
 	if e.loadedTypes[2] {
+		if e.Product == nil {
+			// The edge product was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: product.Label}
+		}
 		return e.Product, nil
 	}
 	return nil, &NotLoadedError{edge: "product"}
@@ -108,6 +115,7 @@ func (*Variation) scanValues() []interface{} {
 // fkValues returns the types for scanning foreign-keys values from sql.Rows.
 func (*Variation) fkValues() []interface{} {
 	return []interface{}{
+		&sql.NullInt64{}, // product_variations
 		&sql.NullInt64{}, // variation_children
 	}
 }
@@ -145,6 +153,12 @@ func (v *Variation) assignValues(values ...interface{}) error {
 	values = values[3:]
 	if len(values) == len(variation.ForeignKeys) {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field product_variations", value)
+		} else if value.Valid {
+			v.product_variations = new(int)
+			*v.product_variations = int(value.Int64)
+		}
+		if value, ok := values[1].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field variation_children", value)
 		} else if value.Valid {
 			v.variation_children = new(int)

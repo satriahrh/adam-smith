@@ -3759,8 +3759,7 @@ type VariationMutation struct {
 	children              map[int]struct{}
 	removedchildren       map[int]struct{}
 	clearedchildren       bool
-	product               map[int]struct{}
-	removedproduct        map[int]struct{}
+	product               *int
 	clearedproduct        bool
 	variant               map[int]struct{}
 	removedvariant        map[int]struct{}
@@ -4108,14 +4107,9 @@ func (m *VariationMutation) ResetChildren() {
 	m.removedchildren = nil
 }
 
-// AddProductIDs adds the product edge to Product by ids.
-func (m *VariationMutation) AddProductIDs(ids ...int) {
-	if m.product == nil {
-		m.product = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.product[ids[i]] = struct{}{}
-	}
+// SetProductID sets the product edge to Product by id.
+func (m *VariationMutation) SetProductID(id int) {
+	m.product = &id
 }
 
 // ClearProduct clears the product edge to Product.
@@ -4128,28 +4122,20 @@ func (m *VariationMutation) ProductCleared() bool {
 	return m.clearedproduct
 }
 
-// RemoveProductIDs removes the product edge to Product by ids.
-func (m *VariationMutation) RemoveProductIDs(ids ...int) {
-	if m.removedproduct == nil {
-		m.removedproduct = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedproduct[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedProduct returns the removed ids of product.
-func (m *VariationMutation) RemovedProductIDs() (ids []int) {
-	for id := range m.removedproduct {
-		ids = append(ids, id)
+// ProductID returns the product id in the mutation.
+func (m *VariationMutation) ProductID() (id int, exists bool) {
+	if m.product != nil {
+		return *m.product, true
 	}
 	return
 }
 
 // ProductIDs returns the product ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// ProductID instead. It exists only for internal usage by the builders.
 func (m *VariationMutation) ProductIDs() (ids []int) {
-	for id := range m.product {
-		ids = append(ids, id)
+	if id := m.product; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -4158,7 +4144,6 @@ func (m *VariationMutation) ProductIDs() (ids []int) {
 func (m *VariationMutation) ResetProduct() {
 	m.product = nil
 	m.clearedproduct = false
-	m.removedproduct = nil
 }
 
 // AddVariantIDs adds the variant edge to Variant by ids.
@@ -4486,11 +4471,9 @@ func (m *VariationMutation) AddedIDs(name string) []ent.Value {
 		}
 		return ids
 	case variation.EdgeProduct:
-		ids := make([]ent.Value, 0, len(m.product))
-		for id := range m.product {
-			ids = append(ids, id)
+		if id := m.product; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case variation.EdgeVariant:
 		ids := make([]ent.Value, 0, len(m.variant))
 		for id := range m.variant {
@@ -4514,9 +4497,6 @@ func (m *VariationMutation) RemovedEdges() []string {
 	if m.removedchildren != nil {
 		edges = append(edges, variation.EdgeChildren)
 	}
-	if m.removedproduct != nil {
-		edges = append(edges, variation.EdgeProduct)
-	}
 	if m.removedvariant != nil {
 		edges = append(edges, variation.EdgeVariant)
 	}
@@ -4533,12 +4513,6 @@ func (m *VariationMutation) RemovedIDs(name string) []ent.Value {
 	case variation.EdgeChildren:
 		ids := make([]ent.Value, 0, len(m.removedchildren))
 		for id := range m.removedchildren {
-			ids = append(ids, id)
-		}
-		return ids
-	case variation.EdgeProduct:
-		ids := make([]ent.Value, 0, len(m.removedproduct))
-		for id := range m.removedproduct {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4604,6 +4578,9 @@ func (m *VariationMutation) ClearEdge(name string) error {
 	switch name {
 	case variation.EdgeParent:
 		m.ClearParent()
+		return nil
+	case variation.EdgeProduct:
+		m.ClearProduct()
 		return nil
 	}
 	return fmt.Errorf("unknown Variation unique edge %s", name)

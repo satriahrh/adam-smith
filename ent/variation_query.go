@@ -120,7 +120,7 @@ func (vq *VariationQuery) QueryProduct() *ProductQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variation.Table, variation.FieldID, selector),
 			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, variation.ProductTable, variation.ProductPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, variation.ProductTable, variation.ProductColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -488,7 +488,7 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 			vq.withOutboundDeals != nil,
 		}
 	)
-	if vq.withParent != nil {
+	if vq.withParent != nil || vq.withProduct != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -573,65 +573,26 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 	}
 
 	if query := vq.withProduct; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Variation, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Product = []*Product{}
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Variation)
+		for i := range nodes {
+			if fk := nodes[i].product_variations; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Variation)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   variation.ProductTable,
-				Columns: variation.ProductPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(variation.ProductPrimaryKey[1], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, vq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "product": %v`, err)
-		}
-		query.Where(product.IDIn(edgeids...))
+		query.Where(product.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "product" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "product_variations" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Product = append(nodes[i].Edges.Product, n)
+				nodes[i].Edges.Product = n
 			}
 		}
 	}

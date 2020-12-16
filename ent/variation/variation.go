@@ -35,11 +35,13 @@ const (
 	ChildrenTable = "variations"
 	// ChildrenColumn is the table column denoting the children relation/edge.
 	ChildrenColumn = "variation_children"
-	// ProductTable is the table the holds the product relation/edge. The primary key declared below.
-	ProductTable = "product_variations"
+	// ProductTable is the table the holds the product relation/edge.
+	ProductTable = "variations"
 	// ProductInverseTable is the table name for the Product entity.
 	// It exists in this package in order to avoid circular dependency with the "product" package.
 	ProductInverseTable = "products"
+	// ProductColumn is the table column denoting the product relation/edge.
+	ProductColumn = "product_variations"
 	// VariantTable is the table the holds the variant relation/edge. The primary key declared below.
 	VariantTable = "variant_variant_uses"
 	// VariantInverseTable is the table name for the Variant entity.
@@ -62,13 +64,11 @@ var Columns = []string{
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Variation type.
 var ForeignKeys = []string{
+	"product_variations",
 	"variation_children",
 }
 
 var (
-	// ProductPrimaryKey and ProductColumn2 are the table columns denoting the
-	// primary key for the product relation (M2M).
-	ProductPrimaryKey = []string{"product_id", "variation_id"}
 	// VariantPrimaryKey and VariantColumn2 are the table columns denoting the
 	// primary key for the variant relation (M2M).
 	VariantPrimaryKey = []string{"variant_id", "variation_id"}

@@ -25,11 +25,13 @@ const (
 
 	// Table holds the table name of the product in the database.
 	Table = "products"
-	// VariationsTable is the table the holds the variations relation/edge. The primary key declared below.
-	VariationsTable = "product_variations"
+	// VariationsTable is the table the holds the variations relation/edge.
+	VariationsTable = "variations"
 	// VariationsInverseTable is the table name for the Variation entity.
 	// It exists in this package in order to avoid circular dependency with the "variation" package.
 	VariationsInverseTable = "variations"
+	// VariationsColumn is the table column denoting the variations relation/edge.
+	VariationsColumn = "product_variations"
 	// BrandTable is the table the holds the brand relation/edge.
 	BrandTable = "products"
 	// BrandInverseTable is the table name for the Brand entity.
@@ -53,12 +55,6 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"brand_products",
 }
-
-var (
-	// VariationsPrimaryKey and VariationsColumn2 are the table columns denoting the
-	// primary key for the variations relation (M2M).
-	VariationsPrimaryKey = []string{"product_id", "variation_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

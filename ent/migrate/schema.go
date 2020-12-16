@@ -120,6 +120,7 @@ var (
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
 		{Name: "stock", Type: field.TypeUint8},
 		{Name: "price", Type: field.TypeUint},
+		{Name: "product_variations", Type: field.TypeInt, Nullable: true},
 		{Name: "variation_children", Type: field.TypeInt, Nullable: true},
 	}
 	// VariationsTable holds the schema information for the "variations" table.
@@ -129,8 +130,15 @@ var (
 		PrimaryKey: []*schema.Column{VariationsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:  "variations_variations_children",
+				Symbol:  "variations_products_variations",
 				Columns: []*schema.Column{VariationsColumns[4]},
+
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "variations_variations_children",
+				Columns: []*schema.Column{VariationsColumns[5]},
 
 				RefColumns: []*schema.Column{VariationsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -187,33 +195,6 @@ var (
 				Columns: []*schema.Column{OutboundTransactionDealsColumns[1]},
 
 				RefColumns: []*schema.Column{OutboundDealsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// ProductVariationsColumns holds the columns for the "product_variations" table.
-	ProductVariationsColumns = []*schema.Column{
-		{Name: "product_id", Type: field.TypeInt},
-		{Name: "variation_id", Type: field.TypeInt},
-	}
-	// ProductVariationsTable holds the schema information for the "product_variations" table.
-	ProductVariationsTable = &schema.Table{
-		Name:       "product_variations",
-		Columns:    ProductVariationsColumns,
-		PrimaryKey: []*schema.Column{ProductVariationsColumns[0], ProductVariationsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:  "product_variations_product_id",
-				Columns: []*schema.Column{ProductVariationsColumns[0]},
-
-				RefColumns: []*schema.Column{ProductsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:  "product_variations_variation_id",
-				Columns: []*schema.Column{ProductVariationsColumns[1]},
-
-				RefColumns: []*schema.Column{VariationsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -283,7 +264,6 @@ var (
 		VariationsTable,
 		OutboundTransactionShippingTable,
 		OutboundTransactionDealsTable,
-		ProductVariationsTable,
 		VariantVariantUsesTable,
 		VariationOutboundDealsTable,
 	}
@@ -291,13 +271,12 @@ var (
 
 func init() {
 	ProductsTable.ForeignKeys[0].RefTable = BrandsTable
-	VariationsTable.ForeignKeys[0].RefTable = VariationsTable
+	VariationsTable.ForeignKeys[0].RefTable = ProductsTable
+	VariationsTable.ForeignKeys[1].RefTable = VariationsTable
 	OutboundTransactionShippingTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
 	OutboundTransactionShippingTable.ForeignKeys[1].RefTable = OutboundShippingsTable
 	OutboundTransactionDealsTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
 	OutboundTransactionDealsTable.ForeignKeys[1].RefTable = OutboundDealsTable
-	ProductVariationsTable.ForeignKeys[0].RefTable = ProductsTable
-	ProductVariationsTable.ForeignKeys[1].RefTable = VariationsTable
 	VariantVariantUsesTable.ForeignKeys[0].RefTable = VariantsTable
 	VariantVariantUsesTable.ForeignKeys[1].RefTable = VariationsTable
 	VariationOutboundDealsTable.ForeignKeys[0].RefTable = VariationsTable
