@@ -27,12 +27,12 @@ type VariationQuery struct {
 	order      []OrderFunc
 	predicates []predicate.Variation
 	// eager-loading edges.
-	withParent   *VariationQuery
-	withChildren *VariationQuery
-	withProduct  *ProductQuery
-	withVariant  *VariantQuery
-	withDeals    *OutboundDealQuery
-	withFKs      bool
+	withParent        *VariationQuery
+	withChildren      *VariationQuery
+	withProduct       *ProductQuery
+	withVariant       *VariantQuery
+	withOutboundDeals *OutboundDealQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -150,8 +150,8 @@ func (vq *VariationQuery) QueryVariant() *VariantQuery {
 	return query
 }
 
-// QueryDeals chains the current query on the deals edge.
-func (vq *VariationQuery) QueryDeals() *OutboundDealQuery {
+// QueryOutboundDeals chains the current query on the outbound_deals edge.
+func (vq *VariationQuery) QueryOutboundDeals() *OutboundDealQuery {
 	query := &OutboundDealQuery{config: vq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := vq.prepareQuery(ctx); err != nil {
@@ -164,7 +164,7 @@ func (vq *VariationQuery) QueryDeals() *OutboundDealQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variation.Table, variation.FieldID, selector),
 			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, variation.DealsTable, variation.DealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, variation.OutboundDealsTable, variation.OutboundDealsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -342,16 +342,16 @@ func (vq *VariationQuery) Clone() *VariationQuery {
 		return nil
 	}
 	return &VariationQuery{
-		config:       vq.config,
-		limit:        vq.limit,
-		offset:       vq.offset,
-		order:        append([]OrderFunc{}, vq.order...),
-		predicates:   append([]predicate.Variation{}, vq.predicates...),
-		withParent:   vq.withParent.Clone(),
-		withChildren: vq.withChildren.Clone(),
-		withProduct:  vq.withProduct.Clone(),
-		withVariant:  vq.withVariant.Clone(),
-		withDeals:    vq.withDeals.Clone(),
+		config:            vq.config,
+		limit:             vq.limit,
+		offset:            vq.offset,
+		order:             append([]OrderFunc{}, vq.order...),
+		predicates:        append([]predicate.Variation{}, vq.predicates...),
+		withParent:        vq.withParent.Clone(),
+		withChildren:      vq.withChildren.Clone(),
+		withProduct:       vq.withProduct.Clone(),
+		withVariant:       vq.withVariant.Clone(),
+		withOutboundDeals: vq.withOutboundDeals.Clone(),
 		// clone intermediate query.
 		sql:  vq.sql.Clone(),
 		path: vq.path,
@@ -402,14 +402,14 @@ func (vq *VariationQuery) WithVariant(opts ...func(*VariantQuery)) *VariationQue
 	return vq
 }
 
-//  WithDeals tells the query-builder to eager-loads the nodes that are connected to
-// the "deals" edge. The optional arguments used to configure the query builder of the edge.
-func (vq *VariationQuery) WithDeals(opts ...func(*OutboundDealQuery)) *VariationQuery {
+//  WithOutboundDeals tells the query-builder to eager-loads the nodes that are connected to
+// the "outbound_deals" edge. The optional arguments used to configure the query builder of the edge.
+func (vq *VariationQuery) WithOutboundDeals(opts ...func(*OutboundDealQuery)) *VariationQuery {
 	query := &OutboundDealQuery{config: vq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	vq.withDeals = query
+	vq.withOutboundDeals = query
 	return vq
 }
 
@@ -485,7 +485,7 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 			vq.withChildren != nil,
 			vq.withProduct != nil,
 			vq.withVariant != nil,
-			vq.withDeals != nil,
+			vq.withOutboundDeals != nil,
 		}
 	)
 	if vq.withParent != nil {
@@ -700,13 +700,13 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 		}
 	}
 
-	if query := vq.withDeals; query != nil {
+	if query := vq.withOutboundDeals; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		ids := make(map[int]*Variation, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
-			node.Edges.Deals = []*OutboundDeal{}
+			node.Edges.OutboundDeals = []*OutboundDeal{}
 		}
 		var (
 			edgeids []int
@@ -714,12 +714,12 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   variation.DealsTable,
-				Columns: variation.DealsPrimaryKey,
+				Inverse: false,
+				Table:   variation.OutboundDealsTable,
+				Columns: variation.OutboundDealsPrimaryKey,
 			},
 			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(variation.DealsPrimaryKey[1], fks...))
+				s.Where(sql.InValues(variation.OutboundDealsPrimaryKey[0], fks...))
 			},
 
 			ScanValues: func() [2]interface{} {
@@ -746,7 +746,7 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 			},
 		}
 		if err := sqlgraph.QueryEdges(ctx, vq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "deals": %v`, err)
+			return nil, fmt.Errorf(`query edges "outbound_deals": %v`, err)
 		}
 		query.Where(outbounddeal.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
@@ -756,10 +756,10 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 		for _, n := range neighbors {
 			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "deals" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected "outbound_deals" node returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Deals = append(nodes[i].Edges.Deals, n)
+				nodes[i].Edges.OutboundDeals = append(nodes[i].Edges.OutboundDeals, n)
 			}
 		}
 	}

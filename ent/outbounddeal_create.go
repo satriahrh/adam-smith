@@ -33,19 +33,19 @@ func (odc *OutboundDealCreate) SetAmount(u uint) *OutboundDealCreate {
 	return odc
 }
 
-// AddVariationIDs adds the variation edge to Variation by ids.
-func (odc *OutboundDealCreate) AddVariationIDs(ids ...int) *OutboundDealCreate {
-	odc.mutation.AddVariationIDs(ids...)
+// AddVariantIDs adds the variant edge to Variation by ids.
+func (odc *OutboundDealCreate) AddVariantIDs(ids ...int) *OutboundDealCreate {
+	odc.mutation.AddVariantIDs(ids...)
 	return odc
 }
 
-// AddVariation adds the variation edges to Variation.
-func (odc *OutboundDealCreate) AddVariation(v ...*Variation) *OutboundDealCreate {
+// AddVariant adds the variant edges to Variation.
+func (odc *OutboundDealCreate) AddVariant(v ...*Variation) *OutboundDealCreate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return odc.AddVariationIDs(ids...)
+	return odc.AddVariantIDs(ids...)
 }
 
 // AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
@@ -163,12 +163,12 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 		})
 		_node.Amount = value
 	}
-	if nodes := odc.mutation.VariationIDs(); len(nodes) > 0 {
+	if nodes := odc.mutation.VariantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: outbounddeal.VariationPrimaryKey,
+			Inverse: true,
+			Table:   outbounddeal.VariantTable,
+			Columns: outbounddeal.VariantPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

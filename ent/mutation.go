@@ -436,9 +436,9 @@ type OutboundDealMutation struct {
 	amount             *uint
 	addamount          *uint
 	clearedFields      map[string]struct{}
-	variation          map[int]struct{}
-	removedvariation   map[int]struct{}
-	clearedvariation   bool
+	variant            map[int]struct{}
+	removedvariant     map[int]struct{}
+	clearedvariant     bool
 	transaction        map[int]struct{}
 	removedtransaction map[int]struct{}
 	clearedtransaction bool
@@ -640,57 +640,57 @@ func (m *OutboundDealMutation) ResetAmount() {
 	m.addamount = nil
 }
 
-// AddVariationIDs adds the variation edge to Variation by ids.
-func (m *OutboundDealMutation) AddVariationIDs(ids ...int) {
-	if m.variation == nil {
-		m.variation = make(map[int]struct{})
+// AddVariantIDs adds the variant edge to Variation by ids.
+func (m *OutboundDealMutation) AddVariantIDs(ids ...int) {
+	if m.variant == nil {
+		m.variant = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.variation[ids[i]] = struct{}{}
+		m.variant[ids[i]] = struct{}{}
 	}
 }
 
-// ClearVariation clears the variation edge to Variation.
-func (m *OutboundDealMutation) ClearVariation() {
-	m.clearedvariation = true
+// ClearVariant clears the variant edge to Variation.
+func (m *OutboundDealMutation) ClearVariant() {
+	m.clearedvariant = true
 }
 
-// VariationCleared returns if the edge variation was cleared.
-func (m *OutboundDealMutation) VariationCleared() bool {
-	return m.clearedvariation
+// VariantCleared returns if the edge variant was cleared.
+func (m *OutboundDealMutation) VariantCleared() bool {
+	return m.clearedvariant
 }
 
-// RemoveVariationIDs removes the variation edge to Variation by ids.
-func (m *OutboundDealMutation) RemoveVariationIDs(ids ...int) {
-	if m.removedvariation == nil {
-		m.removedvariation = make(map[int]struct{})
+// RemoveVariantIDs removes the variant edge to Variation by ids.
+func (m *OutboundDealMutation) RemoveVariantIDs(ids ...int) {
+	if m.removedvariant == nil {
+		m.removedvariant = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.removedvariation[ids[i]] = struct{}{}
+		m.removedvariant[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedVariation returns the removed ids of variation.
-func (m *OutboundDealMutation) RemovedVariationIDs() (ids []int) {
-	for id := range m.removedvariation {
+// RemovedVariant returns the removed ids of variant.
+func (m *OutboundDealMutation) RemovedVariantIDs() (ids []int) {
+	for id := range m.removedvariant {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// VariationIDs returns the variation ids in the mutation.
-func (m *OutboundDealMutation) VariationIDs() (ids []int) {
-	for id := range m.variation {
+// VariantIDs returns the variant ids in the mutation.
+func (m *OutboundDealMutation) VariantIDs() (ids []int) {
+	for id := range m.variant {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetVariation reset all changes of the "variation" edge.
-func (m *OutboundDealMutation) ResetVariation() {
-	m.variation = nil
-	m.clearedvariation = false
-	m.removedvariation = nil
+// ResetVariant reset all changes of the "variant" edge.
+func (m *OutboundDealMutation) ResetVariant() {
+	m.variant = nil
+	m.clearedvariant = false
+	m.removedvariant = nil
 }
 
 // AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
@@ -906,8 +906,8 @@ func (m *OutboundDealMutation) ResetField(name string) error {
 // mutation.
 func (m *OutboundDealMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.variation != nil {
-		edges = append(edges, outbounddeal.EdgeVariation)
+	if m.variant != nil {
+		edges = append(edges, outbounddeal.EdgeVariant)
 	}
 	if m.transaction != nil {
 		edges = append(edges, outbounddeal.EdgeTransaction)
@@ -919,9 +919,9 @@ func (m *OutboundDealMutation) AddedEdges() []string {
 // the given edge name.
 func (m *OutboundDealMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		ids := make([]ent.Value, 0, len(m.variation))
-		for id := range m.variation {
+	case outbounddeal.EdgeVariant:
+		ids := make([]ent.Value, 0, len(m.variant))
+		for id := range m.variant {
 			ids = append(ids, id)
 		}
 		return ids
@@ -939,8 +939,8 @@ func (m *OutboundDealMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *OutboundDealMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedvariation != nil {
-		edges = append(edges, outbounddeal.EdgeVariation)
+	if m.removedvariant != nil {
+		edges = append(edges, outbounddeal.EdgeVariant)
 	}
 	if m.removedtransaction != nil {
 		edges = append(edges, outbounddeal.EdgeTransaction)
@@ -952,9 +952,9 @@ func (m *OutboundDealMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *OutboundDealMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		ids := make([]ent.Value, 0, len(m.removedvariation))
-		for id := range m.removedvariation {
+	case outbounddeal.EdgeVariant:
+		ids := make([]ent.Value, 0, len(m.removedvariant))
+		for id := range m.removedvariant {
 			ids = append(ids, id)
 		}
 		return ids
@@ -972,8 +972,8 @@ func (m *OutboundDealMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *OutboundDealMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedvariation {
-		edges = append(edges, outbounddeal.EdgeVariation)
+	if m.clearedvariant {
+		edges = append(edges, outbounddeal.EdgeVariant)
 	}
 	if m.clearedtransaction {
 		edges = append(edges, outbounddeal.EdgeTransaction)
@@ -985,8 +985,8 @@ func (m *OutboundDealMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *OutboundDealMutation) EdgeCleared(name string) bool {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		return m.clearedvariation
+	case outbounddeal.EdgeVariant:
+		return m.clearedvariant
 	case outbounddeal.EdgeTransaction:
 		return m.clearedtransaction
 	}
@@ -1006,8 +1006,8 @@ func (m *OutboundDealMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *OutboundDealMutation) ResetEdge(name string) error {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		m.ResetVariation()
+	case outbounddeal.EdgeVariant:
+		m.ResetVariant()
 		return nil
 	case outbounddeal.EdgeTransaction:
 		m.ResetTransaction()
@@ -3768,32 +3768,32 @@ func (m *VariantMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type VariationMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	images          *[]string
-	stock           *uint8
-	addstock        *uint8
-	price           *uint
-	addprice        *uint
-	clearedFields   map[string]struct{}
-	parent          *int
-	clearedparent   bool
-	children        map[int]struct{}
-	removedchildren map[int]struct{}
-	clearedchildren bool
-	product         map[int]struct{}
-	removedproduct  map[int]struct{}
-	clearedproduct  bool
-	variant         map[int]struct{}
-	removedvariant  map[int]struct{}
-	clearedvariant  bool
-	deals           map[int]struct{}
-	removeddeals    map[int]struct{}
-	cleareddeals    bool
-	done            bool
-	oldValue        func(context.Context) (*Variation, error)
-	predicates      []predicate.Variation
+	op                    Op
+	typ                   string
+	id                    *int
+	images                *[]string
+	stock                 *uint8
+	addstock              *uint8
+	price                 *uint
+	addprice              *uint
+	clearedFields         map[string]struct{}
+	parent                *int
+	clearedparent         bool
+	children              map[int]struct{}
+	removedchildren       map[int]struct{}
+	clearedchildren       bool
+	product               map[int]struct{}
+	removedproduct        map[int]struct{}
+	clearedproduct        bool
+	variant               map[int]struct{}
+	removedvariant        map[int]struct{}
+	clearedvariant        bool
+	outbound_deals        map[int]struct{}
+	removedoutbound_deals map[int]struct{}
+	clearedoutbound_deals bool
+	done                  bool
+	oldValue              func(context.Context) (*Variation, error)
+	predicates            []predicate.Variation
 }
 
 var _ ent.Mutation = (*VariationMutation)(nil)
@@ -4237,57 +4237,57 @@ func (m *VariationMutation) ResetVariant() {
 	m.removedvariant = nil
 }
 
-// AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (m *VariationMutation) AddDealIDs(ids ...int) {
-	if m.deals == nil {
-		m.deals = make(map[int]struct{})
+// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
+func (m *VariationMutation) AddOutboundDealIDs(ids ...int) {
+	if m.outbound_deals == nil {
+		m.outbound_deals = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.deals[ids[i]] = struct{}{}
+		m.outbound_deals[ids[i]] = struct{}{}
 	}
 }
 
-// ClearDeals clears the deals edge to OutboundDeal.
-func (m *VariationMutation) ClearDeals() {
-	m.cleareddeals = true
+// ClearOutboundDeals clears the outbound_deals edge to OutboundDeal.
+func (m *VariationMutation) ClearOutboundDeals() {
+	m.clearedoutbound_deals = true
 }
 
-// DealsCleared returns if the edge deals was cleared.
-func (m *VariationMutation) DealsCleared() bool {
-	return m.cleareddeals
+// OutboundDealsCleared returns if the edge outbound_deals was cleared.
+func (m *VariationMutation) OutboundDealsCleared() bool {
+	return m.clearedoutbound_deals
 }
 
-// RemoveDealIDs removes the deals edge to OutboundDeal by ids.
-func (m *VariationMutation) RemoveDealIDs(ids ...int) {
-	if m.removeddeals == nil {
-		m.removeddeals = make(map[int]struct{})
+// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
+func (m *VariationMutation) RemoveOutboundDealIDs(ids ...int) {
+	if m.removedoutbound_deals == nil {
+		m.removedoutbound_deals = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.removeddeals[ids[i]] = struct{}{}
+		m.removedoutbound_deals[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedDeals returns the removed ids of deals.
-func (m *VariationMutation) RemovedDealsIDs() (ids []int) {
-	for id := range m.removeddeals {
+// RemovedOutboundDeals returns the removed ids of outbound_deals.
+func (m *VariationMutation) RemovedOutboundDealsIDs() (ids []int) {
+	for id := range m.removedoutbound_deals {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// DealsIDs returns the deals ids in the mutation.
-func (m *VariationMutation) DealsIDs() (ids []int) {
-	for id := range m.deals {
+// OutboundDealsIDs returns the outbound_deals ids in the mutation.
+func (m *VariationMutation) OutboundDealsIDs() (ids []int) {
+	for id := range m.outbound_deals {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetDeals reset all changes of the "deals" edge.
-func (m *VariationMutation) ResetDeals() {
-	m.deals = nil
-	m.cleareddeals = false
-	m.removeddeals = nil
+// ResetOutboundDeals reset all changes of the "outbound_deals" edge.
+func (m *VariationMutation) ResetOutboundDeals() {
+	m.outbound_deals = nil
+	m.clearedoutbound_deals = false
+	m.removedoutbound_deals = nil
 }
 
 // Op returns the operation name.
@@ -4488,8 +4488,8 @@ func (m *VariationMutation) AddedEdges() []string {
 	if m.variant != nil {
 		edges = append(edges, variation.EdgeVariant)
 	}
-	if m.deals != nil {
-		edges = append(edges, variation.EdgeDeals)
+	if m.outbound_deals != nil {
+		edges = append(edges, variation.EdgeOutboundDeals)
 	}
 	return edges
 }
@@ -4520,9 +4520,9 @@ func (m *VariationMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case variation.EdgeDeals:
-		ids := make([]ent.Value, 0, len(m.deals))
-		for id := range m.deals {
+	case variation.EdgeOutboundDeals:
+		ids := make([]ent.Value, 0, len(m.outbound_deals))
+		for id := range m.outbound_deals {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4543,8 +4543,8 @@ func (m *VariationMutation) RemovedEdges() []string {
 	if m.removedvariant != nil {
 		edges = append(edges, variation.EdgeVariant)
 	}
-	if m.removeddeals != nil {
-		edges = append(edges, variation.EdgeDeals)
+	if m.removedoutbound_deals != nil {
+		edges = append(edges, variation.EdgeOutboundDeals)
 	}
 	return edges
 }
@@ -4571,9 +4571,9 @@ func (m *VariationMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case variation.EdgeDeals:
-		ids := make([]ent.Value, 0, len(m.removeddeals))
-		for id := range m.removeddeals {
+	case variation.EdgeOutboundDeals:
+		ids := make([]ent.Value, 0, len(m.removedoutbound_deals))
+		for id := range m.removedoutbound_deals {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4597,8 +4597,8 @@ func (m *VariationMutation) ClearedEdges() []string {
 	if m.clearedvariant {
 		edges = append(edges, variation.EdgeVariant)
 	}
-	if m.cleareddeals {
-		edges = append(edges, variation.EdgeDeals)
+	if m.clearedoutbound_deals {
+		edges = append(edges, variation.EdgeOutboundDeals)
 	}
 	return edges
 }
@@ -4615,8 +4615,8 @@ func (m *VariationMutation) EdgeCleared(name string) bool {
 		return m.clearedproduct
 	case variation.EdgeVariant:
 		return m.clearedvariant
-	case variation.EdgeDeals:
-		return m.cleareddeals
+	case variation.EdgeOutboundDeals:
+		return m.clearedoutbound_deals
 	}
 	return false
 }
@@ -4649,8 +4649,8 @@ func (m *VariationMutation) ResetEdge(name string) error {
 	case variation.EdgeVariant:
 		m.ResetVariant()
 		return nil
-	case variation.EdgeDeals:
-		m.ResetDeals()
+	case variation.EdgeOutboundDeals:
+		m.ResetOutboundDeals()
 		return nil
 	}
 	return fmt.Errorf("unknown Variation edge %s", name)

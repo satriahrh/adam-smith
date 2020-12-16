@@ -22,8 +22,8 @@ const (
 	EdgeProduct = "product"
 	// EdgeVariant holds the string denoting the variant edge name in mutations.
 	EdgeVariant = "variant"
-	// EdgeDeals holds the string denoting the deals edge name in mutations.
-	EdgeDeals = "deals"
+	// EdgeOutboundDeals holds the string denoting the outbound_deals edge name in mutations.
+	EdgeOutboundDeals = "outbound_deals"
 
 	// Table holds the table name of the variation in the database.
 	Table = "variations"
@@ -45,11 +45,11 @@ const (
 	// VariantInverseTable is the table name for the Variant entity.
 	// It exists in this package in order to avoid circular dependency with the "variant" package.
 	VariantInverseTable = "variants"
-	// DealsTable is the table the holds the deals relation/edge. The primary key declared below.
-	DealsTable = "outbound_deal_variation"
-	// DealsInverseTable is the table name for the OutboundDeal entity.
+	// OutboundDealsTable is the table the holds the outbound_deals relation/edge. The primary key declared below.
+	OutboundDealsTable = "variation_outbound_deals"
+	// OutboundDealsInverseTable is the table name for the OutboundDeal entity.
 	// It exists in this package in order to avoid circular dependency with the "outbounddeal" package.
-	DealsInverseTable = "outbound_deals"
+	OutboundDealsInverseTable = "outbound_deals"
 )
 
 // Columns holds all SQL columns for variation fields.
@@ -72,9 +72,9 @@ var (
 	// VariantPrimaryKey and VariantColumn2 are the table columns denoting the
 	// primary key for the variant relation (M2M).
 	VariantPrimaryKey = []string{"variant_id", "variation_id"}
-	// DealsPrimaryKey and DealsColumn2 are the table columns denoting the
-	// primary key for the deals relation (M2M).
-	DealsPrimaryKey = []string{"outbound_deal_id", "variation_id"}
+	// OutboundDealsPrimaryKey and OutboundDealsColumn2 are the table columns denoting the
+	// primary key for the outbound_deals relation (M2M).
+	OutboundDealsPrimaryKey = []string{"variation_id", "outbound_deal_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

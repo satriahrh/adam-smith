@@ -22,7 +22,8 @@ func (OutboundDeal) Fields() []ent.Field {
 // Edges of the OutboundDeal.
 func (OutboundDeal) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("variation", Variation.Type),
+		edge.From("variant", Variation.Type).
+			Ref("outbound_deals"),
 		edge.From("transaction", OutboundTransaction.Type).
 			Ref("deals"),
 	}

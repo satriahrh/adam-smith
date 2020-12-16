@@ -147,19 +147,19 @@ func (vu *VariationUpdate) AddVariant(v ...*Variant) *VariationUpdate {
 	return vu.AddVariantIDs(ids...)
 }
 
-// AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (vu *VariationUpdate) AddDealIDs(ids ...int) *VariationUpdate {
-	vu.mutation.AddDealIDs(ids...)
+// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
+func (vu *VariationUpdate) AddOutboundDealIDs(ids ...int) *VariationUpdate {
+	vu.mutation.AddOutboundDealIDs(ids...)
 	return vu
 }
 
-// AddDeals adds the deals edges to OutboundDeal.
-func (vu *VariationUpdate) AddDeals(o ...*OutboundDeal) *VariationUpdate {
+// AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
+func (vu *VariationUpdate) AddOutboundDeals(o ...*OutboundDeal) *VariationUpdate {
 	ids := make([]int, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
-	return vu.AddDealIDs(ids...)
+	return vu.AddOutboundDealIDs(ids...)
 }
 
 // Mutation returns the VariationMutation object of the builder.
@@ -236,25 +236,25 @@ func (vu *VariationUpdate) RemoveVariant(v ...*Variant) *VariationUpdate {
 	return vu.RemoveVariantIDs(ids...)
 }
 
-// ClearDeals clears all "deals" edges to type OutboundDeal.
-func (vu *VariationUpdate) ClearDeals() *VariationUpdate {
-	vu.mutation.ClearDeals()
+// ClearOutboundDeals clears all "outbound_deals" edges to type OutboundDeal.
+func (vu *VariationUpdate) ClearOutboundDeals() *VariationUpdate {
+	vu.mutation.ClearOutboundDeals()
 	return vu
 }
 
-// RemoveDealIDs removes the deals edge to OutboundDeal by ids.
-func (vu *VariationUpdate) RemoveDealIDs(ids ...int) *VariationUpdate {
-	vu.mutation.RemoveDealIDs(ids...)
+// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
+func (vu *VariationUpdate) RemoveOutboundDealIDs(ids ...int) *VariationUpdate {
+	vu.mutation.RemoveOutboundDealIDs(ids...)
 	return vu
 }
 
-// RemoveDeals removes deals edges to OutboundDeal.
-func (vu *VariationUpdate) RemoveDeals(o ...*OutboundDeal) *VariationUpdate {
+// RemoveOutboundDeals removes outbound_deals edges to OutboundDeal.
+func (vu *VariationUpdate) RemoveOutboundDeals(o ...*OutboundDeal) *VariationUpdate {
 	ids := make([]int, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
-	return vu.RemoveDealIDs(ids...)
+	return vu.RemoveOutboundDealIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -564,12 +564,12 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if vu.mutation.DealsCleared() {
+	if vu.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.DealsTable,
-			Columns: variation.DealsPrimaryKey,
+			Inverse: false,
+			Table:   variation.OutboundDealsTable,
+			Columns: variation.OutboundDealsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -580,12 +580,12 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.RemovedDealsIDs(); len(nodes) > 0 && !vu.mutation.DealsCleared() {
+	if nodes := vu.mutation.RemovedOutboundDealsIDs(); len(nodes) > 0 && !vu.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.DealsTable,
-			Columns: variation.DealsPrimaryKey,
+			Inverse: false,
+			Table:   variation.OutboundDealsTable,
+			Columns: variation.OutboundDealsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -599,12 +599,12 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.DealsIDs(); len(nodes) > 0 {
+	if nodes := vu.mutation.OutboundDealsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.DealsTable,
-			Columns: variation.DealsPrimaryKey,
+			Inverse: false,
+			Table:   variation.OutboundDealsTable,
+			Columns: variation.OutboundDealsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -754,19 +754,19 @@ func (vuo *VariationUpdateOne) AddVariant(v ...*Variant) *VariationUpdateOne {
 	return vuo.AddVariantIDs(ids...)
 }
 
-// AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (vuo *VariationUpdateOne) AddDealIDs(ids ...int) *VariationUpdateOne {
-	vuo.mutation.AddDealIDs(ids...)
+// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
+func (vuo *VariationUpdateOne) AddOutboundDealIDs(ids ...int) *VariationUpdateOne {
+	vuo.mutation.AddOutboundDealIDs(ids...)
 	return vuo
 }
 
-// AddDeals adds the deals edges to OutboundDeal.
-func (vuo *VariationUpdateOne) AddDeals(o ...*OutboundDeal) *VariationUpdateOne {
+// AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
+func (vuo *VariationUpdateOne) AddOutboundDeals(o ...*OutboundDeal) *VariationUpdateOne {
 	ids := make([]int, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
-	return vuo.AddDealIDs(ids...)
+	return vuo.AddOutboundDealIDs(ids...)
 }
 
 // Mutation returns the VariationMutation object of the builder.
@@ -843,25 +843,25 @@ func (vuo *VariationUpdateOne) RemoveVariant(v ...*Variant) *VariationUpdateOne 
 	return vuo.RemoveVariantIDs(ids...)
 }
 
-// ClearDeals clears all "deals" edges to type OutboundDeal.
-func (vuo *VariationUpdateOne) ClearDeals() *VariationUpdateOne {
-	vuo.mutation.ClearDeals()
+// ClearOutboundDeals clears all "outbound_deals" edges to type OutboundDeal.
+func (vuo *VariationUpdateOne) ClearOutboundDeals() *VariationUpdateOne {
+	vuo.mutation.ClearOutboundDeals()
 	return vuo
 }
 
-// RemoveDealIDs removes the deals edge to OutboundDeal by ids.
-func (vuo *VariationUpdateOne) RemoveDealIDs(ids ...int) *VariationUpdateOne {
-	vuo.mutation.RemoveDealIDs(ids...)
+// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
+func (vuo *VariationUpdateOne) RemoveOutboundDealIDs(ids ...int) *VariationUpdateOne {
+	vuo.mutation.RemoveOutboundDealIDs(ids...)
 	return vuo
 }
 
-// RemoveDeals removes deals edges to OutboundDeal.
-func (vuo *VariationUpdateOne) RemoveDeals(o ...*OutboundDeal) *VariationUpdateOne {
+// RemoveOutboundDeals removes outbound_deals edges to OutboundDeal.
+func (vuo *VariationUpdateOne) RemoveOutboundDeals(o ...*OutboundDeal) *VariationUpdateOne {
 	ids := make([]int, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
-	return vuo.RemoveDealIDs(ids...)
+	return vuo.RemoveOutboundDealIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -1169,12 +1169,12 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if vuo.mutation.DealsCleared() {
+	if vuo.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.DealsTable,
-			Columns: variation.DealsPrimaryKey,
+			Inverse: false,
+			Table:   variation.OutboundDealsTable,
+			Columns: variation.OutboundDealsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1185,12 +1185,12 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.RemovedDealsIDs(); len(nodes) > 0 && !vuo.mutation.DealsCleared() {
+	if nodes := vuo.mutation.RemovedOutboundDealsIDs(); len(nodes) > 0 && !vuo.mutation.OutboundDealsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.DealsTable,
-			Columns: variation.DealsPrimaryKey,
+			Inverse: false,
+			Table:   variation.OutboundDealsTable,
+			Columns: variation.OutboundDealsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1204,12 +1204,12 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.DealsIDs(); len(nodes) > 0 {
+	if nodes := vuo.mutation.OutboundDealsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.DealsTable,
-			Columns: variation.DealsPrimaryKey,
+			Inverse: false,
+			Table:   variation.OutboundDealsTable,
+			Columns: variation.OutboundDealsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

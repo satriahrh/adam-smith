@@ -383,25 +383,25 @@ func HasVariantWith(preds ...predicate.Variant) predicate.Variation {
 	})
 }
 
-// HasDeals applies the HasEdge predicate on the "deals" edge.
-func HasDeals() predicate.Variation {
+// HasOutboundDeals applies the HasEdge predicate on the "outbound_deals" edge.
+func HasOutboundDeals() predicate.Variation {
 	return predicate.Variation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(DealsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, DealsTable, DealsPrimaryKey...),
+			sqlgraph.To(OutboundDealsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, OutboundDealsTable, OutboundDealsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasDealsWith applies the HasEdge predicate on the "deals" edge with a given conditions (other predicates).
-func HasDealsWith(preds ...predicate.OutboundDeal) predicate.Variation {
+// HasOutboundDealsWith applies the HasEdge predicate on the "outbound_deals" edge with a given conditions (other predicates).
+func HasOutboundDealsWith(preds ...predicate.OutboundDeal) predicate.Variation {
 	return predicate.Variation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(DealsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, DealsTable, DealsPrimaryKey...),
+			sqlgraph.To(OutboundDealsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, OutboundDealsTable, OutboundDealsPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

@@ -155,33 +155,6 @@ var (
 			},
 		},
 	}
-	// OutboundDealVariationColumns holds the columns for the "outbound_deal_variation" table.
-	OutboundDealVariationColumns = []*schema.Column{
-		{Name: "outbound_deal_id", Type: field.TypeInt},
-		{Name: "variation_id", Type: field.TypeInt},
-	}
-	// OutboundDealVariationTable holds the schema information for the "outbound_deal_variation" table.
-	OutboundDealVariationTable = &schema.Table{
-		Name:       "outbound_deal_variation",
-		Columns:    OutboundDealVariationColumns,
-		PrimaryKey: []*schema.Column{OutboundDealVariationColumns[0], OutboundDealVariationColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:  "outbound_deal_variation_outbound_deal_id",
-				Columns: []*schema.Column{OutboundDealVariationColumns[0]},
-
-				RefColumns: []*schema.Column{OutboundDealsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:  "outbound_deal_variation_variation_id",
-				Columns: []*schema.Column{OutboundDealVariationColumns[1]},
-
-				RefColumns: []*schema.Column{VariationsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// OutboundTransactionShippingColumns holds the columns for the "outbound_transaction_shipping" table.
 	OutboundTransactionShippingColumns = []*schema.Column{
 		{Name: "outbound_transaction_id", Type: field.TypeInt},
@@ -290,6 +263,33 @@ var (
 			},
 		},
 	}
+	// VariationOutboundDealsColumns holds the columns for the "variation_outbound_deals" table.
+	VariationOutboundDealsColumns = []*schema.Column{
+		{Name: "variation_id", Type: field.TypeInt},
+		{Name: "outbound_deal_id", Type: field.TypeInt},
+	}
+	// VariationOutboundDealsTable holds the schema information for the "variation_outbound_deals" table.
+	VariationOutboundDealsTable = &schema.Table{
+		Name:       "variation_outbound_deals",
+		Columns:    VariationOutboundDealsColumns,
+		PrimaryKey: []*schema.Column{VariationOutboundDealsColumns[0], VariationOutboundDealsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "variation_outbound_deals_variation_id",
+				Columns: []*schema.Column{VariationOutboundDealsColumns[0]},
+
+				RefColumns: []*schema.Column{VariationsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:  "variation_outbound_deals_outbound_deal_id",
+				Columns: []*schema.Column{VariationOutboundDealsColumns[1]},
+
+				RefColumns: []*schema.Column{OutboundDealsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BrandsTable,
@@ -300,11 +300,11 @@ var (
 		VariantsTable,
 		VariationsTable,
 		BrandProductsTable,
-		OutboundDealVariationTable,
 		OutboundTransactionShippingTable,
 		OutboundTransactionDealsTable,
 		ProductVariationsTable,
 		VariantVariantUsesTable,
+		VariationOutboundDealsTable,
 	}
 )
 
@@ -312,8 +312,6 @@ func init() {
 	VariationsTable.ForeignKeys[0].RefTable = VariationsTable
 	BrandProductsTable.ForeignKeys[0].RefTable = BrandsTable
 	BrandProductsTable.ForeignKeys[1].RefTable = ProductsTable
-	OutboundDealVariationTable.ForeignKeys[0].RefTable = OutboundDealsTable
-	OutboundDealVariationTable.ForeignKeys[1].RefTable = VariationsTable
 	OutboundTransactionShippingTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
 	OutboundTransactionShippingTable.ForeignKeys[1].RefTable = OutboundShippingsTable
 	OutboundTransactionDealsTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
@@ -322,4 +320,6 @@ func init() {
 	ProductVariationsTable.ForeignKeys[1].RefTable = VariationsTable
 	VariantVariantUsesTable.ForeignKeys[0].RefTable = VariantsTable
 	VariantVariantUsesTable.ForeignKeys[1].RefTable = VariationsTable
+	VariationOutboundDealsTable.ForeignKeys[0].RefTable = VariationsTable
+	VariationOutboundDealsTable.ForeignKeys[1].RefTable = OutboundDealsTable
 }

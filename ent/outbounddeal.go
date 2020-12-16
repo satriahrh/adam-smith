@@ -26,8 +26,8 @@ type OutboundDeal struct {
 
 // OutboundDealEdges holds the relations/edges for other nodes in the graph.
 type OutboundDealEdges struct {
-	// Variation holds the value of the variation edge.
-	Variation []*Variation
+	// Variant holds the value of the variant edge.
+	Variant []*Variation
 	// Transaction holds the value of the transaction edge.
 	Transaction []*OutboundTransaction
 	// loadedTypes holds the information for reporting if a
@@ -35,13 +35,13 @@ type OutboundDealEdges struct {
 	loadedTypes [2]bool
 }
 
-// VariationOrErr returns the Variation value or an error if the edge
+// VariantOrErr returns the Variant value or an error if the edge
 // was not loaded in eager-loading.
-func (e OutboundDealEdges) VariationOrErr() ([]*Variation, error) {
+func (e OutboundDealEdges) VariantOrErr() ([]*Variation, error) {
 	if e.loadedTypes[0] {
-		return e.Variation, nil
+		return e.Variant, nil
 	}
-	return nil, &NotLoadedError{edge: "variation"}
+	return nil, &NotLoadedError{edge: "variant"}
 }
 
 // TransactionOrErr returns the Transaction value or an error if the edge
@@ -87,9 +87,9 @@ func (od *OutboundDeal) assignValues(values ...interface{}) error {
 	return nil
 }
 
-// QueryVariation queries the variation edge of the OutboundDeal.
-func (od *OutboundDeal) QueryVariation() *VariationQuery {
-	return (&OutboundDealClient{config: od.config}).QueryVariation(od)
+// QueryVariant queries the variant edge of the OutboundDeal.
+func (od *OutboundDeal) QueryVariant() *VariationQuery {
+	return (&OutboundDealClient{config: od.config}).QueryVariant(od)
 }
 
 // QueryTransaction queries the transaction edge of the OutboundDeal.

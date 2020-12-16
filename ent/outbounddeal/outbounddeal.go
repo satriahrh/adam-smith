@@ -12,18 +12,18 @@ const (
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
 
-	// EdgeVariation holds the string denoting the variation edge name in mutations.
-	EdgeVariation = "variation"
+	// EdgeVariant holds the string denoting the variant edge name in mutations.
+	EdgeVariant = "variant"
 	// EdgeTransaction holds the string denoting the transaction edge name in mutations.
 	EdgeTransaction = "transaction"
 
 	// Table holds the table name of the outbounddeal in the database.
 	Table = "outbound_deals"
-	// VariationTable is the table the holds the variation relation/edge. The primary key declared below.
-	VariationTable = "outbound_deal_variation"
-	// VariationInverseTable is the table name for the Variation entity.
+	// VariantTable is the table the holds the variant relation/edge. The primary key declared below.
+	VariantTable = "variation_outbound_deals"
+	// VariantInverseTable is the table name for the Variation entity.
 	// It exists in this package in order to avoid circular dependency with the "variation" package.
-	VariationInverseTable = "variations"
+	VariantInverseTable = "variations"
 	// TransactionTable is the table the holds the transaction relation/edge. The primary key declared below.
 	TransactionTable = "outbound_transaction_deals"
 	// TransactionInverseTable is the table name for the OutboundTransaction entity.
@@ -39,9 +39,9 @@ var Columns = []string{
 }
 
 var (
-	// VariationPrimaryKey and VariationColumn2 are the table columns denoting the
-	// primary key for the variation relation (M2M).
-	VariationPrimaryKey = []string{"outbound_deal_id", "variation_id"}
+	// VariantPrimaryKey and VariantColumn2 are the table columns denoting the
+	// primary key for the variant relation (M2M).
+	VariantPrimaryKey = []string{"variation_id", "outbound_deal_id"}
 	// TransactionPrimaryKey and TransactionColumn2 are the table columns denoting the
 	// primary key for the transaction relation (M2M).
 	TransactionPrimaryKey = []string{"outbound_transaction_id", "outbound_deal_id"}

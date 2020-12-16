@@ -346,15 +346,15 @@ func (c *OutboundDealClient) GetX(ctx context.Context, id int) *OutboundDeal {
 	return obj
 }
 
-// QueryVariation queries the variation edge of a OutboundDeal.
-func (c *OutboundDealClient) QueryVariation(od *OutboundDeal) *VariationQuery {
+// QueryVariant queries the variant edge of a OutboundDeal.
+func (c *OutboundDealClient) QueryVariant(od *OutboundDeal) *VariationQuery {
 	query := &VariationQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := od.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, id),
 			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, outbounddeal.VariationTable, outbounddeal.VariationPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, outbounddeal.VariantTable, outbounddeal.VariantPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(od.driver.Dialect(), step)
 		return fromV, nil
@@ -978,15 +978,15 @@ func (c *VariationClient) QueryVariant(v *Variation) *VariantQuery {
 	return query
 }
 
-// QueryDeals queries the deals edge of a Variation.
-func (c *VariationClient) QueryDeals(v *Variation) *OutboundDealQuery {
+// QueryOutboundDeals queries the outbound_deals edge of a Variation.
+func (c *VariationClient) QueryOutboundDeals(v *Variation) *OutboundDealQuery {
 	query := &OutboundDealQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variation.Table, variation.FieldID, id),
 			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, variation.DealsTable, variation.DealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, variation.OutboundDealsTable, variation.OutboundDealsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil

@@ -38,8 +38,8 @@ type VariationEdges struct {
 	Product []*Product
 	// Variant holds the value of the variant edge.
 	Variant []*Variant
-	// Deals holds the value of the deals edge.
-	Deals []*OutboundDeal
+	// OutboundDeals holds the value of the outbound_deals edge.
+	OutboundDeals []*OutboundDeal
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [5]bool
@@ -86,13 +86,13 @@ func (e VariationEdges) VariantOrErr() ([]*Variant, error) {
 	return nil, &NotLoadedError{edge: "variant"}
 }
 
-// DealsOrErr returns the Deals value or an error if the edge
+// OutboundDealsOrErr returns the OutboundDeals value or an error if the edge
 // was not loaded in eager-loading.
-func (e VariationEdges) DealsOrErr() ([]*OutboundDeal, error) {
+func (e VariationEdges) OutboundDealsOrErr() ([]*OutboundDeal, error) {
 	if e.loadedTypes[4] {
-		return e.Deals, nil
+		return e.OutboundDeals, nil
 	}
-	return nil, &NotLoadedError{edge: "deals"}
+	return nil, &NotLoadedError{edge: "outbound_deals"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -174,9 +174,9 @@ func (v *Variation) QueryVariant() *VariantQuery {
 	return (&VariationClient{config: v.config}).QueryVariant(v)
 }
 
-// QueryDeals queries the deals edge of the Variation.
-func (v *Variation) QueryDeals() *OutboundDealQuery {
-	return (&VariationClient{config: v.config}).QueryDeals(v)
+// QueryOutboundDeals queries the outbound_deals edge of the Variation.
+func (v *Variation) QueryOutboundDeals() *OutboundDealQuery {
+	return (&VariationClient{config: v.config}).QueryOutboundDeals(v)
 }
 
 // Update returns a builder for updating this Variation.
