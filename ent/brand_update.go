@@ -168,10 +168,10 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if bu.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -184,10 +184,10 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := bu.mutation.RemovedProductsIDs(); len(nodes) > 0 && !bu.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -203,10 +203,10 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := bu.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -377,10 +377,10 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 	}
 	if buo.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -393,10 +393,10 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 	}
 	if nodes := buo.mutation.RemovedProductsIDs(); len(nodes) > 0 && !buo.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -412,10 +412,10 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 	}
 	if nodes := buo.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

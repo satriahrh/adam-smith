@@ -137,10 +137,10 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 	}
 	if nodes := bc.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   brand.ProductsTable,
-			Columns: brand.ProductsPrimaryKey,
+			Columns: []string{brand.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

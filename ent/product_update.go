@@ -53,21 +53,6 @@ func (pu *ProductUpdate) SetMarketplaces(sm schema.ProductMarketplace) *ProductU
 	return pu
 }
 
-// AddBrandIDs adds the brand edge to Brand by ids.
-func (pu *ProductUpdate) AddBrandIDs(ids ...int) *ProductUpdate {
-	pu.mutation.AddBrandIDs(ids...)
-	return pu
-}
-
-// AddBrand adds the brand edges to Brand.
-func (pu *ProductUpdate) AddBrand(b ...*Brand) *ProductUpdate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return pu.AddBrandIDs(ids...)
-}
-
 // AddVariationIDs adds the variations edge to Variation by ids.
 func (pu *ProductUpdate) AddVariationIDs(ids ...int) *ProductUpdate {
 	pu.mutation.AddVariationIDs(ids...)
@@ -83,30 +68,28 @@ func (pu *ProductUpdate) AddVariations(v ...*Variation) *ProductUpdate {
 	return pu.AddVariationIDs(ids...)
 }
 
+// SetBrandID sets the brand edge to Brand by id.
+func (pu *ProductUpdate) SetBrandID(id int) *ProductUpdate {
+	pu.mutation.SetBrandID(id)
+	return pu
+}
+
+// SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
+func (pu *ProductUpdate) SetNillableBrandID(id *int) *ProductUpdate {
+	if id != nil {
+		pu = pu.SetBrandID(*id)
+	}
+	return pu
+}
+
+// SetBrand sets the brand edge to Brand.
+func (pu *ProductUpdate) SetBrand(b *Brand) *ProductUpdate {
+	return pu.SetBrandID(b.ID)
+}
+
 // Mutation returns the ProductMutation object of the builder.
 func (pu *ProductUpdate) Mutation() *ProductMutation {
 	return pu.mutation
-}
-
-// ClearBrand clears all "brand" edges to type Brand.
-func (pu *ProductUpdate) ClearBrand() *ProductUpdate {
-	pu.mutation.ClearBrand()
-	return pu
-}
-
-// RemoveBrandIDs removes the brand edge to Brand by ids.
-func (pu *ProductUpdate) RemoveBrandIDs(ids ...int) *ProductUpdate {
-	pu.mutation.RemoveBrandIDs(ids...)
-	return pu
-}
-
-// RemoveBrand removes brand edges to Brand.
-func (pu *ProductUpdate) RemoveBrand(b ...*Brand) *ProductUpdate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return pu.RemoveBrandIDs(ids...)
 }
 
 // ClearVariations clears all "variations" edges to type Variation.
@@ -128,6 +111,12 @@ func (pu *ProductUpdate) RemoveVariations(v ...*Variation) *ProductUpdate {
 		ids[i] = v[i].ID
 	}
 	return pu.RemoveVariationIDs(ids...)
+}
+
+// ClearBrand clears the "brand" edge to type Brand.
+func (pu *ProductUpdate) ClearBrand() *ProductUpdate {
+	pu.mutation.ClearBrand()
+	return pu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -227,60 +216,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: product.FieldMarketplaces,
 		})
 	}
-	if pu.mutation.BrandCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedBrandIDs(); len(nodes) > 0 && !pu.mutation.BrandCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.BrandIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if pu.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -335,6 +270,41 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pu.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: []string{product.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.BrandIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: []string{product.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{product.Label}
@@ -377,21 +347,6 @@ func (puo *ProductUpdateOne) SetMarketplaces(sm schema.ProductMarketplace) *Prod
 	return puo
 }
 
-// AddBrandIDs adds the brand edge to Brand by ids.
-func (puo *ProductUpdateOne) AddBrandIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.AddBrandIDs(ids...)
-	return puo
-}
-
-// AddBrand adds the brand edges to Brand.
-func (puo *ProductUpdateOne) AddBrand(b ...*Brand) *ProductUpdateOne {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return puo.AddBrandIDs(ids...)
-}
-
 // AddVariationIDs adds the variations edge to Variation by ids.
 func (puo *ProductUpdateOne) AddVariationIDs(ids ...int) *ProductUpdateOne {
 	puo.mutation.AddVariationIDs(ids...)
@@ -407,30 +362,28 @@ func (puo *ProductUpdateOne) AddVariations(v ...*Variation) *ProductUpdateOne {
 	return puo.AddVariationIDs(ids...)
 }
 
+// SetBrandID sets the brand edge to Brand by id.
+func (puo *ProductUpdateOne) SetBrandID(id int) *ProductUpdateOne {
+	puo.mutation.SetBrandID(id)
+	return puo
+}
+
+// SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
+func (puo *ProductUpdateOne) SetNillableBrandID(id *int) *ProductUpdateOne {
+	if id != nil {
+		puo = puo.SetBrandID(*id)
+	}
+	return puo
+}
+
+// SetBrand sets the brand edge to Brand.
+func (puo *ProductUpdateOne) SetBrand(b *Brand) *ProductUpdateOne {
+	return puo.SetBrandID(b.ID)
+}
+
 // Mutation returns the ProductMutation object of the builder.
 func (puo *ProductUpdateOne) Mutation() *ProductMutation {
 	return puo.mutation
-}
-
-// ClearBrand clears all "brand" edges to type Brand.
-func (puo *ProductUpdateOne) ClearBrand() *ProductUpdateOne {
-	puo.mutation.ClearBrand()
-	return puo
-}
-
-// RemoveBrandIDs removes the brand edge to Brand by ids.
-func (puo *ProductUpdateOne) RemoveBrandIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.RemoveBrandIDs(ids...)
-	return puo
-}
-
-// RemoveBrand removes brand edges to Brand.
-func (puo *ProductUpdateOne) RemoveBrand(b ...*Brand) *ProductUpdateOne {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return puo.RemoveBrandIDs(ids...)
 }
 
 // ClearVariations clears all "variations" edges to type Variation.
@@ -452,6 +405,12 @@ func (puo *ProductUpdateOne) RemoveVariations(v ...*Variation) *ProductUpdateOne
 		ids[i] = v[i].ID
 	}
 	return puo.RemoveVariationIDs(ids...)
+}
+
+// ClearBrand clears the "brand" edge to type Brand.
+func (puo *ProductUpdateOne) ClearBrand() *ProductUpdateOne {
+	puo.mutation.ClearBrand()
+	return puo
 }
 
 // Save executes the query and returns the updated entity.
@@ -549,60 +508,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Column: product.FieldMarketplaces,
 		})
 	}
-	if puo.mutation.BrandCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedBrandIDs(); len(nodes) > 0 && !puo.mutation.BrandCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.BrandIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if puo.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -649,6 +554,41 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: variation.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: []string{product.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.BrandIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: []string{product.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
 				},
 			},
 		}

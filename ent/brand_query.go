@@ -69,7 +69,7 @@ func (bq *BrandQuery) QueryProducts() *ProductQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(brand.Table, brand.FieldID, selector),
 			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, brand.ProductsTable, brand.ProductsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, brand.ProductsTable, brand.ProductsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
 		return fromU, nil
@@ -363,65 +363,30 @@ func (bq *BrandQuery) sqlAll(ctx context.Context) ([]*Brand, error) {
 
 	if query := bq.withProducts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Brand, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Products = []*Product{}
+		nodeids := make(map[int]*Brand)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Products = []*Product{}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Brand)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   brand.ProductsTable,
-				Columns: brand.ProductsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(brand.ProductsPrimaryKey[0], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, bq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "products": %v`, err)
-		}
-		query.Where(product.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.Product(func(s *sql.Selector) {
+			s.Where(sql.InValues(brand.ProductsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.brand_products
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "brand_products" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "products" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "brand_products" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Products = append(nodes[i].Edges.Products, n)
-			}
+			node.Edges.Products = append(node.Edges.Products, n)
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/facebook/ent/dialect/sql"
+	"github.com/satriahrh/adam-smith/ent/brand"
 	"github.com/satriahrh/adam-smith/ent/product"
 	"github.com/satriahrh/adam-smith/ent/schema"
 )
@@ -29,36 +30,42 @@ type Product struct {
 	Marketplaces schema.ProductMarketplace `json:"marketplaces,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
-	Edges ProductEdges `json:"edges"`
+	Edges          ProductEdges `json:"edges"`
+	brand_products *int
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// Brand holds the value of the brand edge.
-	Brand []*Brand
 	// Variations holds the value of the variations edge.
 	Variations []*Variation
+	// Brand holds the value of the brand edge.
+	Brand *Brand
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// BrandOrErr returns the Brand value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) BrandOrErr() ([]*Brand, error) {
-	if e.loadedTypes[0] {
-		return e.Brand, nil
-	}
-	return nil, &NotLoadedError{edge: "brand"}
-}
-
 // VariationsOrErr returns the Variations value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) VariationsOrErr() ([]*Variation, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Variations, nil
 	}
 	return nil, &NotLoadedError{edge: "variations"}
+}
+
+// BrandOrErr returns the Brand value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ProductEdges) BrandOrErr() (*Brand, error) {
+	if e.loadedTypes[1] {
+		if e.Brand == nil {
+			// The edge brand was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: brand.Label}
+		}
+		return e.Brand, nil
+	}
+	return nil, &NotLoadedError{edge: "brand"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -70,6 +77,13 @@ func (*Product) scanValues() []interface{} {
 		&[]byte{},         // descriptions
 		&[]byte{},         // images
 		&[]byte{},         // marketplaces
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*Product) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // brand_products
 	}
 }
 
@@ -119,17 +133,26 @@ func (pr *Product) assignValues(values ...interface{}) error {
 			return fmt.Errorf("unmarshal field marketplaces: %v", err)
 		}
 	}
+	values = values[5:]
+	if len(values) == len(product.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field brand_products", value)
+		} else if value.Valid {
+			pr.brand_products = new(int)
+			*pr.brand_products = int(value.Int64)
+		}
+	}
 	return nil
-}
-
-// QueryBrand queries the brand edge of the Product.
-func (pr *Product) QueryBrand() *BrandQuery {
-	return (&ProductClient{config: pr.config}).QueryBrand(pr)
 }
 
 // QueryVariations queries the variations edge of the Product.
 func (pr *Product) QueryVariations() *VariationQuery {
 	return (&ProductClient{config: pr.config}).QueryVariations(pr)
+}
+
+// QueryBrand queries the brand edge of the Product.
+func (pr *Product) QueryBrand() *BrandQuery {
+	return (&ProductClient{config: pr.config}).QueryBrand(pr)
 }
 
 // Update returns a builder for updating this Product.

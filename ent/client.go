@@ -250,7 +250,7 @@ func (c *BrandClient) QueryProducts(b *Brand) *ProductQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(brand.Table, brand.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, brand.ProductsTable, brand.ProductsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, brand.ProductsTable, brand.ProductsColumn),
 		)
 		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
 		return fromV, nil
@@ -690,22 +690,6 @@ func (c *ProductClient) GetX(ctx context.Context, id int) *Product {
 	return obj
 }
 
-// QueryBrand queries the brand edge of a Product.
-func (c *ProductClient) QueryBrand(pr *Product) *BrandQuery {
-	query := &BrandQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(product.Table, product.FieldID, id),
-			sqlgraph.To(brand.Table, brand.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, product.BrandTable, product.BrandPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryVariations queries the variations edge of a Product.
 func (c *ProductClient) QueryVariations(pr *Product) *VariationQuery {
 	query := &VariationQuery{config: c.config}
@@ -715,6 +699,22 @@ func (c *ProductClient) QueryVariations(pr *Product) *VariationQuery {
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(variation.Table, variation.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, product.VariationsTable, product.VariationsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBrand queries the brand edge of a Product.
+func (c *ProductClient) QueryBrand(pr *Product) *BrandQuery {
+	query := &BrandQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, id),
+			sqlgraph.To(brand.Table, brand.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, product.BrandTable, product.BrandColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil

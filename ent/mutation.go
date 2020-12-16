@@ -2648,12 +2648,11 @@ type ProductMutation struct {
 	images            *schema.ProductImages
 	marketplaces      *schema.ProductMarketplace
 	clearedFields     map[string]struct{}
-	brand             map[int]struct{}
-	removedbrand      map[int]struct{}
-	clearedbrand      bool
 	variations        map[int]struct{}
 	removedvariations map[int]struct{}
 	clearedvariations bool
+	brand             *int
+	clearedbrand      bool
 	done              bool
 	oldValue          func(context.Context) (*Product, error)
 	predicates        []predicate.Product
@@ -2923,59 +2922,6 @@ func (m *ProductMutation) ResetMarketplaces() {
 	m.marketplaces = nil
 }
 
-// AddBrandIDs adds the brand edge to Brand by ids.
-func (m *ProductMutation) AddBrandIDs(ids ...int) {
-	if m.brand == nil {
-		m.brand = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.brand[ids[i]] = struct{}{}
-	}
-}
-
-// ClearBrand clears the brand edge to Brand.
-func (m *ProductMutation) ClearBrand() {
-	m.clearedbrand = true
-}
-
-// BrandCleared returns if the edge brand was cleared.
-func (m *ProductMutation) BrandCleared() bool {
-	return m.clearedbrand
-}
-
-// RemoveBrandIDs removes the brand edge to Brand by ids.
-func (m *ProductMutation) RemoveBrandIDs(ids ...int) {
-	if m.removedbrand == nil {
-		m.removedbrand = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedbrand[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedBrand returns the removed ids of brand.
-func (m *ProductMutation) RemovedBrandIDs() (ids []int) {
-	for id := range m.removedbrand {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// BrandIDs returns the brand ids in the mutation.
-func (m *ProductMutation) BrandIDs() (ids []int) {
-	for id := range m.brand {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetBrand reset all changes of the "brand" edge.
-func (m *ProductMutation) ResetBrand() {
-	m.brand = nil
-	m.clearedbrand = false
-	m.removedbrand = nil
-}
-
 // AddVariationIDs adds the variations edge to Variation by ids.
 func (m *ProductMutation) AddVariationIDs(ids ...int) {
 	if m.variations == nil {
@@ -3027,6 +2973,45 @@ func (m *ProductMutation) ResetVariations() {
 	m.variations = nil
 	m.clearedvariations = false
 	m.removedvariations = nil
+}
+
+// SetBrandID sets the brand edge to Brand by id.
+func (m *ProductMutation) SetBrandID(id int) {
+	m.brand = &id
+}
+
+// ClearBrand clears the brand edge to Brand.
+func (m *ProductMutation) ClearBrand() {
+	m.clearedbrand = true
+}
+
+// BrandCleared returns if the edge brand was cleared.
+func (m *ProductMutation) BrandCleared() bool {
+	return m.clearedbrand
+}
+
+// BrandID returns the brand id in the mutation.
+func (m *ProductMutation) BrandID() (id int, exists bool) {
+	if m.brand != nil {
+		return *m.brand, true
+	}
+	return
+}
+
+// BrandIDs returns the brand ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// BrandID instead. It exists only for internal usage by the builders.
+func (m *ProductMutation) BrandIDs() (ids []int) {
+	if id := m.brand; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBrand reset all changes of the "brand" edge.
+func (m *ProductMutation) ResetBrand() {
+	m.brand = nil
+	m.clearedbrand = false
 }
 
 // Op returns the operation name.
@@ -3213,11 +3198,11 @@ func (m *ProductMutation) ResetField(name string) error {
 // mutation.
 func (m *ProductMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.brand != nil {
-		edges = append(edges, product.EdgeBrand)
-	}
 	if m.variations != nil {
 		edges = append(edges, product.EdgeVariations)
+	}
+	if m.brand != nil {
+		edges = append(edges, product.EdgeBrand)
 	}
 	return edges
 }
@@ -3226,18 +3211,16 @@ func (m *ProductMutation) AddedEdges() []string {
 // the given edge name.
 func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case product.EdgeBrand:
-		ids := make([]ent.Value, 0, len(m.brand))
-		for id := range m.brand {
-			ids = append(ids, id)
-		}
-		return ids
 	case product.EdgeVariations:
 		ids := make([]ent.Value, 0, len(m.variations))
 		for id := range m.variations {
 			ids = append(ids, id)
 		}
 		return ids
+	case product.EdgeBrand:
+		if id := m.brand; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
@@ -3246,9 +3229,6 @@ func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *ProductMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedbrand != nil {
-		edges = append(edges, product.EdgeBrand)
-	}
 	if m.removedvariations != nil {
 		edges = append(edges, product.EdgeVariations)
 	}
@@ -3259,12 +3239,6 @@ func (m *ProductMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case product.EdgeBrand:
-		ids := make([]ent.Value, 0, len(m.removedbrand))
-		for id := range m.removedbrand {
-			ids = append(ids, id)
-		}
-		return ids
 	case product.EdgeVariations:
 		ids := make([]ent.Value, 0, len(m.removedvariations))
 		for id := range m.removedvariations {
@@ -3279,11 +3253,11 @@ func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *ProductMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedbrand {
-		edges = append(edges, product.EdgeBrand)
-	}
 	if m.clearedvariations {
 		edges = append(edges, product.EdgeVariations)
+	}
+	if m.clearedbrand {
+		edges = append(edges, product.EdgeBrand)
 	}
 	return edges
 }
@@ -3292,10 +3266,10 @@ func (m *ProductMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *ProductMutation) EdgeCleared(name string) bool {
 	switch name {
-	case product.EdgeBrand:
-		return m.clearedbrand
 	case product.EdgeVariations:
 		return m.clearedvariations
+	case product.EdgeBrand:
+		return m.clearedbrand
 	}
 	return false
 }
@@ -3304,6 +3278,9 @@ func (m *ProductMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *ProductMutation) ClearEdge(name string) error {
 	switch name {
+	case product.EdgeBrand:
+		m.ClearBrand()
+		return nil
 	}
 	return fmt.Errorf("unknown Product unique edge %s", name)
 }
@@ -3313,11 +3290,11 @@ func (m *ProductMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *ProductMutation) ResetEdge(name string) error {
 	switch name {
-	case product.EdgeBrand:
-		m.ResetBrand()
-		return nil
 	case product.EdgeVariations:
 		m.ResetVariations()
+		return nil
+	case product.EdgeBrand:
+		m.ResetBrand()
 		return nil
 	}
 	return fmt.Errorf("unknown Product edge %s", name)

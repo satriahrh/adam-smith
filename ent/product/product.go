@@ -18,23 +18,25 @@ const (
 	// FieldMarketplaces holds the string denoting the marketplaces field in the database.
 	FieldMarketplaces = "marketplaces"
 
-	// EdgeBrand holds the string denoting the brand edge name in mutations.
-	EdgeBrand = "brand"
 	// EdgeVariations holds the string denoting the variations edge name in mutations.
 	EdgeVariations = "variations"
+	// EdgeBrand holds the string denoting the brand edge name in mutations.
+	EdgeBrand = "brand"
 
 	// Table holds the table name of the product in the database.
 	Table = "products"
-	// BrandTable is the table the holds the brand relation/edge. The primary key declared below.
-	BrandTable = "brand_products"
-	// BrandInverseTable is the table name for the Brand entity.
-	// It exists in this package in order to avoid circular dependency with the "brand" package.
-	BrandInverseTable = "brands"
 	// VariationsTable is the table the holds the variations relation/edge. The primary key declared below.
 	VariationsTable = "product_variations"
 	// VariationsInverseTable is the table name for the Variation entity.
 	// It exists in this package in order to avoid circular dependency with the "variation" package.
 	VariationsInverseTable = "variations"
+	// BrandTable is the table the holds the brand relation/edge.
+	BrandTable = "products"
+	// BrandInverseTable is the table name for the Brand entity.
+	// It exists in this package in order to avoid circular dependency with the "brand" package.
+	BrandInverseTable = "brands"
+	// BrandColumn is the table column denoting the brand relation/edge.
+	BrandColumn = "brand_products"
 )
 
 // Columns holds all SQL columns for product fields.
@@ -47,10 +49,12 @@ var Columns = []string{
 	FieldMarketplaces,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the Product type.
+var ForeignKeys = []string{
+	"brand_products",
+}
+
 var (
-	// BrandPrimaryKey and BrandColumn2 are the table columns denoting the
-	// primary key for the brand relation (M2M).
-	BrandPrimaryKey = []string{"brand_id", "product_id"}
 	// VariationsPrimaryKey and VariationsColumn2 are the table columns denoting the
 	// primary key for the variations relation (M2M).
 	VariationsPrimaryKey = []string{"product_id", "variation_id"}
@@ -60,6 +64,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

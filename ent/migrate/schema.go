@@ -77,13 +77,22 @@ var (
 		{Name: "descriptions", Type: field.TypeJSON},
 		{Name: "images", Type: field.TypeJSON},
 		{Name: "marketplaces", Type: field.TypeJSON},
+		{Name: "brand_products", Type: field.TypeInt, Nullable: true},
 	}
 	// ProductsTable holds the schema information for the "products" table.
 	ProductsTable = &schema.Table{
-		Name:        "products",
-		Columns:     ProductsColumns,
-		PrimaryKey:  []*schema.Column{ProductsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
+		Name:       "products",
+		Columns:    ProductsColumns,
+		PrimaryKey: []*schema.Column{ProductsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "products_brands_products",
+				Columns: []*schema.Column{ProductsColumns[6]},
+
+				RefColumns: []*schema.Column{BrandsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// VariantsColumns holds the columns for the "variants" table.
 	VariantsColumns = []*schema.Column{
@@ -125,33 +134,6 @@ var (
 
 				RefColumns: []*schema.Column{VariationsColumns[0]},
 				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// BrandProductsColumns holds the columns for the "brand_products" table.
-	BrandProductsColumns = []*schema.Column{
-		{Name: "brand_id", Type: field.TypeInt},
-		{Name: "product_id", Type: field.TypeInt},
-	}
-	// BrandProductsTable holds the schema information for the "brand_products" table.
-	BrandProductsTable = &schema.Table{
-		Name:       "brand_products",
-		Columns:    BrandProductsColumns,
-		PrimaryKey: []*schema.Column{BrandProductsColumns[0], BrandProductsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:  "brand_products_brand_id",
-				Columns: []*schema.Column{BrandProductsColumns[0]},
-
-				RefColumns: []*schema.Column{BrandsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:  "brand_products_product_id",
-				Columns: []*schema.Column{BrandProductsColumns[1]},
-
-				RefColumns: []*schema.Column{ProductsColumns[0]},
-				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -299,7 +281,6 @@ var (
 		ProductsTable,
 		VariantsTable,
 		VariationsTable,
-		BrandProductsTable,
 		OutboundTransactionShippingTable,
 		OutboundTransactionDealsTable,
 		ProductVariationsTable,
@@ -309,9 +290,8 @@ var (
 )
 
 func init() {
+	ProductsTable.ForeignKeys[0].RefTable = BrandsTable
 	VariationsTable.ForeignKeys[0].RefTable = VariationsTable
-	BrandProductsTable.ForeignKeys[0].RefTable = BrandsTable
-	BrandProductsTable.ForeignKeys[1].RefTable = ProductsTable
 	OutboundTransactionShippingTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
 	OutboundTransactionShippingTable.ForeignKeys[1].RefTable = OutboundShippingsTable
 	OutboundTransactionDealsTable.ForeignKeys[0].RefTable = OutboundTransactionsTable

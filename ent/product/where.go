@@ -327,34 +327,6 @@ func NameContainsFold(v string) predicate.Product {
 	})
 }
 
-// HasBrand applies the HasEdge predicate on the "brand" edge.
-func HasBrand() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BrandTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, BrandTable, BrandPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasBrandWith applies the HasEdge predicate on the "brand" edge with a given conditions (other predicates).
-func HasBrandWith(preds ...predicate.Brand) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BrandInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, BrandTable, BrandPrimaryKey...),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasVariations applies the HasEdge predicate on the "variations" edge.
 func HasVariations() predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
@@ -374,6 +346,34 @@ func HasVariationsWith(preds ...predicate.Variation) predicate.Product {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(VariationsInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, VariationsTable, VariationsPrimaryKey...),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasBrand applies the HasEdge predicate on the "brand" edge.
+func HasBrand() predicate.Product {
+	return predicate.Product(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BrandTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, BrandTable, BrandColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBrandWith applies the HasEdge predicate on the "brand" edge with a given conditions (other predicates).
+func HasBrandWith(preds ...predicate.Brand) predicate.Product {
+	return predicate.Product(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BrandInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, BrandTable, BrandColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

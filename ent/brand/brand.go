@@ -15,11 +15,13 @@ const (
 
 	// Table holds the table name of the brand in the database.
 	Table = "brands"
-	// ProductsTable is the table the holds the products relation/edge. The primary key declared below.
-	ProductsTable = "brand_products"
+	// ProductsTable is the table the holds the products relation/edge.
+	ProductsTable = "products"
 	// ProductsInverseTable is the table name for the Product entity.
 	// It exists in this package in order to avoid circular dependency with the "product" package.
 	ProductsInverseTable = "products"
+	// ProductsColumn is the table column denoting the products relation/edge.
+	ProductsColumn = "brand_products"
 )
 
 // Columns holds all SQL columns for brand fields.
@@ -27,12 +29,6 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 }
-
-var (
-	// ProductsPrimaryKey and ProductsColumn2 are the table columns denoting the
-	// primary key for the products relation (M2M).
-	ProductsPrimaryKey = []string{"brand_id", "product_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

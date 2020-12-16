@@ -52,21 +52,6 @@ func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplace) *ProductC
 	return pc
 }
 
-// AddBrandIDs adds the brand edge to Brand by ids.
-func (pc *ProductCreate) AddBrandIDs(ids ...int) *ProductCreate {
-	pc.mutation.AddBrandIDs(ids...)
-	return pc
-}
-
-// AddBrand adds the brand edges to Brand.
-func (pc *ProductCreate) AddBrand(b ...*Brand) *ProductCreate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return pc.AddBrandIDs(ids...)
-}
-
 // AddVariationIDs adds the variations edge to Variation by ids.
 func (pc *ProductCreate) AddVariationIDs(ids ...int) *ProductCreate {
 	pc.mutation.AddVariationIDs(ids...)
@@ -80,6 +65,25 @@ func (pc *ProductCreate) AddVariations(v ...*Variation) *ProductCreate {
 		ids[i] = v[i].ID
 	}
 	return pc.AddVariationIDs(ids...)
+}
+
+// SetBrandID sets the brand edge to Brand by id.
+func (pc *ProductCreate) SetBrandID(id int) *ProductCreate {
+	pc.mutation.SetBrandID(id)
+	return pc
+}
+
+// SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
+func (pc *ProductCreate) SetNillableBrandID(id *int) *ProductCreate {
+	if id != nil {
+		pc = pc.SetBrandID(*id)
+	}
+	return pc
+}
+
+// SetBrand sets the brand edge to Brand.
+func (pc *ProductCreate) SetBrand(b *Brand) *ProductCreate {
+	return pc.SetBrandID(b.ID)
 }
 
 // Mutation returns the ProductMutation object of the builder.
@@ -215,25 +219,6 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		})
 		_node.Marketplaces = value
 	}
-	if nodes := pc.mutation.BrandIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: product.BrandPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: brand.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := pc.mutation.VariationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -245,6 +230,25 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: variation.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.BrandIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   product.BrandTable,
+			Columns: []string{product.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: brand.FieldID,
 				},
 			},
 		}
