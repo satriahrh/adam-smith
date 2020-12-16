@@ -2,7 +2,6 @@ export GEN_ROOT_DIRECTORY = './generated'
 
 setup:
 	go mod vendor
-	go get github.com/facebook/ent/cmd/ent
 	make generate
 generate-setup:
 	rm -Rf $(GEN_ROOT_DIRECTORY)
