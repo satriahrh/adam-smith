@@ -52,21 +52,6 @@ func (otc *OutboundTransactionCreate) SetAmount(u uint) *OutboundTransactionCrea
 	return otc
 }
 
-// AddShippingIDs adds the shipping edge to OutboundShipping by ids.
-func (otc *OutboundTransactionCreate) AddShippingIDs(ids ...int) *OutboundTransactionCreate {
-	otc.mutation.AddShippingIDs(ids...)
-	return otc
-}
-
-// AddShipping adds the shipping edges to OutboundShipping.
-func (otc *OutboundTransactionCreate) AddShipping(o ...*OutboundShipping) *OutboundTransactionCreate {
-	ids := make([]int, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return otc.AddShippingIDs(ids...)
-}
-
 // AddDealIDs adds the deals edge to OutboundDeal by ids.
 func (otc *OutboundTransactionCreate) AddDealIDs(ids ...int) *OutboundTransactionCreate {
 	otc.mutation.AddDealIDs(ids...)
@@ -80,6 +65,25 @@ func (otc *OutboundTransactionCreate) AddDeals(o ...*OutboundDeal) *OutboundTran
 		ids[i] = o[i].ID
 	}
 	return otc.AddDealIDs(ids...)
+}
+
+// SetShippingID sets the shipping edge to OutboundShipping by id.
+func (otc *OutboundTransactionCreate) SetShippingID(id int) *OutboundTransactionCreate {
+	otc.mutation.SetShippingID(id)
+	return otc
+}
+
+// SetNillableShippingID sets the shipping edge to OutboundShipping by id if the given value is not nil.
+func (otc *OutboundTransactionCreate) SetNillableShippingID(id *int) *OutboundTransactionCreate {
+	if id != nil {
+		otc = otc.SetShippingID(*id)
+	}
+	return otc
+}
+
+// SetShipping sets the shipping edge to OutboundShipping.
+func (otc *OutboundTransactionCreate) SetShipping(o *OutboundShipping) *OutboundTransactionCreate {
+	return otc.SetShippingID(o.ID)
 }
 
 // Mutation returns the OutboundTransactionMutation object of the builder.
@@ -220,17 +224,17 @@ func (otc *OutboundTransactionCreate) createSpec() (*OutboundTransaction, *sqlgr
 		})
 		_node.Amount = value
 	}
-	if nodes := otc.mutation.ShippingIDs(); len(nodes) > 0 {
+	if nodes := otc.mutation.DealsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   outboundtransaction.ShippingTable,
-			Columns: outboundtransaction.ShippingPrimaryKey,
+			Table:   outboundtransaction.DealsTable,
+			Columns: []string{outboundtransaction.DealsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: outboundshipping.FieldID,
+					Column: outbounddeal.FieldID,
 				},
 			},
 		}
@@ -239,17 +243,17 @@ func (otc *OutboundTransactionCreate) createSpec() (*OutboundTransaction, *sqlgr
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := otc.mutation.DealsIDs(); len(nodes) > 0 {
+	if nodes := otc.mutation.ShippingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   outboundtransaction.DealsTable,
-			Columns: outboundtransaction.DealsPrimaryKey,
+			Table:   outboundtransaction.ShippingTable,
+			Columns: []string{outboundtransaction.ShippingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: outbounddeal.FieldID,
+					Column: outboundshipping.FieldID,
 				},
 			},
 		}

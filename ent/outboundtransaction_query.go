@@ -26,8 +26,8 @@ type OutboundTransactionQuery struct {
 	order      []OrderFunc
 	predicates []predicate.OutboundTransaction
 	// eager-loading edges.
-	withShipping *OutboundShippingQuery
 	withDeals    *OutboundDealQuery
+	withShipping *OutboundShippingQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,28 +57,6 @@ func (otq *OutboundTransactionQuery) Order(o ...OrderFunc) *OutboundTransactionQ
 	return otq
 }
 
-// QueryShipping chains the current query on the shipping edge.
-func (otq *OutboundTransactionQuery) QueryShipping() *OutboundShippingQuery {
-	query := &OutboundShippingQuery{config: otq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := otq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := otq.sqlQuery()
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(outboundtransaction.Table, outboundtransaction.FieldID, selector),
-			sqlgraph.To(outboundshipping.Table, outboundshipping.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, outboundtransaction.ShippingTable, outboundtransaction.ShippingPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(otq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryDeals chains the current query on the deals edge.
 func (otq *OutboundTransactionQuery) QueryDeals() *OutboundDealQuery {
 	query := &OutboundDealQuery{config: otq.config}
@@ -93,7 +71,29 @@ func (otq *OutboundTransactionQuery) QueryDeals() *OutboundDealQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outboundtransaction.Table, outboundtransaction.FieldID, selector),
 			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, outboundtransaction.DealsTable, outboundtransaction.DealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, outboundtransaction.DealsTable, outboundtransaction.DealsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(otq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryShipping chains the current query on the shipping edge.
+func (otq *OutboundTransactionQuery) QueryShipping() *OutboundShippingQuery {
+	query := &OutboundShippingQuery{config: otq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := otq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := otq.sqlQuery()
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(outboundtransaction.Table, outboundtransaction.FieldID, selector),
+			sqlgraph.To(outboundshipping.Table, outboundshipping.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, outboundtransaction.ShippingTable, outboundtransaction.ShippingColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(otq.driver.Dialect(), step)
 		return fromU, nil
@@ -276,23 +276,12 @@ func (otq *OutboundTransactionQuery) Clone() *OutboundTransactionQuery {
 		offset:       otq.offset,
 		order:        append([]OrderFunc{}, otq.order...),
 		predicates:   append([]predicate.OutboundTransaction{}, otq.predicates...),
-		withShipping: otq.withShipping.Clone(),
 		withDeals:    otq.withDeals.Clone(),
+		withShipping: otq.withShipping.Clone(),
 		// clone intermediate query.
 		sql:  otq.sql.Clone(),
 		path: otq.path,
 	}
-}
-
-//  WithShipping tells the query-builder to eager-loads the nodes that are connected to
-// the "shipping" edge. The optional arguments used to configure the query builder of the edge.
-func (otq *OutboundTransactionQuery) WithShipping(opts ...func(*OutboundShippingQuery)) *OutboundTransactionQuery {
-	query := &OutboundShippingQuery{config: otq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	otq.withShipping = query
-	return otq
 }
 
 //  WithDeals tells the query-builder to eager-loads the nodes that are connected to
@@ -303,6 +292,17 @@ func (otq *OutboundTransactionQuery) WithDeals(opts ...func(*OutboundDealQuery))
 		opt(query)
 	}
 	otq.withDeals = query
+	return otq
+}
+
+//  WithShipping tells the query-builder to eager-loads the nodes that are connected to
+// the "shipping" edge. The optional arguments used to configure the query builder of the edge.
+func (otq *OutboundTransactionQuery) WithShipping(opts ...func(*OutboundShippingQuery)) *OutboundTransactionQuery {
+	query := &OutboundShippingQuery{config: otq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	otq.withShipping = query
 	return otq
 }
 
@@ -373,8 +373,8 @@ func (otq *OutboundTransactionQuery) sqlAll(ctx context.Context) ([]*OutboundTra
 		nodes       = []*OutboundTransaction{}
 		_spec       = otq.querySpec()
 		loadedTypes = [2]bool{
-			otq.withShipping != nil,
 			otq.withDeals != nil,
+			otq.withShipping != nil,
 		}
 	)
 	_spec.ScanValues = func() []interface{} {
@@ -398,131 +398,60 @@ func (otq *OutboundTransactionQuery) sqlAll(ctx context.Context) ([]*OutboundTra
 		return nodes, nil
 	}
 
-	if query := otq.withShipping; query != nil {
+	if query := otq.withDeals; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*OutboundTransaction, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Shipping = []*OutboundShipping{}
+		nodeids := make(map[int]*OutboundTransaction)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Deals = []*OutboundDeal{}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*OutboundTransaction)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   outboundtransaction.ShippingTable,
-				Columns: outboundtransaction.ShippingPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(outboundtransaction.ShippingPrimaryKey[0], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, otq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "shipping": %v`, err)
-		}
-		query.Where(outboundshipping.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.OutboundDeal(func(s *sql.Selector) {
+			s.Where(sql.InValues(outboundtransaction.DealsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.outbound_transaction_deals
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "outbound_transaction_deals" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "shipping" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_transaction_deals" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Shipping = append(nodes[i].Edges.Shipping, n)
-			}
+			node.Edges.Deals = append(node.Edges.Deals, n)
 		}
 	}
 
-	if query := otq.withDeals; query != nil {
+	if query := otq.withShipping; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*OutboundTransaction, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Deals = []*OutboundDeal{}
+		nodeids := make(map[int]*OutboundTransaction)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*OutboundTransaction)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   outboundtransaction.DealsTable,
-				Columns: outboundtransaction.DealsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(outboundtransaction.DealsPrimaryKey[0], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, otq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "deals": %v`, err)
-		}
-		query.Where(outbounddeal.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.OutboundShipping(func(s *sql.Selector) {
+			s.Where(sql.InValues(outboundtransaction.ShippingColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.outbound_transaction_shipping
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "outbound_transaction_shipping" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "deals" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_transaction_shipping" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Deals = append(nodes[i].Edges.Deals, n)
-			}
+			node.Edges.Shipping = n
 		}
 	}
 

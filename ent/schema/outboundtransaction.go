@@ -44,7 +44,8 @@ func (OutboundTransaction) Fields() []ent.Field {
 // Edges of the OutboundTransaction.
 func (OutboundTransaction) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("shipping", OutboundShipping.Type),
 		edge.To("deals", OutboundDeal.Type),
+		edge.To("shipping", OutboundShipping.Type).
+			Unique(),
 	}
 }

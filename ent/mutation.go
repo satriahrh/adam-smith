@@ -438,8 +438,7 @@ type OutboundDealMutation struct {
 	clearedFields      map[string]struct{}
 	variation          *int
 	clearedvariation   bool
-	transaction        map[int]struct{}
-	removedtransaction map[int]struct{}
+	transaction        *int
 	clearedtransaction bool
 	done               bool
 	oldValue           func(context.Context) (*OutboundDeal, error)
@@ -678,14 +677,9 @@ func (m *OutboundDealMutation) ResetVariation() {
 	m.clearedvariation = false
 }
 
-// AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
-func (m *OutboundDealMutation) AddTransactionIDs(ids ...int) {
-	if m.transaction == nil {
-		m.transaction = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.transaction[ids[i]] = struct{}{}
-	}
+// SetTransactionID sets the transaction edge to OutboundTransaction by id.
+func (m *OutboundDealMutation) SetTransactionID(id int) {
+	m.transaction = &id
 }
 
 // ClearTransaction clears the transaction edge to OutboundTransaction.
@@ -698,28 +692,20 @@ func (m *OutboundDealMutation) TransactionCleared() bool {
 	return m.clearedtransaction
 }
 
-// RemoveTransactionIDs removes the transaction edge to OutboundTransaction by ids.
-func (m *OutboundDealMutation) RemoveTransactionIDs(ids ...int) {
-	if m.removedtransaction == nil {
-		m.removedtransaction = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedtransaction[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTransaction returns the removed ids of transaction.
-func (m *OutboundDealMutation) RemovedTransactionIDs() (ids []int) {
-	for id := range m.removedtransaction {
-		ids = append(ids, id)
+// TransactionID returns the transaction id in the mutation.
+func (m *OutboundDealMutation) TransactionID() (id int, exists bool) {
+	if m.transaction != nil {
+		return *m.transaction, true
 	}
 	return
 }
 
 // TransactionIDs returns the transaction ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// TransactionID instead. It exists only for internal usage by the builders.
 func (m *OutboundDealMutation) TransactionIDs() (ids []int) {
-	for id := range m.transaction {
-		ids = append(ids, id)
+	if id := m.transaction; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -728,7 +714,6 @@ func (m *OutboundDealMutation) TransactionIDs() (ids []int) {
 func (m *OutboundDealMutation) ResetTransaction() {
 	m.transaction = nil
 	m.clearedtransaction = false
-	m.removedtransaction = nil
 }
 
 // Op returns the operation name.
@@ -909,11 +894,9 @@ func (m *OutboundDealMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case outbounddeal.EdgeTransaction:
-		ids := make([]ent.Value, 0, len(m.transaction))
-		for id := range m.transaction {
-			ids = append(ids, id)
+		if id := m.transaction; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -922,9 +905,6 @@ func (m *OutboundDealMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *OutboundDealMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedtransaction != nil {
-		edges = append(edges, outbounddeal.EdgeTransaction)
-	}
 	return edges
 }
 
@@ -932,12 +912,6 @@ func (m *OutboundDealMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *OutboundDealMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case outbounddeal.EdgeTransaction:
-		ids := make([]ent.Value, 0, len(m.removedtransaction))
-		for id := range m.removedtransaction {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -973,6 +947,9 @@ func (m *OutboundDealMutation) ClearEdge(name string) error {
 	switch name {
 	case outbounddeal.EdgeVariation:
 		m.ClearVariation()
+		return nil
+	case outbounddeal.EdgeTransaction:
+		m.ClearTransaction()
 		return nil
 	}
 	return fmt.Errorf("unknown OutboundDeal unique edge %s", name)
@@ -1012,8 +989,7 @@ type OutboundShippingMutation struct {
 	cost                  *uint
 	addcost               *uint
 	clearedFields         map[string]struct{}
-	transaction           map[int]struct{}
-	removedtransaction    map[int]struct{}
+	transaction           *int
 	clearedtransaction    bool
 	done                  bool
 	oldValue              func(context.Context) (*OutboundShipping, error)
@@ -1472,14 +1448,9 @@ func (m *OutboundShippingMutation) ResetCost() {
 	m.addcost = nil
 }
 
-// AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
-func (m *OutboundShippingMutation) AddTransactionIDs(ids ...int) {
-	if m.transaction == nil {
-		m.transaction = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.transaction[ids[i]] = struct{}{}
-	}
+// SetTransactionID sets the transaction edge to OutboundTransaction by id.
+func (m *OutboundShippingMutation) SetTransactionID(id int) {
+	m.transaction = &id
 }
 
 // ClearTransaction clears the transaction edge to OutboundTransaction.
@@ -1492,28 +1463,20 @@ func (m *OutboundShippingMutation) TransactionCleared() bool {
 	return m.clearedtransaction
 }
 
-// RemoveTransactionIDs removes the transaction edge to OutboundTransaction by ids.
-func (m *OutboundShippingMutation) RemoveTransactionIDs(ids ...int) {
-	if m.removedtransaction == nil {
-		m.removedtransaction = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedtransaction[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTransaction returns the removed ids of transaction.
-func (m *OutboundShippingMutation) RemovedTransactionIDs() (ids []int) {
-	for id := range m.removedtransaction {
-		ids = append(ids, id)
+// TransactionID returns the transaction id in the mutation.
+func (m *OutboundShippingMutation) TransactionID() (id int, exists bool) {
+	if m.transaction != nil {
+		return *m.transaction, true
 	}
 	return
 }
 
 // TransactionIDs returns the transaction ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// TransactionID instead. It exists only for internal usage by the builders.
 func (m *OutboundShippingMutation) TransactionIDs() (ids []int) {
-	for id := range m.transaction {
-		ids = append(ids, id)
+	if id := m.transaction; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -1522,7 +1485,6 @@ func (m *OutboundShippingMutation) TransactionIDs() (ids []int) {
 func (m *OutboundShippingMutation) ResetTransaction() {
 	m.transaction = nil
 	m.clearedtransaction = false
-	m.removedtransaction = nil
 }
 
 // Op returns the operation name.
@@ -1815,11 +1777,9 @@ func (m *OutboundShippingMutation) AddedEdges() []string {
 func (m *OutboundShippingMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case outboundshipping.EdgeTransaction:
-		ids := make([]ent.Value, 0, len(m.transaction))
-		for id := range m.transaction {
-			ids = append(ids, id)
+		if id := m.transaction; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -1828,9 +1788,6 @@ func (m *OutboundShippingMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *OutboundShippingMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedtransaction != nil {
-		edges = append(edges, outboundshipping.EdgeTransaction)
-	}
 	return edges
 }
 
@@ -1838,12 +1795,6 @@ func (m *OutboundShippingMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *OutboundShippingMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case outboundshipping.EdgeTransaction:
-		ids := make([]ent.Value, 0, len(m.removedtransaction))
-		for id := range m.removedtransaction {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -1872,6 +1823,9 @@ func (m *OutboundShippingMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *OutboundShippingMutation) ClearEdge(name string) error {
 	switch name {
+	case outboundshipping.EdgeTransaction:
+		m.ClearTransaction()
+		return nil
 	}
 	return fmt.Errorf("unknown OutboundShipping unique edge %s", name)
 }
@@ -1902,12 +1856,11 @@ type OutboundTransactionMutation struct {
 	amount          *uint
 	addamount       *uint
 	clearedFields   map[string]struct{}
-	shipping        map[int]struct{}
-	removedshipping map[int]struct{}
-	clearedshipping bool
 	deals           map[int]struct{}
 	removeddeals    map[int]struct{}
 	cleareddeals    bool
+	shipping        *int
+	clearedshipping bool
 	done            bool
 	oldValue        func(context.Context) (*OutboundTransaction, error)
 	predicates      []predicate.OutboundTransaction
@@ -2197,59 +2150,6 @@ func (m *OutboundTransactionMutation) ResetAmount() {
 	m.addamount = nil
 }
 
-// AddShippingIDs adds the shipping edge to OutboundShipping by ids.
-func (m *OutboundTransactionMutation) AddShippingIDs(ids ...int) {
-	if m.shipping == nil {
-		m.shipping = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.shipping[ids[i]] = struct{}{}
-	}
-}
-
-// ClearShipping clears the shipping edge to OutboundShipping.
-func (m *OutboundTransactionMutation) ClearShipping() {
-	m.clearedshipping = true
-}
-
-// ShippingCleared returns if the edge shipping was cleared.
-func (m *OutboundTransactionMutation) ShippingCleared() bool {
-	return m.clearedshipping
-}
-
-// RemoveShippingIDs removes the shipping edge to OutboundShipping by ids.
-func (m *OutboundTransactionMutation) RemoveShippingIDs(ids ...int) {
-	if m.removedshipping == nil {
-		m.removedshipping = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedshipping[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedShipping returns the removed ids of shipping.
-func (m *OutboundTransactionMutation) RemovedShippingIDs() (ids []int) {
-	for id := range m.removedshipping {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ShippingIDs returns the shipping ids in the mutation.
-func (m *OutboundTransactionMutation) ShippingIDs() (ids []int) {
-	for id := range m.shipping {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetShipping reset all changes of the "shipping" edge.
-func (m *OutboundTransactionMutation) ResetShipping() {
-	m.shipping = nil
-	m.clearedshipping = false
-	m.removedshipping = nil
-}
-
 // AddDealIDs adds the deals edge to OutboundDeal by ids.
 func (m *OutboundTransactionMutation) AddDealIDs(ids ...int) {
 	if m.deals == nil {
@@ -2301,6 +2201,45 @@ func (m *OutboundTransactionMutation) ResetDeals() {
 	m.deals = nil
 	m.cleareddeals = false
 	m.removeddeals = nil
+}
+
+// SetShippingID sets the shipping edge to OutboundShipping by id.
+func (m *OutboundTransactionMutation) SetShippingID(id int) {
+	m.shipping = &id
+}
+
+// ClearShipping clears the shipping edge to OutboundShipping.
+func (m *OutboundTransactionMutation) ClearShipping() {
+	m.clearedshipping = true
+}
+
+// ShippingCleared returns if the edge shipping was cleared.
+func (m *OutboundTransactionMutation) ShippingCleared() bool {
+	return m.clearedshipping
+}
+
+// ShippingID returns the shipping id in the mutation.
+func (m *OutboundTransactionMutation) ShippingID() (id int, exists bool) {
+	if m.shipping != nil {
+		return *m.shipping, true
+	}
+	return
+}
+
+// ShippingIDs returns the shipping ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// ShippingID instead. It exists only for internal usage by the builders.
+func (m *OutboundTransactionMutation) ShippingIDs() (ids []int) {
+	if id := m.shipping; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetShipping reset all changes of the "shipping" edge.
+func (m *OutboundTransactionMutation) ResetShipping() {
+	m.shipping = nil
+	m.clearedshipping = false
 }
 
 // Op returns the operation name.
@@ -2502,11 +2441,11 @@ func (m *OutboundTransactionMutation) ResetField(name string) error {
 // mutation.
 func (m *OutboundTransactionMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.shipping != nil {
-		edges = append(edges, outboundtransaction.EdgeShipping)
-	}
 	if m.deals != nil {
 		edges = append(edges, outboundtransaction.EdgeDeals)
+	}
+	if m.shipping != nil {
+		edges = append(edges, outboundtransaction.EdgeShipping)
 	}
 	return edges
 }
@@ -2515,18 +2454,16 @@ func (m *OutboundTransactionMutation) AddedEdges() []string {
 // the given edge name.
 func (m *OutboundTransactionMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case outboundtransaction.EdgeShipping:
-		ids := make([]ent.Value, 0, len(m.shipping))
-		for id := range m.shipping {
-			ids = append(ids, id)
-		}
-		return ids
 	case outboundtransaction.EdgeDeals:
 		ids := make([]ent.Value, 0, len(m.deals))
 		for id := range m.deals {
 			ids = append(ids, id)
 		}
 		return ids
+	case outboundtransaction.EdgeShipping:
+		if id := m.shipping; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
@@ -2535,9 +2472,6 @@ func (m *OutboundTransactionMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *OutboundTransactionMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedshipping != nil {
-		edges = append(edges, outboundtransaction.EdgeShipping)
-	}
 	if m.removeddeals != nil {
 		edges = append(edges, outboundtransaction.EdgeDeals)
 	}
@@ -2548,12 +2482,6 @@ func (m *OutboundTransactionMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *OutboundTransactionMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case outboundtransaction.EdgeShipping:
-		ids := make([]ent.Value, 0, len(m.removedshipping))
-		for id := range m.removedshipping {
-			ids = append(ids, id)
-		}
-		return ids
 	case outboundtransaction.EdgeDeals:
 		ids := make([]ent.Value, 0, len(m.removeddeals))
 		for id := range m.removeddeals {
@@ -2568,11 +2496,11 @@ func (m *OutboundTransactionMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *OutboundTransactionMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedshipping {
-		edges = append(edges, outboundtransaction.EdgeShipping)
-	}
 	if m.cleareddeals {
 		edges = append(edges, outboundtransaction.EdgeDeals)
+	}
+	if m.clearedshipping {
+		edges = append(edges, outboundtransaction.EdgeShipping)
 	}
 	return edges
 }
@@ -2581,10 +2509,10 @@ func (m *OutboundTransactionMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *OutboundTransactionMutation) EdgeCleared(name string) bool {
 	switch name {
-	case outboundtransaction.EdgeShipping:
-		return m.clearedshipping
 	case outboundtransaction.EdgeDeals:
 		return m.cleareddeals
+	case outboundtransaction.EdgeShipping:
+		return m.clearedshipping
 	}
 	return false
 }
@@ -2593,6 +2521,9 @@ func (m *OutboundTransactionMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *OutboundTransactionMutation) ClearEdge(name string) error {
 	switch name {
+	case outboundtransaction.EdgeShipping:
+		m.ClearShipping()
+		return nil
 	}
 	return fmt.Errorf("unknown OutboundTransaction unique edge %s", name)
 }
@@ -2602,11 +2533,11 @@ func (m *OutboundTransactionMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *OutboundTransactionMutation) ResetEdge(name string) error {
 	switch name {
-	case outboundtransaction.EdgeShipping:
-		m.ResetShipping()
-		return nil
 	case outboundtransaction.EdgeDeals:
 		m.ResetDeals()
+		return nil
+	case outboundtransaction.EdgeShipping:
+		m.ResetShipping()
 		return nil
 	}
 	return fmt.Errorf("unknown OutboundTransaction edge %s", name)

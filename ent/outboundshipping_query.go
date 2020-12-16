@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -26,6 +25,7 @@ type OutboundShippingQuery struct {
 	predicates []predicate.OutboundShipping
 	// eager-loading edges.
 	withTransaction *OutboundTransactionQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -69,7 +69,7 @@ func (osq *OutboundShippingQuery) QueryTransaction() *OutboundTransactionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outboundshipping.Table, outboundshipping.FieldID, selector),
 			sqlgraph.To(outboundtransaction.Table, outboundtransaction.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, outboundshipping.TransactionTable, outboundshipping.TransactionPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2O, true, outboundshipping.TransactionTable, outboundshipping.TransactionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(osq.driver.Dialect(), step)
 		return fromU, nil
@@ -335,15 +335,25 @@ func (osq *OutboundShippingQuery) prepareQuery(ctx context.Context) error {
 func (osq *OutboundShippingQuery) sqlAll(ctx context.Context) ([]*OutboundShipping, error) {
 	var (
 		nodes       = []*OutboundShipping{}
+		withFKs     = osq.withFKs
 		_spec       = osq.querySpec()
 		loadedTypes = [1]bool{
 			osq.withTransaction != nil,
 		}
 	)
+	if osq.withTransaction != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, outboundshipping.ForeignKeys...)
+	}
 	_spec.ScanValues = func() []interface{} {
 		node := &OutboundShipping{config: osq.config}
 		nodes = append(nodes, node)
 		values := node.scanValues()
+		if withFKs {
+			values = append(values, node.fkValues()...)
+		}
 		return values
 	}
 	_spec.Assign = func(values ...interface{}) error {
@@ -362,65 +372,26 @@ func (osq *OutboundShippingQuery) sqlAll(ctx context.Context) ([]*OutboundShippi
 	}
 
 	if query := osq.withTransaction; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*OutboundShipping, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Transaction = []*OutboundTransaction{}
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*OutboundShipping)
+		for i := range nodes {
+			if fk := nodes[i].outbound_transaction_shipping; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*OutboundShipping)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   outboundshipping.TransactionTable,
-				Columns: outboundshipping.TransactionPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(outboundshipping.TransactionPrimaryKey[1], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, osq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "transaction": %v`, err)
-		}
-		query.Where(outboundtransaction.IDIn(edgeids...))
+		query.Where(outboundtransaction.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "transaction" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_transaction_shipping" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Transaction = append(nodes[i].Edges.Transaction, n)
+				nodes[i].Edges.Transaction = n
 			}
 		}
 	}

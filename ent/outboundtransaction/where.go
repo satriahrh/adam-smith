@@ -222,41 +222,13 @@ func AmountLTE(v uint) predicate.OutboundTransaction {
 	})
 }
 
-// HasShipping applies the HasEdge predicate on the "shipping" edge.
-func HasShipping() predicate.OutboundTransaction {
-	return predicate.OutboundTransaction(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ShippingTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ShippingTable, ShippingPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasShippingWith applies the HasEdge predicate on the "shipping" edge with a given conditions (other predicates).
-func HasShippingWith(preds ...predicate.OutboundShipping) predicate.OutboundTransaction {
-	return predicate.OutboundTransaction(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ShippingInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ShippingTable, ShippingPrimaryKey...),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasDeals applies the HasEdge predicate on the "deals" edge.
 func HasDeals() predicate.OutboundTransaction {
 	return predicate.OutboundTransaction(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(DealsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, DealsTable, DealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, DealsTable, DealsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -268,7 +240,35 @@ func HasDealsWith(preds ...predicate.OutboundDeal) predicate.OutboundTransaction
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(DealsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, DealsTable, DealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, DealsTable, DealsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasShipping applies the HasEdge predicate on the "shipping" edge.
+func HasShipping() predicate.OutboundTransaction {
+	return predicate.OutboundTransaction(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ShippingTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ShippingTable, ShippingColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasShippingWith applies the HasEdge predicate on the "shipping" edge with a given conditions (other predicates).
+func HasShippingWith(preds ...predicate.OutboundShipping) predicate.OutboundTransaction {
+	return predicate.OutboundTransaction(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ShippingInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ShippingTable, ShippingColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

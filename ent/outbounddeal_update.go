@@ -73,19 +73,23 @@ func (odu *OutboundDealUpdate) SetVariation(v *Variation) *OutboundDealUpdate {
 	return odu.SetVariationID(v.ID)
 }
 
-// AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
-func (odu *OutboundDealUpdate) AddTransactionIDs(ids ...int) *OutboundDealUpdate {
-	odu.mutation.AddTransactionIDs(ids...)
+// SetTransactionID sets the transaction edge to OutboundTransaction by id.
+func (odu *OutboundDealUpdate) SetTransactionID(id int) *OutboundDealUpdate {
+	odu.mutation.SetTransactionID(id)
 	return odu
 }
 
-// AddTransaction adds the transaction edges to OutboundTransaction.
-func (odu *OutboundDealUpdate) AddTransaction(o ...*OutboundTransaction) *OutboundDealUpdate {
-	ids := make([]int, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
+// SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
+func (odu *OutboundDealUpdate) SetNillableTransactionID(id *int) *OutboundDealUpdate {
+	if id != nil {
+		odu = odu.SetTransactionID(*id)
 	}
-	return odu.AddTransactionIDs(ids...)
+	return odu
+}
+
+// SetTransaction sets the transaction edge to OutboundTransaction.
+func (odu *OutboundDealUpdate) SetTransaction(o *OutboundTransaction) *OutboundDealUpdate {
+	return odu.SetTransactionID(o.ID)
 }
 
 // Mutation returns the OutboundDealMutation object of the builder.
@@ -99,25 +103,10 @@ func (odu *OutboundDealUpdate) ClearVariation() *OutboundDealUpdate {
 	return odu
 }
 
-// ClearTransaction clears all "transaction" edges to type OutboundTransaction.
+// ClearTransaction clears the "transaction" edge to type OutboundTransaction.
 func (odu *OutboundDealUpdate) ClearTransaction() *OutboundDealUpdate {
 	odu.mutation.ClearTransaction()
 	return odu
-}
-
-// RemoveTransactionIDs removes the transaction edge to OutboundTransaction by ids.
-func (odu *OutboundDealUpdate) RemoveTransactionIDs(ids ...int) *OutboundDealUpdate {
-	odu.mutation.RemoveTransactionIDs(ids...)
-	return odu
-}
-
-// RemoveTransaction removes transaction edges to OutboundTransaction.
-func (odu *OutboundDealUpdate) RemoveTransaction(o ...*OutboundTransaction) *OutboundDealUpdate {
-	ids := make([]int, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return odu.RemoveTransactionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -254,10 +243,10 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if odu.mutation.TransactionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
+			Columns: []string{outbounddeal.TransactionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -265,34 +254,15 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 					Column: outboundtransaction.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := odu.mutation.RemovedTransactionIDs(); len(nodes) > 0 && !odu.mutation.TransactionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: outboundtransaction.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := odu.mutation.TransactionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
+			Columns: []string{outbounddeal.TransactionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -369,19 +339,23 @@ func (oduo *OutboundDealUpdateOne) SetVariation(v *Variation) *OutboundDealUpdat
 	return oduo.SetVariationID(v.ID)
 }
 
-// AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
-func (oduo *OutboundDealUpdateOne) AddTransactionIDs(ids ...int) *OutboundDealUpdateOne {
-	oduo.mutation.AddTransactionIDs(ids...)
+// SetTransactionID sets the transaction edge to OutboundTransaction by id.
+func (oduo *OutboundDealUpdateOne) SetTransactionID(id int) *OutboundDealUpdateOne {
+	oduo.mutation.SetTransactionID(id)
 	return oduo
 }
 
-// AddTransaction adds the transaction edges to OutboundTransaction.
-func (oduo *OutboundDealUpdateOne) AddTransaction(o ...*OutboundTransaction) *OutboundDealUpdateOne {
-	ids := make([]int, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
+// SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
+func (oduo *OutboundDealUpdateOne) SetNillableTransactionID(id *int) *OutboundDealUpdateOne {
+	if id != nil {
+		oduo = oduo.SetTransactionID(*id)
 	}
-	return oduo.AddTransactionIDs(ids...)
+	return oduo
+}
+
+// SetTransaction sets the transaction edge to OutboundTransaction.
+func (oduo *OutboundDealUpdateOne) SetTransaction(o *OutboundTransaction) *OutboundDealUpdateOne {
+	return oduo.SetTransactionID(o.ID)
 }
 
 // Mutation returns the OutboundDealMutation object of the builder.
@@ -395,25 +369,10 @@ func (oduo *OutboundDealUpdateOne) ClearVariation() *OutboundDealUpdateOne {
 	return oduo
 }
 
-// ClearTransaction clears all "transaction" edges to type OutboundTransaction.
+// ClearTransaction clears the "transaction" edge to type OutboundTransaction.
 func (oduo *OutboundDealUpdateOne) ClearTransaction() *OutboundDealUpdateOne {
 	oduo.mutation.ClearTransaction()
 	return oduo
-}
-
-// RemoveTransactionIDs removes the transaction edge to OutboundTransaction by ids.
-func (oduo *OutboundDealUpdateOne) RemoveTransactionIDs(ids ...int) *OutboundDealUpdateOne {
-	oduo.mutation.RemoveTransactionIDs(ids...)
-	return oduo
-}
-
-// RemoveTransaction removes transaction edges to OutboundTransaction.
-func (oduo *OutboundDealUpdateOne) RemoveTransaction(o ...*OutboundTransaction) *OutboundDealUpdateOne {
-	ids := make([]int, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return oduo.RemoveTransactionIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -548,10 +507,10 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 	}
 	if oduo.mutation.TransactionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
+			Columns: []string{outbounddeal.TransactionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -559,34 +518,15 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 					Column: outboundtransaction.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := oduo.mutation.RemovedTransactionIDs(); len(nodes) > 0 && !oduo.mutation.TransactionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: outboundtransaction.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := oduo.mutation.TransactionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
+			Columns: []string{outbounddeal.TransactionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

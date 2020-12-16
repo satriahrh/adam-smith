@@ -26,11 +26,13 @@ const (
 	VariationInverseTable = "variations"
 	// VariationColumn is the table column denoting the variation relation/edge.
 	VariationColumn = "outbound_deal_variation"
-	// TransactionTable is the table the holds the transaction relation/edge. The primary key declared below.
-	TransactionTable = "outbound_transaction_deals"
+	// TransactionTable is the table the holds the transaction relation/edge.
+	TransactionTable = "outbound_deals"
 	// TransactionInverseTable is the table name for the OutboundTransaction entity.
 	// It exists in this package in order to avoid circular dependency with the "outboundtransaction" package.
 	TransactionInverseTable = "outbound_transactions"
+	// TransactionColumn is the table column denoting the transaction relation/edge.
+	TransactionColumn = "outbound_transaction_deals"
 )
 
 // Columns holds all SQL columns for outbounddeal fields.
@@ -43,13 +45,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the OutboundDeal type.
 var ForeignKeys = []string{
 	"outbound_deal_variation",
+	"outbound_transaction_deals",
 }
-
-var (
-	// TransactionPrimaryKey and TransactionColumn2 are the table columns denoting the
-	// primary key for the transaction relation (M2M).
-	TransactionPrimaryKey = []string{"outbound_transaction_id", "outbound_deal_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

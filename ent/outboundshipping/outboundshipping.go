@@ -35,11 +35,13 @@ const (
 
 	// Table holds the table name of the outboundshipping in the database.
 	Table = "outbound_shippings"
-	// TransactionTable is the table the holds the transaction relation/edge. The primary key declared below.
-	TransactionTable = "outbound_transaction_shipping"
+	// TransactionTable is the table the holds the transaction relation/edge.
+	TransactionTable = "outbound_shippings"
 	// TransactionInverseTable is the table name for the OutboundTransaction entity.
 	// It exists in this package in order to avoid circular dependency with the "outboundtransaction" package.
 	TransactionInverseTable = "outbound_transactions"
+	// TransactionColumn is the table column denoting the transaction relation/edge.
+	TransactionColumn = "outbound_transaction_shipping"
 )
 
 // Columns holds all SQL columns for outboundshipping fields.
@@ -56,16 +58,20 @@ var Columns = []string{
 	FieldCost,
 }
 
-var (
-	// TransactionPrimaryKey and TransactionColumn2 are the table columns denoting the
-	// primary key for the transaction relation (M2M).
-	TransactionPrimaryKey = []string{"outbound_transaction_id", "outbound_shipping_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the OutboundShipping type.
+var ForeignKeys = []string{
+	"outbound_transaction_shipping",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

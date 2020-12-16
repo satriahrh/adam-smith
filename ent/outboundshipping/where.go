@@ -879,7 +879,7 @@ func HasTransaction() predicate.OutboundShipping {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TransactionTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, TransactionTable, TransactionPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2O, true, TransactionTable, TransactionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -891,7 +891,7 @@ func HasTransactionWith(preds ...predicate.OutboundTransaction) predicate.Outbou
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TransactionInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, TransactionTable, TransactionPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2O, true, TransactionTable, TransactionColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

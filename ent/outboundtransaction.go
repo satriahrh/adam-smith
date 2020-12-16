@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/facebook/ent/dialect/sql"
+	"github.com/satriahrh/adam-smith/ent/outboundshipping"
 	"github.com/satriahrh/adam-smith/ent/outboundtransaction"
 	"github.com/satriahrh/adam-smith/ent/schema"
 )
@@ -34,31 +35,36 @@ type OutboundTransaction struct {
 
 // OutboundTransactionEdges holds the relations/edges for other nodes in the graph.
 type OutboundTransactionEdges struct {
-	// Shipping holds the value of the shipping edge.
-	Shipping []*OutboundShipping
 	// Deals holds the value of the deals edge.
 	Deals []*OutboundDeal
+	// Shipping holds the value of the shipping edge.
+	Shipping *OutboundShipping
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// ShippingOrErr returns the Shipping value or an error if the edge
-// was not loaded in eager-loading.
-func (e OutboundTransactionEdges) ShippingOrErr() ([]*OutboundShipping, error) {
-	if e.loadedTypes[0] {
-		return e.Shipping, nil
-	}
-	return nil, &NotLoadedError{edge: "shipping"}
-}
-
 // DealsOrErr returns the Deals value or an error if the edge
 // was not loaded in eager-loading.
 func (e OutboundTransactionEdges) DealsOrErr() ([]*OutboundDeal, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Deals, nil
 	}
 	return nil, &NotLoadedError{edge: "deals"}
+}
+
+// ShippingOrErr returns the Shipping value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OutboundTransactionEdges) ShippingOrErr() (*OutboundShipping, error) {
+	if e.loadedTypes[1] {
+		if e.Shipping == nil {
+			// The edge shipping was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: outboundshipping.Label}
+		}
+		return e.Shipping, nil
+	}
+	return nil, &NotLoadedError{edge: "shipping"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -122,14 +128,14 @@ func (ot *OutboundTransaction) assignValues(values ...interface{}) error {
 	return nil
 }
 
-// QueryShipping queries the shipping edge of the OutboundTransaction.
-func (ot *OutboundTransaction) QueryShipping() *OutboundShippingQuery {
-	return (&OutboundTransactionClient{config: ot.config}).QueryShipping(ot)
-}
-
 // QueryDeals queries the deals edge of the OutboundTransaction.
 func (ot *OutboundTransaction) QueryDeals() *OutboundDealQuery {
 	return (&OutboundTransactionClient{config: ot.config}).QueryDeals(ot)
+}
+
+// QueryShipping queries the shipping edge of the OutboundTransaction.
+func (ot *OutboundTransaction) QueryShipping() *OutboundShippingQuery {
+	return (&OutboundTransactionClient{config: ot.config}).QueryShipping(ot)
 }
 
 // Update returns a builder for updating this OutboundTransaction.

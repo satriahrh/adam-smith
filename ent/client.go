@@ -370,7 +370,7 @@ func (c *OutboundDealClient) QueryTransaction(od *OutboundDeal) *OutboundTransac
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, id),
 			sqlgraph.To(outboundtransaction.Table, outboundtransaction.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, outbounddeal.TransactionTable, outbounddeal.TransactionPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, outbounddeal.TransactionTable, outbounddeal.TransactionColumn),
 		)
 		fromV = sqlgraph.Neighbors(od.driver.Dialect(), step)
 		return fromV, nil
@@ -474,7 +474,7 @@ func (c *OutboundShippingClient) QueryTransaction(os *OutboundShipping) *Outboun
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outboundshipping.Table, outboundshipping.FieldID, id),
 			sqlgraph.To(outboundtransaction.Table, outboundtransaction.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, outboundshipping.TransactionTable, outboundshipping.TransactionPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2O, true, outboundshipping.TransactionTable, outboundshipping.TransactionColumn),
 		)
 		fromV = sqlgraph.Neighbors(os.driver.Dialect(), step)
 		return fromV, nil
@@ -570,22 +570,6 @@ func (c *OutboundTransactionClient) GetX(ctx context.Context, id int) *OutboundT
 	return obj
 }
 
-// QueryShipping queries the shipping edge of a OutboundTransaction.
-func (c *OutboundTransactionClient) QueryShipping(ot *OutboundTransaction) *OutboundShippingQuery {
-	query := &OutboundShippingQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := ot.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(outboundtransaction.Table, outboundtransaction.FieldID, id),
-			sqlgraph.To(outboundshipping.Table, outboundshipping.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, outboundtransaction.ShippingTable, outboundtransaction.ShippingPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(ot.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryDeals queries the deals edge of a OutboundTransaction.
 func (c *OutboundTransactionClient) QueryDeals(ot *OutboundTransaction) *OutboundDealQuery {
 	query := &OutboundDealQuery{config: c.config}
@@ -594,7 +578,23 @@ func (c *OutboundTransactionClient) QueryDeals(ot *OutboundTransaction) *Outboun
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outboundtransaction.Table, outboundtransaction.FieldID, id),
 			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, outboundtransaction.DealsTable, outboundtransaction.DealsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, outboundtransaction.DealsTable, outboundtransaction.DealsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ot.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryShipping queries the shipping edge of a OutboundTransaction.
+func (c *OutboundTransactionClient) QueryShipping(ot *OutboundTransaction) *OutboundShippingQuery {
+	query := &OutboundShippingQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ot.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(outboundtransaction.Table, outboundtransaction.FieldID, id),
+			sqlgraph.To(outboundshipping.Table, outboundshipping.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, outboundtransaction.ShippingTable, outboundtransaction.ShippingColumn),
 		)
 		fromV = sqlgraph.Neighbors(ot.driver.Dialect(), step)
 		return fromV, nil

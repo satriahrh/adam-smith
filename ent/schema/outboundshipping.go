@@ -33,6 +33,7 @@ func (OutboundShipping) Fields() []ent.Field {
 func (OutboundShipping) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("transaction", OutboundTransaction.Type).
-			Ref("shipping"),
+			Ref("shipping").
+			Unique(),
 	}
 }

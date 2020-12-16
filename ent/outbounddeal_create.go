@@ -52,19 +52,23 @@ func (odc *OutboundDealCreate) SetVariation(v *Variation) *OutboundDealCreate {
 	return odc.SetVariationID(v.ID)
 }
 
-// AddTransactionIDs adds the transaction edge to OutboundTransaction by ids.
-func (odc *OutboundDealCreate) AddTransactionIDs(ids ...int) *OutboundDealCreate {
-	odc.mutation.AddTransactionIDs(ids...)
+// SetTransactionID sets the transaction edge to OutboundTransaction by id.
+func (odc *OutboundDealCreate) SetTransactionID(id int) *OutboundDealCreate {
+	odc.mutation.SetTransactionID(id)
 	return odc
 }
 
-// AddTransaction adds the transaction edges to OutboundTransaction.
-func (odc *OutboundDealCreate) AddTransaction(o ...*OutboundTransaction) *OutboundDealCreate {
-	ids := make([]int, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
+// SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
+func (odc *OutboundDealCreate) SetNillableTransactionID(id *int) *OutboundDealCreate {
+	if id != nil {
+		odc = odc.SetTransactionID(*id)
 	}
-	return odc.AddTransactionIDs(ids...)
+	return odc
+}
+
+// SetTransaction sets the transaction edge to OutboundTransaction.
+func (odc *OutboundDealCreate) SetTransaction(o *OutboundTransaction) *OutboundDealCreate {
+	return odc.SetTransactionID(o.ID)
 }
 
 // Mutation returns the OutboundDealMutation object of the builder.
@@ -188,10 +192,10 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 	}
 	if nodes := odc.mutation.TransactionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   outbounddeal.TransactionTable,
-			Columns: outbounddeal.TransactionPrimaryKey,
+			Columns: []string{outbounddeal.TransactionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

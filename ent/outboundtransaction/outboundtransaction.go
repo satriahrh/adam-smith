@@ -22,23 +22,27 @@ const (
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
 
-	// EdgeShipping holds the string denoting the shipping edge name in mutations.
-	EdgeShipping = "shipping"
 	// EdgeDeals holds the string denoting the deals edge name in mutations.
 	EdgeDeals = "deals"
+	// EdgeShipping holds the string denoting the shipping edge name in mutations.
+	EdgeShipping = "shipping"
 
 	// Table holds the table name of the outboundtransaction in the database.
 	Table = "outbound_transactions"
-	// ShippingTable is the table the holds the shipping relation/edge. The primary key declared below.
-	ShippingTable = "outbound_transaction_shipping"
-	// ShippingInverseTable is the table name for the OutboundShipping entity.
-	// It exists in this package in order to avoid circular dependency with the "outboundshipping" package.
-	ShippingInverseTable = "outbound_shippings"
-	// DealsTable is the table the holds the deals relation/edge. The primary key declared below.
-	DealsTable = "outbound_transaction_deals"
+	// DealsTable is the table the holds the deals relation/edge.
+	DealsTable = "outbound_deals"
 	// DealsInverseTable is the table name for the OutboundDeal entity.
 	// It exists in this package in order to avoid circular dependency with the "outbounddeal" package.
 	DealsInverseTable = "outbound_deals"
+	// DealsColumn is the table column denoting the deals relation/edge.
+	DealsColumn = "outbound_transaction_deals"
+	// ShippingTable is the table the holds the shipping relation/edge.
+	ShippingTable = "outbound_shippings"
+	// ShippingInverseTable is the table name for the OutboundShipping entity.
+	// It exists in this package in order to avoid circular dependency with the "outboundshipping" package.
+	ShippingInverseTable = "outbound_shippings"
+	// ShippingColumn is the table column denoting the shipping relation/edge.
+	ShippingColumn = "outbound_transaction_shipping"
 )
 
 // Columns holds all SQL columns for outboundtransaction fields.
@@ -50,15 +54,6 @@ var Columns = []string{
 	FieldCost,
 	FieldAmount,
 }
-
-var (
-	// ShippingPrimaryKey and ShippingColumn2 are the table columns denoting the
-	// primary key for the shipping relation (M2M).
-	ShippingPrimaryKey = []string{"outbound_transaction_id", "outbound_shipping_id"}
-	// DealsPrimaryKey and DealsColumn2 are the table columns denoting the
-	// primary key for the deals relation (M2M).
-	DealsPrimaryKey = []string{"outbound_transaction_id", "outbound_deal_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

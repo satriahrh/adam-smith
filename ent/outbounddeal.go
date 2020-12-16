@@ -8,6 +8,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/satriahrh/adam-smith/ent/outbounddeal"
+	"github.com/satriahrh/adam-smith/ent/outboundtransaction"
 	"github.com/satriahrh/adam-smith/ent/variation"
 )
 
@@ -22,8 +23,9 @@ type OutboundDeal struct {
 	Amount uint `json:"amount,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OutboundDealQuery when eager-loading is set.
-	Edges                   OutboundDealEdges `json:"edges"`
-	outbound_deal_variation *int
+	Edges                      OutboundDealEdges `json:"edges"`
+	outbound_deal_variation    *int
+	outbound_transaction_deals *int
 }
 
 // OutboundDealEdges holds the relations/edges for other nodes in the graph.
@@ -31,7 +33,7 @@ type OutboundDealEdges struct {
 	// Variation holds the value of the variation edge.
 	Variation *Variation
 	// Transaction holds the value of the transaction edge.
-	Transaction []*OutboundTransaction
+	Transaction *OutboundTransaction
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -52,9 +54,14 @@ func (e OutboundDealEdges) VariationOrErr() (*Variation, error) {
 }
 
 // TransactionOrErr returns the Transaction value or an error if the edge
-// was not loaded in eager-loading.
-func (e OutboundDealEdges) TransactionOrErr() ([]*OutboundTransaction, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OutboundDealEdges) TransactionOrErr() (*OutboundTransaction, error) {
 	if e.loadedTypes[1] {
+		if e.Transaction == nil {
+			// The edge transaction was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: outboundtransaction.Label}
+		}
 		return e.Transaction, nil
 	}
 	return nil, &NotLoadedError{edge: "transaction"}
@@ -73,6 +80,7 @@ func (*OutboundDeal) scanValues() []interface{} {
 func (*OutboundDeal) fkValues() []interface{} {
 	return []interface{}{
 		&sql.NullInt64{}, // outbound_deal_variation
+		&sql.NullInt64{}, // outbound_transaction_deals
 	}
 }
 
@@ -105,6 +113,12 @@ func (od *OutboundDeal) assignValues(values ...interface{}) error {
 		} else if value.Valid {
 			od.outbound_deal_variation = new(int)
 			*od.outbound_deal_variation = int(value.Int64)
+		}
+		if value, ok := values[1].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field outbound_transaction_deals", value)
+		} else if value.Valid {
+			od.outbound_transaction_deals = new(int)
+			*od.outbound_transaction_deals = int(value.Int64)
 		}
 	}
 	return nil

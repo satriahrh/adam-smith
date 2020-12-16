@@ -25,6 +25,7 @@ func (OutboundDeal) Edges() []ent.Edge {
 		edge.To("variation", Variation.Type).
 			Unique(),
 		edge.From("transaction", OutboundTransaction.Type).
-			Ref("deals"),
+			Ref("deals").
+			Unique(),
 	}
 }

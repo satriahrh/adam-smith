@@ -8,6 +8,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/satriahrh/adam-smith/ent/outboundshipping"
+	"github.com/satriahrh/adam-smith/ent/outboundtransaction"
 )
 
 // OutboundShipping is the model entity for the OutboundShipping schema.
@@ -35,22 +36,28 @@ type OutboundShipping struct {
 	Cost uint `json:"cost,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OutboundShippingQuery when eager-loading is set.
-	Edges OutboundShippingEdges `json:"edges"`
+	Edges                         OutboundShippingEdges `json:"edges"`
+	outbound_transaction_shipping *int
 }
 
 // OutboundShippingEdges holds the relations/edges for other nodes in the graph.
 type OutboundShippingEdges struct {
 	// Transaction holds the value of the transaction edge.
-	Transaction []*OutboundTransaction
+	Transaction *OutboundTransaction
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // TransactionOrErr returns the Transaction value or an error if the edge
-// was not loaded in eager-loading.
-func (e OutboundShippingEdges) TransactionOrErr() ([]*OutboundTransaction, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OutboundShippingEdges) TransactionOrErr() (*OutboundTransaction, error) {
 	if e.loadedTypes[0] {
+		if e.Transaction == nil {
+			// The edge transaction was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: outboundtransaction.Label}
+		}
 		return e.Transaction, nil
 	}
 	return nil, &NotLoadedError{edge: "transaction"}
@@ -69,6 +76,13 @@ func (*OutboundShipping) scanValues() []interface{} {
 		&sql.NullString{}, // address
 		&sql.NullInt64{},  // postal_code
 		&sql.NullInt64{},  // cost
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*OutboundShipping) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // outbound_transaction_shipping
 	}
 }
 
@@ -128,6 +142,15 @@ func (os *OutboundShipping) assignValues(values ...interface{}) error {
 		return fmt.Errorf("unexpected type %T for field cost", values[8])
 	} else if value.Valid {
 		os.Cost = uint(value.Int64)
+	}
+	values = values[9:]
+	if len(values) == len(outboundshipping.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field outbound_transaction_shipping", value)
+		} else if value.Valid {
+			os.outbound_transaction_shipping = new(int)
+			*os.outbound_transaction_shipping = int(value.Int64)
+		}
 	}
 	return nil
 }
