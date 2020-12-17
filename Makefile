@@ -1,11 +1,14 @@
 export GEN_ROOT_DIRECTORY = './generated'
 
 setup:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go
-	go mod vendor
+	go get google.golang.org/protobuf/cmd/protoc-gen-go
+	go get github.com/facebook/ent/cmd/ent
 generate:
+	make generate-ent
+	make generate-proto
+generate-ent:
 	go generate ent/generate.go
 generate-proto:
-	protoc --proto_path=proto --go_out=build/proto --go_opt=paths=source_relative proto/brand.proto
+	protoc --proto_path=proto --go_out=build/proto --go_opt=paths=source_relative proto/*.proto
 %:
 	@:
