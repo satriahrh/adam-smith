@@ -14,8 +14,12 @@ import (
 func init() {
 	brandFields := schema.Brand{}.Fields()
 	_ = brandFields
+	// brandDescCode is the schema descriptor for code field.
+	brandDescCode := brandFields[0].Descriptor()
+	// brand.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	brand.CodeValidator = brandDescCode.Validators[0].(func(string) error)
 	// brandDescName is the schema descriptor for name field.
-	brandDescName := brandFields[0].Descriptor()
+	brandDescName := brandFields[1].Descriptor()
 	// brand.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	brand.NameValidator = brandDescName.Validators[0].(func(string) error)
 	variationFields := schema.Variation{}.Fields()

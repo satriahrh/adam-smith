@@ -11,6 +11,7 @@ var (
 	// BrandsColumns holds the columns for the "brands" table.
 	BrandsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 	}
 	// BrandsTable holds the schema information for the "brands" table.

@@ -15,6 +15,8 @@ type Brand struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Code holds the value of the "code" field.
+	Code string `json:"code,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -44,6 +46,7 @@ func (e BrandEdges) ProductsOrErr() ([]*Product, error) {
 func (*Brand) scanValues() []interface{} {
 	return []interface{}{
 		&sql.NullInt64{},  // id
+		&sql.NullString{}, // code
 		&sql.NullString{}, // name
 	}
 }
@@ -61,7 +64,12 @@ func (b *Brand) assignValues(values ...interface{}) error {
 	b.ID = int(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field name", values[0])
+		return fmt.Errorf("unexpected type %T for field code", values[0])
+	} else if value.Valid {
+		b.Code = value.String
+	}
+	if value, ok := values[1].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field name", values[1])
 	} else if value.Valid {
 		b.Name = value.String
 	}
@@ -96,6 +104,8 @@ func (b *Brand) String() string {
 	var builder strings.Builder
 	builder.WriteString("Brand(")
 	builder.WriteString(fmt.Sprintf("id=%v", b.ID))
+	builder.WriteString(", code=")
+	builder.WriteString(b.Code)
 	builder.WriteString(", name=")
 	builder.WriteString(b.Name)
 	builder.WriteByte(')')

@@ -276,12 +276,12 @@ func (bq *BrandQuery) WithProducts(opts ...func(*ProductQuery)) *BrandQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Code string `json:"code,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Brand.Query().
-//		GroupBy(brand.FieldName).
+//		GroupBy(brand.FieldCode).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -302,11 +302,11 @@ func (bq *BrandQuery) GroupBy(field string, fields ...string) *BrandGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Code string `json:"code,omitempty"`
 //	}
 //
 //	client.Brand.Query().
-//		Select(brand.FieldName).
+//		Select(brand.FieldCode).
 //		Scan(ctx, &v)
 //
 func (bq *BrandQuery) Select(field string, fields ...string) *BrandSelect {

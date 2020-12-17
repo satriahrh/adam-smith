@@ -45,6 +45,7 @@ type BrandMutation struct {
 	op              Op
 	typ             string
 	id              *int
+	code            *string
 	name            *string
 	clearedFields   map[string]struct{}
 	products        map[int]struct{}
@@ -132,6 +133,43 @@ func (m *BrandMutation) ID() (id int, exists bool) {
 		return
 	}
 	return *m.id, true
+}
+
+// SetCode sets the code field.
+func (m *BrandMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the code value in the mutation.
+func (m *BrandMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old code value of the Brand.
+// If the Brand object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *BrandMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCode is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode reset all changes of the "code" field.
+func (m *BrandMutation) ResetCode() {
+	m.code = nil
 }
 
 // SetName sets the name field.
@@ -238,7 +276,10 @@ func (m *BrandMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *BrandMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
+	if m.code != nil {
+		fields = append(fields, brand.FieldCode)
+	}
 	if m.name != nil {
 		fields = append(fields, brand.FieldName)
 	}
@@ -250,6 +291,8 @@ func (m *BrandMutation) Fields() []string {
 // not set, or was not define in the schema.
 func (m *BrandMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case brand.FieldCode:
+		return m.Code()
 	case brand.FieldName:
 		return m.Name()
 	}
@@ -261,6 +304,8 @@ func (m *BrandMutation) Field(name string) (ent.Value, bool) {
 // or the query to the database was failed.
 func (m *BrandMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case brand.FieldCode:
+		return m.OldCode(ctx)
 	case brand.FieldName:
 		return m.OldName(ctx)
 	}
@@ -272,6 +317,13 @@ func (m *BrandMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type mismatch the field type.
 func (m *BrandMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case brand.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
 	case brand.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -329,6 +381,9 @@ func (m *BrandMutation) ClearField(name string) error {
 // defined in the schema.
 func (m *BrandMutation) ResetField(name string) error {
 	switch name {
+	case brand.FieldCode:
+		m.ResetCode()
+		return nil
 	case brand.FieldName:
 		m.ResetName()
 		return nil

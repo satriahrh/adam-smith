@@ -7,6 +7,8 @@ const (
 	Label = "brand"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCode holds the string denoting the code field in the database.
+	FieldCode = "code"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 
@@ -27,6 +29,7 @@ const (
 // Columns holds all SQL columns for brand fields.
 var Columns = []string{
 	FieldID,
+	FieldCode,
 	FieldName,
 }
 
@@ -41,6 +44,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	CodeValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 )
