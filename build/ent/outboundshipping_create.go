@@ -75,13 +75,13 @@ func (osc *OutboundShippingCreate) SetCost(u uint) *OutboundShippingCreate {
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (osc *OutboundShippingCreate) SetTransactionID(id int) *OutboundShippingCreate {
+func (osc *OutboundShippingCreate) SetTransactionID(id uint64) *OutboundShippingCreate {
 	osc.mutation.SetTransactionID(id)
 	return osc
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (osc *OutboundShippingCreate) SetNillableTransactionID(id *int) *OutboundShippingCreate {
+func (osc *OutboundShippingCreate) SetNillableTransactionID(id *uint64) *OutboundShippingCreate {
 	if id != nil {
 		osc = osc.SetTransactionID(*id)
 	}
@@ -198,7 +198,7 @@ func (osc *OutboundShippingCreate) sqlSave(ctx context.Context) (*OutboundShippi
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -208,7 +208,7 @@ func (osc *OutboundShippingCreate) createSpec() (*OutboundShipping, *sqlgraph.Cr
 		_spec = &sqlgraph.CreateSpec{
 			Table: outboundshipping.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundshipping.FieldID,
 			},
 		}
@@ -294,7 +294,7 @@ func (osc *OutboundShippingCreate) createSpec() (*OutboundShipping, *sqlgraph.Cr
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -347,7 +347,7 @@ func (oscb *OutboundShippingCreateBulk) Save(ctx context.Context) ([]*OutboundSh
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

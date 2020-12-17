@@ -96,13 +96,13 @@ func (osu *OutboundShippingUpdate) AddCost(u uint) *OutboundShippingUpdate {
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (osu *OutboundShippingUpdate) SetTransactionID(id int) *OutboundShippingUpdate {
+func (osu *OutboundShippingUpdate) SetTransactionID(id uint64) *OutboundShippingUpdate {
 	osu.mutation.SetTransactionID(id)
 	return osu
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (osu *OutboundShippingUpdate) SetNillableTransactionID(id *int) *OutboundShippingUpdate {
+func (osu *OutboundShippingUpdate) SetNillableTransactionID(id *uint64) *OutboundShippingUpdate {
 	if id != nil {
 		osu = osu.SetTransactionID(*id)
 	}
@@ -208,7 +208,7 @@ func (osu *OutboundShippingUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Table:   outboundshipping.Table,
 			Columns: outboundshipping.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundshipping.FieldID,
 			},
 		},
@@ -306,7 +306,7 @@ func (osu *OutboundShippingUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -322,7 +322,7 @@ func (osu *OutboundShippingUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -419,13 +419,13 @@ func (osuo *OutboundShippingUpdateOne) AddCost(u uint) *OutboundShippingUpdateOn
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (osuo *OutboundShippingUpdateOne) SetTransactionID(id int) *OutboundShippingUpdateOne {
+func (osuo *OutboundShippingUpdateOne) SetTransactionID(id uint64) *OutboundShippingUpdateOne {
 	osuo.mutation.SetTransactionID(id)
 	return osuo
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (osuo *OutboundShippingUpdateOne) SetNillableTransactionID(id *int) *OutboundShippingUpdateOne {
+func (osuo *OutboundShippingUpdateOne) SetNillableTransactionID(id *uint64) *OutboundShippingUpdateOne {
 	if id != nil {
 		osuo = osuo.SetTransactionID(*id)
 	}
@@ -531,7 +531,7 @@ func (osuo *OutboundShippingUpdateOne) sqlSave(ctx context.Context) (_node *Outb
 			Table:   outboundshipping.Table,
 			Columns: outboundshipping.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundshipping.FieldID,
 			},
 		},
@@ -627,7 +627,7 @@ func (osuo *OutboundShippingUpdateOne) sqlSave(ctx context.Context) (_node *Outb
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -643,7 +643,7 @@ func (osuo *OutboundShippingUpdateOne) sqlSave(ctx context.Context) (_node *Outb
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},

@@ -14,7 +14,7 @@ import (
 type Variant struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type variant.Type `json:"type,omitempty"`
 	// Value holds the value of the "value" field.
@@ -61,7 +61,7 @@ func (v *Variant) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	v.ID = int(value.Int64)
+	v.ID = uint64(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field type", values[0])

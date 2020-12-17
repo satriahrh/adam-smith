@@ -67,14 +67,14 @@ func (otu *OutboundTransactionUpdate) AddAmount(u uint) *OutboundTransactionUpda
 }
 
 // AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (otu *OutboundTransactionUpdate) AddDealIDs(ids ...int) *OutboundTransactionUpdate {
+func (otu *OutboundTransactionUpdate) AddDealIDs(ids ...uint64) *OutboundTransactionUpdate {
 	otu.mutation.AddDealIDs(ids...)
 	return otu
 }
 
 // AddDeals adds the deals edges to OutboundDeal.
 func (otu *OutboundTransactionUpdate) AddDeals(o ...*OutboundDeal) *OutboundTransactionUpdate {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -82,13 +82,13 @@ func (otu *OutboundTransactionUpdate) AddDeals(o ...*OutboundDeal) *OutboundTran
 }
 
 // SetShippingID sets the shipping edge to OutboundShipping by id.
-func (otu *OutboundTransactionUpdate) SetShippingID(id int) *OutboundTransactionUpdate {
+func (otu *OutboundTransactionUpdate) SetShippingID(id uint64) *OutboundTransactionUpdate {
 	otu.mutation.SetShippingID(id)
 	return otu
 }
 
 // SetNillableShippingID sets the shipping edge to OutboundShipping by id if the given value is not nil.
-func (otu *OutboundTransactionUpdate) SetNillableShippingID(id *int) *OutboundTransactionUpdate {
+func (otu *OutboundTransactionUpdate) SetNillableShippingID(id *uint64) *OutboundTransactionUpdate {
 	if id != nil {
 		otu = otu.SetShippingID(*id)
 	}
@@ -112,14 +112,14 @@ func (otu *OutboundTransactionUpdate) ClearDeals() *OutboundTransactionUpdate {
 }
 
 // RemoveDealIDs removes the deals edge to OutboundDeal by ids.
-func (otu *OutboundTransactionUpdate) RemoveDealIDs(ids ...int) *OutboundTransactionUpdate {
+func (otu *OutboundTransactionUpdate) RemoveDealIDs(ids ...uint64) *OutboundTransactionUpdate {
 	otu.mutation.RemoveDealIDs(ids...)
 	return otu
 }
 
 // RemoveDeals removes deals edges to OutboundDeal.
 func (otu *OutboundTransactionUpdate) RemoveDeals(o ...*OutboundDeal) *OutboundTransactionUpdate {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -205,7 +205,7 @@ func (otu *OutboundTransactionUpdate) sqlSave(ctx context.Context) (n int, err e
 			Table:   outboundtransaction.Table,
 			Columns: outboundtransaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundtransaction.FieldID,
 			},
 		},
@@ -268,7 +268,7 @@ func (otu *OutboundTransactionUpdate) sqlSave(ctx context.Context) (n int, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -284,7 +284,7 @@ func (otu *OutboundTransactionUpdate) sqlSave(ctx context.Context) (n int, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -303,7 +303,7 @@ func (otu *OutboundTransactionUpdate) sqlSave(ctx context.Context) (n int, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -322,7 +322,7 @@ func (otu *OutboundTransactionUpdate) sqlSave(ctx context.Context) (n int, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundshipping.FieldID,
 				},
 			},
@@ -338,7 +338,7 @@ func (otu *OutboundTransactionUpdate) sqlSave(ctx context.Context) (n int, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundshipping.FieldID,
 				},
 			},
@@ -404,14 +404,14 @@ func (otuo *OutboundTransactionUpdateOne) AddAmount(u uint) *OutboundTransaction
 }
 
 // AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (otuo *OutboundTransactionUpdateOne) AddDealIDs(ids ...int) *OutboundTransactionUpdateOne {
+func (otuo *OutboundTransactionUpdateOne) AddDealIDs(ids ...uint64) *OutboundTransactionUpdateOne {
 	otuo.mutation.AddDealIDs(ids...)
 	return otuo
 }
 
 // AddDeals adds the deals edges to OutboundDeal.
 func (otuo *OutboundTransactionUpdateOne) AddDeals(o ...*OutboundDeal) *OutboundTransactionUpdateOne {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -419,13 +419,13 @@ func (otuo *OutboundTransactionUpdateOne) AddDeals(o ...*OutboundDeal) *Outbound
 }
 
 // SetShippingID sets the shipping edge to OutboundShipping by id.
-func (otuo *OutboundTransactionUpdateOne) SetShippingID(id int) *OutboundTransactionUpdateOne {
+func (otuo *OutboundTransactionUpdateOne) SetShippingID(id uint64) *OutboundTransactionUpdateOne {
 	otuo.mutation.SetShippingID(id)
 	return otuo
 }
 
 // SetNillableShippingID sets the shipping edge to OutboundShipping by id if the given value is not nil.
-func (otuo *OutboundTransactionUpdateOne) SetNillableShippingID(id *int) *OutboundTransactionUpdateOne {
+func (otuo *OutboundTransactionUpdateOne) SetNillableShippingID(id *uint64) *OutboundTransactionUpdateOne {
 	if id != nil {
 		otuo = otuo.SetShippingID(*id)
 	}
@@ -449,14 +449,14 @@ func (otuo *OutboundTransactionUpdateOne) ClearDeals() *OutboundTransactionUpdat
 }
 
 // RemoveDealIDs removes the deals edge to OutboundDeal by ids.
-func (otuo *OutboundTransactionUpdateOne) RemoveDealIDs(ids ...int) *OutboundTransactionUpdateOne {
+func (otuo *OutboundTransactionUpdateOne) RemoveDealIDs(ids ...uint64) *OutboundTransactionUpdateOne {
 	otuo.mutation.RemoveDealIDs(ids...)
 	return otuo
 }
 
 // RemoveDeals removes deals edges to OutboundDeal.
 func (otuo *OutboundTransactionUpdateOne) RemoveDeals(o ...*OutboundDeal) *OutboundTransactionUpdateOne {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -542,7 +542,7 @@ func (otuo *OutboundTransactionUpdateOne) sqlSave(ctx context.Context) (_node *O
 			Table:   outboundtransaction.Table,
 			Columns: outboundtransaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundtransaction.FieldID,
 			},
 		},
@@ -603,7 +603,7 @@ func (otuo *OutboundTransactionUpdateOne) sqlSave(ctx context.Context) (_node *O
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -619,7 +619,7 @@ func (otuo *OutboundTransactionUpdateOne) sqlSave(ctx context.Context) (_node *O
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -638,7 +638,7 @@ func (otuo *OutboundTransactionUpdateOne) sqlSave(ctx context.Context) (_node *O
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -657,7 +657,7 @@ func (otuo *OutboundTransactionUpdateOne) sqlSave(ctx context.Context) (_node *O
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundshipping.FieldID,
 				},
 			},
@@ -673,7 +673,7 @@ func (otuo *OutboundTransactionUpdateOne) sqlSave(ctx context.Context) (_node *O
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundshipping.FieldID,
 				},
 			},

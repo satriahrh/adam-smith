@@ -17,7 +17,7 @@ import (
 type Product struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Sku holds the value of the "sku" field.
 	Sku string `json:"sku,omitempty"`
 	// Name holds the value of the "name" field.
@@ -31,7 +31,7 @@ type Product struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
 	Edges          ProductEdges `json:"edges"`
-	brand_products *int
+	brand_products *uint64
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
@@ -97,7 +97,7 @@ func (pr *Product) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	pr.ID = int(value.Int64)
+	pr.ID = uint64(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field sku", values[0])
@@ -138,8 +138,8 @@ func (pr *Product) assignValues(values ...interface{}) error {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field brand_products", value)
 		} else if value.Valid {
-			pr.brand_products = new(int)
-			*pr.brand_products = int(value.Int64)
+			pr.brand_products = new(uint64)
+			*pr.brand_products = uint64(value.Int64)
 		}
 	}
 	return nil

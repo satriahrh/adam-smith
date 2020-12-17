@@ -99,8 +99,8 @@ func (bq *BrandQuery) FirstX(ctx context.Context) *Brand {
 }
 
 // FirstID returns the first Brand id in the query. Returns *NotFoundError when no id was found.
-func (bq *BrandQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (bq *BrandQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = bq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -112,7 +112,7 @@ func (bq *BrandQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (bq *BrandQuery) FirstIDX(ctx context.Context) int {
+func (bq *BrandQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := bq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -146,8 +146,8 @@ func (bq *BrandQuery) OnlyX(ctx context.Context) *Brand {
 }
 
 // OnlyID returns the only Brand id in the query, returns an error if not exactly one id was returned.
-func (bq *BrandQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (bq *BrandQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = bq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -163,7 +163,7 @@ func (bq *BrandQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (bq *BrandQuery) OnlyIDX(ctx context.Context) int {
+func (bq *BrandQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := bq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -189,8 +189,8 @@ func (bq *BrandQuery) AllX(ctx context.Context) []*Brand {
 }
 
 // IDs executes the query and returns a list of Brand ids.
-func (bq *BrandQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (bq *BrandQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := bq.Select(brand.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (bq *BrandQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (bq *BrandQuery) IDsX(ctx context.Context) []int {
+func (bq *BrandQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := bq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -363,7 +363,7 @@ func (bq *BrandQuery) sqlAll(ctx context.Context) ([]*Brand, error) {
 
 	if query := bq.withProducts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Brand)
+		nodeids := make(map[uint64]*Brand)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -412,7 +412,7 @@ func (bq *BrandQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   brand.Table,
 			Columns: brand.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: brand.FieldID,
 			},
 		},

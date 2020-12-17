@@ -34,13 +34,13 @@ func (odc *OutboundDealCreate) SetAmount(u uint) *OutboundDealCreate {
 }
 
 // SetVariationID sets the variation edge to Variation by id.
-func (odc *OutboundDealCreate) SetVariationID(id int) *OutboundDealCreate {
+func (odc *OutboundDealCreate) SetVariationID(id uint64) *OutboundDealCreate {
 	odc.mutation.SetVariationID(id)
 	return odc
 }
 
 // SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (odc *OutboundDealCreate) SetNillableVariationID(id *int) *OutboundDealCreate {
+func (odc *OutboundDealCreate) SetNillableVariationID(id *uint64) *OutboundDealCreate {
 	if id != nil {
 		odc = odc.SetVariationID(*id)
 	}
@@ -53,13 +53,13 @@ func (odc *OutboundDealCreate) SetVariation(v *Variation) *OutboundDealCreate {
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (odc *OutboundDealCreate) SetTransactionID(id int) *OutboundDealCreate {
+func (odc *OutboundDealCreate) SetTransactionID(id uint64) *OutboundDealCreate {
 	odc.mutation.SetTransactionID(id)
 	return odc
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (odc *OutboundDealCreate) SetNillableTransactionID(id *int) *OutboundDealCreate {
+func (odc *OutboundDealCreate) SetNillableTransactionID(id *uint64) *OutboundDealCreate {
 	if id != nil {
 		odc = odc.SetTransactionID(*id)
 	}
@@ -140,7 +140,7 @@ func (odc *OutboundDealCreate) sqlSave(ctx context.Context) (*OutboundDeal, erro
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -150,7 +150,7 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 		_spec = &sqlgraph.CreateSpec{
 			Table: outbounddeal.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		}
@@ -180,7 +180,7 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -199,7 +199,7 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -252,7 +252,7 @@ func (odcb *OutboundDealCreateBulk) Save(ctx context.Context) ([]*OutboundDeal, 
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

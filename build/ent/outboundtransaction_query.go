@@ -123,8 +123,8 @@ func (otq *OutboundTransactionQuery) FirstX(ctx context.Context) *OutboundTransa
 }
 
 // FirstID returns the first OutboundTransaction id in the query. Returns *NotFoundError when no id was found.
-func (otq *OutboundTransactionQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (otq *OutboundTransactionQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = otq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -136,7 +136,7 @@ func (otq *OutboundTransactionQuery) FirstID(ctx context.Context) (id int, err e
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (otq *OutboundTransactionQuery) FirstIDX(ctx context.Context) int {
+func (otq *OutboundTransactionQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := otq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -170,8 +170,8 @@ func (otq *OutboundTransactionQuery) OnlyX(ctx context.Context) *OutboundTransac
 }
 
 // OnlyID returns the only OutboundTransaction id in the query, returns an error if not exactly one id was returned.
-func (otq *OutboundTransactionQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (otq *OutboundTransactionQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = otq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -187,7 +187,7 @@ func (otq *OutboundTransactionQuery) OnlyID(ctx context.Context) (id int, err er
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (otq *OutboundTransactionQuery) OnlyIDX(ctx context.Context) int {
+func (otq *OutboundTransactionQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := otq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -213,8 +213,8 @@ func (otq *OutboundTransactionQuery) AllX(ctx context.Context) []*OutboundTransa
 }
 
 // IDs executes the query and returns a list of OutboundTransaction ids.
-func (otq *OutboundTransactionQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (otq *OutboundTransactionQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := otq.Select(outboundtransaction.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func (otq *OutboundTransactionQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (otq *OutboundTransactionQuery) IDsX(ctx context.Context) []int {
+func (otq *OutboundTransactionQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := otq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -400,7 +400,7 @@ func (otq *OutboundTransactionQuery) sqlAll(ctx context.Context) ([]*OutboundTra
 
 	if query := otq.withDeals; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*OutboundTransaction)
+		nodeids := make(map[uint64]*OutboundTransaction)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -429,7 +429,7 @@ func (otq *OutboundTransactionQuery) sqlAll(ctx context.Context) ([]*OutboundTra
 
 	if query := otq.withShipping; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*OutboundTransaction)
+		nodeids := make(map[uint64]*OutboundTransaction)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -477,7 +477,7 @@ func (otq *OutboundTransactionQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   outboundtransaction.Table,
 			Columns: outboundtransaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundtransaction.FieldID,
 			},
 		},

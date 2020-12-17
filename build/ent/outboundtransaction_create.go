@@ -53,14 +53,14 @@ func (otc *OutboundTransactionCreate) SetAmount(u uint) *OutboundTransactionCrea
 }
 
 // AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (otc *OutboundTransactionCreate) AddDealIDs(ids ...int) *OutboundTransactionCreate {
+func (otc *OutboundTransactionCreate) AddDealIDs(ids ...uint64) *OutboundTransactionCreate {
 	otc.mutation.AddDealIDs(ids...)
 	return otc
 }
 
 // AddDeals adds the deals edges to OutboundDeal.
 func (otc *OutboundTransactionCreate) AddDeals(o ...*OutboundDeal) *OutboundTransactionCreate {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -68,13 +68,13 @@ func (otc *OutboundTransactionCreate) AddDeals(o ...*OutboundDeal) *OutboundTran
 }
 
 // SetShippingID sets the shipping edge to OutboundShipping by id.
-func (otc *OutboundTransactionCreate) SetShippingID(id int) *OutboundTransactionCreate {
+func (otc *OutboundTransactionCreate) SetShippingID(id uint64) *OutboundTransactionCreate {
 	otc.mutation.SetShippingID(id)
 	return otc
 }
 
 // SetNillableShippingID sets the shipping edge to OutboundShipping by id if the given value is not nil.
-func (otc *OutboundTransactionCreate) SetNillableShippingID(id *int) *OutboundTransactionCreate {
+func (otc *OutboundTransactionCreate) SetNillableShippingID(id *uint64) *OutboundTransactionCreate {
 	if id != nil {
 		otc = otc.SetShippingID(*id)
 	}
@@ -169,7 +169,7 @@ func (otc *OutboundTransactionCreate) sqlSave(ctx context.Context) (*OutboundTra
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -179,7 +179,7 @@ func (otc *OutboundTransactionCreate) createSpec() (*OutboundTransaction, *sqlgr
 		_spec = &sqlgraph.CreateSpec{
 			Table: outboundtransaction.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundtransaction.FieldID,
 			},
 		}
@@ -233,7 +233,7 @@ func (otc *OutboundTransactionCreate) createSpec() (*OutboundTransaction, *sqlgr
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -252,7 +252,7 @@ func (otc *OutboundTransactionCreate) createSpec() (*OutboundTransaction, *sqlgr
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundshipping.FieldID,
 				},
 			},
@@ -305,7 +305,7 @@ func (otcb *OutboundTransactionCreateBulk) Save(ctx context.Context) ([]*Outboun
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

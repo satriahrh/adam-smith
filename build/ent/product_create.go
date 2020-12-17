@@ -53,14 +53,14 @@ func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplace) *ProductC
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (pc *ProductCreate) AddVariationIDs(ids ...int) *ProductCreate {
+func (pc *ProductCreate) AddVariationIDs(ids ...uint64) *ProductCreate {
 	pc.mutation.AddVariationIDs(ids...)
 	return pc
 }
 
 // AddVariations adds the variations edges to Variation.
 func (pc *ProductCreate) AddVariations(v ...*Variation) *ProductCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -68,13 +68,13 @@ func (pc *ProductCreate) AddVariations(v ...*Variation) *ProductCreate {
 }
 
 // SetBrandID sets the brand edge to Brand by id.
-func (pc *ProductCreate) SetBrandID(id int) *ProductCreate {
+func (pc *ProductCreate) SetBrandID(id uint64) *ProductCreate {
 	pc.mutation.SetBrandID(id)
 	return pc
 }
 
 // SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
-func (pc *ProductCreate) SetNillableBrandID(id *int) *ProductCreate {
+func (pc *ProductCreate) SetNillableBrandID(id *uint64) *ProductCreate {
 	if id != nil {
 		pc = pc.SetBrandID(*id)
 	}
@@ -164,7 +164,7 @@ func (pc *ProductCreate) sqlSave(ctx context.Context) (*Product, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -174,7 +174,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: product.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: product.FieldID,
 			},
 		}
@@ -228,7 +228,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -247,7 +247,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: brand.FieldID,
 				},
 			},
@@ -300,7 +300,7 @@ func (pcb *ProductCreateBulk) Save(ctx context.Context) ([]*Product, error) {
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

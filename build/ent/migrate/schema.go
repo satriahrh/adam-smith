@@ -10,7 +10,7 @@ import (
 var (
 	// BrandsColumns holds the columns for the "brands" table.
 	BrandsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "code", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 	}
@@ -23,11 +23,11 @@ var (
 	}
 	// OutboundDealsColumns holds the columns for the "outbound_deals" table.
 	OutboundDealsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "quantity", Type: field.TypeUint},
 		{Name: "amount", Type: field.TypeUint},
-		{Name: "outbound_deal_variation", Type: field.TypeInt, Nullable: true},
-		{Name: "outbound_transaction_deals", Type: field.TypeInt, Nullable: true},
+		{Name: "outbound_deal_variation", Type: field.TypeUint64, Nullable: true},
+		{Name: "outbound_transaction_deals", Type: field.TypeUint64, Nullable: true},
 	}
 	// OutboundDealsTable holds the schema information for the "outbound_deals" table.
 	OutboundDealsTable = &schema.Table{
@@ -53,7 +53,7 @@ var (
 	}
 	// OutboundShippingsColumns holds the columns for the "outbound_shippings" table.
 	OutboundShippingsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "courier", Type: field.TypeEnum, Enums: []string{"self", "jnt", "shopee_express", "jne", "sicepat", "ninja_express", "anteraja", "pos_indonesia"}},
 		{Name: "courier_tracking_code", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"pick", "drop"}},
@@ -63,7 +63,7 @@ var (
 		{Name: "address", Type: field.TypeString},
 		{Name: "postal_code", Type: field.TypeUint},
 		{Name: "cost", Type: field.TypeUint},
-		{Name: "outbound_transaction_shipping", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "outbound_transaction_shipping", Type: field.TypeUint64, Unique: true, Nullable: true},
 	}
 	// OutboundShippingsTable holds the schema information for the "outbound_shippings" table.
 	OutboundShippingsTable = &schema.Table{
@@ -82,7 +82,7 @@ var (
 	}
 	// OutboundTransactionsColumns holds the columns for the "outbound_transactions" table.
 	OutboundTransactionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "channel", Type: field.TypeEnum, Enums: []string{"shopee", "direct"}},
 		{Name: "invoice", Type: field.TypeJSON},
 		{Name: "benefit", Type: field.TypeJSON},
@@ -98,13 +98,13 @@ var (
 	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "sku", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "descriptions", Type: field.TypeJSON},
 		{Name: "images", Type: field.TypeJSON},
 		{Name: "marketplaces", Type: field.TypeJSON},
-		{Name: "brand_products", Type: field.TypeInt, Nullable: true},
+		{Name: "brand_products", Type: field.TypeUint64, Nullable: true},
 	}
 	// ProductsTable holds the schema information for the "products" table.
 	ProductsTable = &schema.Table{
@@ -123,7 +123,7 @@ var (
 	}
 	// VariantsColumns holds the columns for the "variants" table.
 	VariantsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"color", "size"}},
 		{Name: "value", Type: field.TypeString},
 	}
@@ -143,12 +143,12 @@ var (
 	}
 	// VariationsColumns holds the columns for the "variations" table.
 	VariationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
 		{Name: "stock", Type: field.TypeUint8},
 		{Name: "price", Type: field.TypeUint},
-		{Name: "product_variations", Type: field.TypeInt, Nullable: true},
-		{Name: "variation_children", Type: field.TypeInt, Nullable: true},
+		{Name: "product_variations", Type: field.TypeUint64, Nullable: true},
+		{Name: "variation_children", Type: field.TypeUint64, Nullable: true},
 	}
 	// VariationsTable holds the schema information for the "variations" table.
 	VariationsTable = &schema.Table{

@@ -40,14 +40,14 @@ func (vu *VariantUpdate) SetValue(s string) *VariantUpdate {
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (vu *VariantUpdate) AddVariationIDs(ids ...int) *VariantUpdate {
+func (vu *VariantUpdate) AddVariationIDs(ids ...uint64) *VariantUpdate {
 	vu.mutation.AddVariationIDs(ids...)
 	return vu
 }
 
 // AddVariations adds the variations edges to Variation.
 func (vu *VariantUpdate) AddVariations(v ...*Variation) *VariantUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -66,14 +66,14 @@ func (vu *VariantUpdate) ClearVariations() *VariantUpdate {
 }
 
 // RemoveVariationIDs removes the variations edge to Variation by ids.
-func (vu *VariantUpdate) RemoveVariationIDs(ids ...int) *VariantUpdate {
+func (vu *VariantUpdate) RemoveVariationIDs(ids ...uint64) *VariantUpdate {
 	vu.mutation.RemoveVariationIDs(ids...)
 	return vu
 }
 
 // RemoveVariations removes variations edges to Variation.
 func (vu *VariantUpdate) RemoveVariations(v ...*Variation) *VariantUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -153,7 +153,7 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   variant.Table,
 			Columns: variant.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variant.FieldID,
 			},
 		},
@@ -188,7 +188,7 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -204,7 +204,7 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -223,7 +223,7 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -264,14 +264,14 @@ func (vuo *VariantUpdateOne) SetValue(s string) *VariantUpdateOne {
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (vuo *VariantUpdateOne) AddVariationIDs(ids ...int) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) AddVariationIDs(ids ...uint64) *VariantUpdateOne {
 	vuo.mutation.AddVariationIDs(ids...)
 	return vuo
 }
 
 // AddVariations adds the variations edges to Variation.
 func (vuo *VariantUpdateOne) AddVariations(v ...*Variation) *VariantUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -290,14 +290,14 @@ func (vuo *VariantUpdateOne) ClearVariations() *VariantUpdateOne {
 }
 
 // RemoveVariationIDs removes the variations edge to Variation by ids.
-func (vuo *VariantUpdateOne) RemoveVariationIDs(ids ...int) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) RemoveVariationIDs(ids ...uint64) *VariantUpdateOne {
 	vuo.mutation.RemoveVariationIDs(ids...)
 	return vuo
 }
 
 // RemoveVariations removes variations edges to Variation.
 func (vuo *VariantUpdateOne) RemoveVariations(v ...*Variation) *VariantUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -377,7 +377,7 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 			Table:   variant.Table,
 			Columns: variant.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variant.FieldID,
 			},
 		},
@@ -410,7 +410,7 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -426,7 +426,7 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -445,7 +445,7 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},

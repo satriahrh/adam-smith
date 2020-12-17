@@ -33,14 +33,14 @@ func (bc *BrandCreate) SetName(s string) *BrandCreate {
 }
 
 // AddProductIDs adds the products edge to Product by ids.
-func (bc *BrandCreate) AddProductIDs(ids ...int) *BrandCreate {
+func (bc *BrandCreate) AddProductIDs(ids ...uint64) *BrandCreate {
 	bc.mutation.AddProductIDs(ids...)
 	return bc
 }
 
 // AddProducts adds the products edges to Product.
 func (bc *BrandCreate) AddProducts(p ...*Product) *BrandCreate {
-	ids := make([]int, len(p))
+	ids := make([]uint64, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -126,7 +126,7 @@ func (bc *BrandCreate) sqlSave(ctx context.Context) (*Brand, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -136,7 +136,7 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: brand.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: brand.FieldID,
 			},
 		}
@@ -166,7 +166,7 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -219,7 +219,7 @@ func (bcb *BrandCreateBulk) Save(ctx context.Context) ([]*Brand, error) {
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

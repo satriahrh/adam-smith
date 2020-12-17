@@ -33,14 +33,14 @@ func (vc *VariantCreate) SetValue(s string) *VariantCreate {
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (vc *VariantCreate) AddVariationIDs(ids ...int) *VariantCreate {
+func (vc *VariantCreate) AddVariationIDs(ids ...uint64) *VariantCreate {
 	vc.mutation.AddVariationIDs(ids...)
 	return vc
 }
 
 // AddVariations adds the variations edges to Variation.
 func (vc *VariantCreate) AddVariations(v ...*Variation) *VariantCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -121,7 +121,7 @@ func (vc *VariantCreate) sqlSave(ctx context.Context) (*Variant, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -131,7 +131,7 @@ func (vc *VariantCreate) createSpec() (*Variant, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: variant.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variant.FieldID,
 			},
 		}
@@ -161,7 +161,7 @@ func (vc *VariantCreate) createSpec() (*Variant, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -214,7 +214,7 @@ func (vcb *VariantCreateBulk) Save(ctx context.Context) ([]*Variant, error) {
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

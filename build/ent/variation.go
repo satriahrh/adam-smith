@@ -16,7 +16,7 @@ import (
 type Variation struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Images holds the value of the "images" field.
 	Images []string `json:"images,omitempty"`
 	// Stock holds the value of the "stock" field.
@@ -26,8 +26,8 @@ type Variation struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VariationQuery when eager-loading is set.
 	Edges              VariationEdges `json:"edges"`
-	product_variations *int
-	variation_children *int
+	product_variations *uint64
+	variation_children *uint64
 }
 
 // VariationEdges holds the relations/edges for other nodes in the graph.
@@ -130,7 +130,7 @@ func (v *Variation) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	v.ID = int(value.Int64)
+	v.ID = uint64(value.Int64)
 	values = values[1:]
 
 	if value, ok := values[0].(*[]byte); !ok {
@@ -155,14 +155,14 @@ func (v *Variation) assignValues(values ...interface{}) error {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field product_variations", value)
 		} else if value.Valid {
-			v.product_variations = new(int)
-			*v.product_variations = int(value.Int64)
+			v.product_variations = new(uint64)
+			*v.product_variations = uint64(value.Int64)
 		}
 		if value, ok := values[1].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field variation_children", value)
 		} else if value.Valid {
-			v.variation_children = new(int)
-			*v.variation_children = int(value.Int64)
+			v.variation_children = new(uint64)
+			*v.variation_children = uint64(value.Int64)
 		}
 	}
 	return nil

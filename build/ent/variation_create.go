@@ -57,13 +57,13 @@ func (vc *VariationCreate) SetNillablePrice(u *uint) *VariationCreate {
 }
 
 // SetParentID sets the parent edge to Variation by id.
-func (vc *VariationCreate) SetParentID(id int) *VariationCreate {
+func (vc *VariationCreate) SetParentID(id uint64) *VariationCreate {
 	vc.mutation.SetParentID(id)
 	return vc
 }
 
 // SetNillableParentID sets the parent edge to Variation by id if the given value is not nil.
-func (vc *VariationCreate) SetNillableParentID(id *int) *VariationCreate {
+func (vc *VariationCreate) SetNillableParentID(id *uint64) *VariationCreate {
 	if id != nil {
 		vc = vc.SetParentID(*id)
 	}
@@ -76,14 +76,14 @@ func (vc *VariationCreate) SetParent(v *Variation) *VariationCreate {
 }
 
 // AddChildIDs adds the children edge to Variation by ids.
-func (vc *VariationCreate) AddChildIDs(ids ...int) *VariationCreate {
+func (vc *VariationCreate) AddChildIDs(ids ...uint64) *VariationCreate {
 	vc.mutation.AddChildIDs(ids...)
 	return vc
 }
 
 // AddChildren adds the children edges to Variation.
 func (vc *VariationCreate) AddChildren(v ...*Variation) *VariationCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -91,13 +91,13 @@ func (vc *VariationCreate) AddChildren(v ...*Variation) *VariationCreate {
 }
 
 // SetProductID sets the product edge to Product by id.
-func (vc *VariationCreate) SetProductID(id int) *VariationCreate {
+func (vc *VariationCreate) SetProductID(id uint64) *VariationCreate {
 	vc.mutation.SetProductID(id)
 	return vc
 }
 
 // SetNillableProductID sets the product edge to Product by id if the given value is not nil.
-func (vc *VariationCreate) SetNillableProductID(id *int) *VariationCreate {
+func (vc *VariationCreate) SetNillableProductID(id *uint64) *VariationCreate {
 	if id != nil {
 		vc = vc.SetProductID(*id)
 	}
@@ -110,14 +110,14 @@ func (vc *VariationCreate) SetProduct(p *Product) *VariationCreate {
 }
 
 // AddVariantIDs adds the variant edge to Variant by ids.
-func (vc *VariationCreate) AddVariantIDs(ids ...int) *VariationCreate {
+func (vc *VariationCreate) AddVariantIDs(ids ...uint64) *VariationCreate {
 	vc.mutation.AddVariantIDs(ids...)
 	return vc
 }
 
 // AddVariant adds the variant edges to Variant.
 func (vc *VariationCreate) AddVariant(v ...*Variant) *VariationCreate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -125,14 +125,14 @@ func (vc *VariationCreate) AddVariant(v ...*Variant) *VariationCreate {
 }
 
 // AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (vc *VariationCreate) AddOutboundDealIDs(ids ...int) *VariationCreate {
+func (vc *VariationCreate) AddOutboundDealIDs(ids ...uint64) *VariationCreate {
 	vc.mutation.AddOutboundDealIDs(ids...)
 	return vc
 }
 
 // AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
 func (vc *VariationCreate) AddOutboundDeals(o ...*OutboundDeal) *VariationCreate {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -221,7 +221,7 @@ func (vc *VariationCreate) sqlSave(ctx context.Context) (*Variation, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -231,7 +231,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: variation.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variation.FieldID,
 			},
 		}
@@ -269,7 +269,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -288,7 +288,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -307,7 +307,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -326,7 +326,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -345,7 +345,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -399,7 +399,7 @@ func (vcb *VariationCreateBulk) Save(ctx context.Context) ([]*Variation, error) 
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

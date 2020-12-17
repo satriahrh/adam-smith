@@ -54,14 +54,14 @@ func (pu *ProductUpdate) SetMarketplaces(sm schema.ProductMarketplace) *ProductU
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (pu *ProductUpdate) AddVariationIDs(ids ...int) *ProductUpdate {
+func (pu *ProductUpdate) AddVariationIDs(ids ...uint64) *ProductUpdate {
 	pu.mutation.AddVariationIDs(ids...)
 	return pu
 }
 
 // AddVariations adds the variations edges to Variation.
 func (pu *ProductUpdate) AddVariations(v ...*Variation) *ProductUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -69,13 +69,13 @@ func (pu *ProductUpdate) AddVariations(v ...*Variation) *ProductUpdate {
 }
 
 // SetBrandID sets the brand edge to Brand by id.
-func (pu *ProductUpdate) SetBrandID(id int) *ProductUpdate {
+func (pu *ProductUpdate) SetBrandID(id uint64) *ProductUpdate {
 	pu.mutation.SetBrandID(id)
 	return pu
 }
 
 // SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
-func (pu *ProductUpdate) SetNillableBrandID(id *int) *ProductUpdate {
+func (pu *ProductUpdate) SetNillableBrandID(id *uint64) *ProductUpdate {
 	if id != nil {
 		pu = pu.SetBrandID(*id)
 	}
@@ -99,14 +99,14 @@ func (pu *ProductUpdate) ClearVariations() *ProductUpdate {
 }
 
 // RemoveVariationIDs removes the variations edge to Variation by ids.
-func (pu *ProductUpdate) RemoveVariationIDs(ids ...int) *ProductUpdate {
+func (pu *ProductUpdate) RemoveVariationIDs(ids ...uint64) *ProductUpdate {
 	pu.mutation.RemoveVariationIDs(ids...)
 	return pu
 }
 
 // RemoveVariations removes variations edges to Variation.
 func (pu *ProductUpdate) RemoveVariations(v ...*Variation) *ProductUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -176,7 +176,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   product.Table,
 			Columns: product.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: product.FieldID,
 			},
 		},
@@ -225,7 +225,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -241,7 +241,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -260,7 +260,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -279,7 +279,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: brand.FieldID,
 				},
 			},
@@ -295,7 +295,7 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: brand.FieldID,
 				},
 			},
@@ -348,14 +348,14 @@ func (puo *ProductUpdateOne) SetMarketplaces(sm schema.ProductMarketplace) *Prod
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (puo *ProductUpdateOne) AddVariationIDs(ids ...int) *ProductUpdateOne {
+func (puo *ProductUpdateOne) AddVariationIDs(ids ...uint64) *ProductUpdateOne {
 	puo.mutation.AddVariationIDs(ids...)
 	return puo
 }
 
 // AddVariations adds the variations edges to Variation.
 func (puo *ProductUpdateOne) AddVariations(v ...*Variation) *ProductUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -363,13 +363,13 @@ func (puo *ProductUpdateOne) AddVariations(v ...*Variation) *ProductUpdateOne {
 }
 
 // SetBrandID sets the brand edge to Brand by id.
-func (puo *ProductUpdateOne) SetBrandID(id int) *ProductUpdateOne {
+func (puo *ProductUpdateOne) SetBrandID(id uint64) *ProductUpdateOne {
 	puo.mutation.SetBrandID(id)
 	return puo
 }
 
 // SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
-func (puo *ProductUpdateOne) SetNillableBrandID(id *int) *ProductUpdateOne {
+func (puo *ProductUpdateOne) SetNillableBrandID(id *uint64) *ProductUpdateOne {
 	if id != nil {
 		puo = puo.SetBrandID(*id)
 	}
@@ -393,14 +393,14 @@ func (puo *ProductUpdateOne) ClearVariations() *ProductUpdateOne {
 }
 
 // RemoveVariationIDs removes the variations edge to Variation by ids.
-func (puo *ProductUpdateOne) RemoveVariationIDs(ids ...int) *ProductUpdateOne {
+func (puo *ProductUpdateOne) RemoveVariationIDs(ids ...uint64) *ProductUpdateOne {
 	puo.mutation.RemoveVariationIDs(ids...)
 	return puo
 }
 
 // RemoveVariations removes variations edges to Variation.
 func (puo *ProductUpdateOne) RemoveVariations(v ...*Variation) *ProductUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -470,7 +470,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Table:   product.Table,
 			Columns: product.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: product.FieldID,
 			},
 		},
@@ -517,7 +517,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -533,7 +533,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -552,7 +552,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -571,7 +571,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: brand.FieldID,
 				},
 			},
@@ -587,7 +587,7 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: brand.FieldID,
 				},
 			},

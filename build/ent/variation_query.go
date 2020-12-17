@@ -194,8 +194,8 @@ func (vq *VariationQuery) FirstX(ctx context.Context) *Variation {
 }
 
 // FirstID returns the first Variation id in the query. Returns *NotFoundError when no id was found.
-func (vq *VariationQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (vq *VariationQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = vq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -207,7 +207,7 @@ func (vq *VariationQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (vq *VariationQuery) FirstIDX(ctx context.Context) int {
+func (vq *VariationQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := vq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -241,8 +241,8 @@ func (vq *VariationQuery) OnlyX(ctx context.Context) *Variation {
 }
 
 // OnlyID returns the only Variation id in the query, returns an error if not exactly one id was returned.
-func (vq *VariationQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (vq *VariationQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = vq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -258,7 +258,7 @@ func (vq *VariationQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (vq *VariationQuery) OnlyIDX(ctx context.Context) int {
+func (vq *VariationQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := vq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -284,8 +284,8 @@ func (vq *VariationQuery) AllX(ctx context.Context) []*Variation {
 }
 
 // IDs executes the query and returns a list of Variation ids.
-func (vq *VariationQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (vq *VariationQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := vq.Select(variation.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -293,7 +293,7 @@ func (vq *VariationQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (vq *VariationQuery) IDsX(ctx context.Context) []int {
+func (vq *VariationQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := vq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -519,8 +519,8 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 	}
 
 	if query := vq.withParent; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Variation)
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*Variation)
 		for i := range nodes {
 			if fk := nodes[i].variation_children; fk != nil {
 				ids = append(ids, *fk)
@@ -545,7 +545,7 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 
 	if query := vq.withChildren; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Variation)
+		nodeids := make(map[uint64]*Variation)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -573,8 +573,8 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 	}
 
 	if query := vq.withProduct; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Variation)
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*Variation)
 		for i := range nodes {
 			if fk := nodes[i].product_variations; fk != nil {
 				ids = append(ids, *fk)
@@ -599,15 +599,15 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 
 	if query := vq.withVariant; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Variation, len(nodes))
+		ids := make(map[uint64]*Variation, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Variant = []*Variant{}
 		}
 		var (
-			edgeids []int
-			edges   = make(map[int][]*Variation)
+			edgeids []uint64
+			edges   = make(map[uint64][]*Variation)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -631,8 +631,8 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
+				outValue := uint64(eout.Int64)
+				inValue := uint64(ein.Int64)
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -663,7 +663,7 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 
 	if query := vq.withOutboundDeals; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Variation)
+		nodeids := make(map[uint64]*Variation)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -712,7 +712,7 @@ func (vq *VariationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   variation.Table,
 			Columns: variation.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variation.FieldID,
 			},
 		},

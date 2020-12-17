@@ -55,13 +55,13 @@ func (odu *OutboundDealUpdate) AddAmount(u uint) *OutboundDealUpdate {
 }
 
 // SetVariationID sets the variation edge to Variation by id.
-func (odu *OutboundDealUpdate) SetVariationID(id int) *OutboundDealUpdate {
+func (odu *OutboundDealUpdate) SetVariationID(id uint64) *OutboundDealUpdate {
 	odu.mutation.SetVariationID(id)
 	return odu
 }
 
 // SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (odu *OutboundDealUpdate) SetNillableVariationID(id *int) *OutboundDealUpdate {
+func (odu *OutboundDealUpdate) SetNillableVariationID(id *uint64) *OutboundDealUpdate {
 	if id != nil {
 		odu = odu.SetVariationID(*id)
 	}
@@ -74,13 +74,13 @@ func (odu *OutboundDealUpdate) SetVariation(v *Variation) *OutboundDealUpdate {
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (odu *OutboundDealUpdate) SetTransactionID(id int) *OutboundDealUpdate {
+func (odu *OutboundDealUpdate) SetTransactionID(id uint64) *OutboundDealUpdate {
 	odu.mutation.SetTransactionID(id)
 	return odu
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (odu *OutboundDealUpdate) SetNillableTransactionID(id *int) *OutboundDealUpdate {
+func (odu *OutboundDealUpdate) SetNillableTransactionID(id *uint64) *OutboundDealUpdate {
 	if id != nil {
 		odu = odu.SetTransactionID(*id)
 	}
@@ -166,7 +166,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   outbounddeal.Table,
 			Columns: outbounddeal.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		},
@@ -215,7 +215,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -231,7 +231,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -250,7 +250,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -266,7 +266,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -321,13 +321,13 @@ func (oduo *OutboundDealUpdateOne) AddAmount(u uint) *OutboundDealUpdateOne {
 }
 
 // SetVariationID sets the variation edge to Variation by id.
-func (oduo *OutboundDealUpdateOne) SetVariationID(id int) *OutboundDealUpdateOne {
+func (oduo *OutboundDealUpdateOne) SetVariationID(id uint64) *OutboundDealUpdateOne {
 	oduo.mutation.SetVariationID(id)
 	return oduo
 }
 
 // SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (oduo *OutboundDealUpdateOne) SetNillableVariationID(id *int) *OutboundDealUpdateOne {
+func (oduo *OutboundDealUpdateOne) SetNillableVariationID(id *uint64) *OutboundDealUpdateOne {
 	if id != nil {
 		oduo = oduo.SetVariationID(*id)
 	}
@@ -340,13 +340,13 @@ func (oduo *OutboundDealUpdateOne) SetVariation(v *Variation) *OutboundDealUpdat
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (oduo *OutboundDealUpdateOne) SetTransactionID(id int) *OutboundDealUpdateOne {
+func (oduo *OutboundDealUpdateOne) SetTransactionID(id uint64) *OutboundDealUpdateOne {
 	oduo.mutation.SetTransactionID(id)
 	return oduo
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (oduo *OutboundDealUpdateOne) SetNillableTransactionID(id *int) *OutboundDealUpdateOne {
+func (oduo *OutboundDealUpdateOne) SetNillableTransactionID(id *uint64) *OutboundDealUpdateOne {
 	if id != nil {
 		oduo = oduo.SetTransactionID(*id)
 	}
@@ -432,7 +432,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Table:   outbounddeal.Table,
 			Columns: outbounddeal.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		},
@@ -479,7 +479,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -495,7 +495,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -514,7 +514,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -530,7 +530,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},

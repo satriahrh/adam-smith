@@ -16,7 +16,7 @@ import (
 type OutboundDeal struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity uint `json:"quantity,omitempty"`
 	// Amount holds the value of the "amount" field.
@@ -24,8 +24,8 @@ type OutboundDeal struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OutboundDealQuery when eager-loading is set.
 	Edges                      OutboundDealEdges `json:"edges"`
-	outbound_deal_variation    *int
-	outbound_transaction_deals *int
+	outbound_deal_variation    *uint64
+	outbound_transaction_deals *uint64
 }
 
 // OutboundDealEdges holds the relations/edges for other nodes in the graph.
@@ -94,7 +94,7 @@ func (od *OutboundDeal) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	od.ID = int(value.Int64)
+	od.ID = uint64(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullInt64); !ok {
 		return fmt.Errorf("unexpected type %T for field quantity", values[0])
@@ -111,14 +111,14 @@ func (od *OutboundDeal) assignValues(values ...interface{}) error {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field outbound_deal_variation", value)
 		} else if value.Valid {
-			od.outbound_deal_variation = new(int)
-			*od.outbound_deal_variation = int(value.Int64)
+			od.outbound_deal_variation = new(uint64)
+			*od.outbound_deal_variation = uint64(value.Int64)
 		}
 		if value, ok := values[1].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field outbound_transaction_deals", value)
 		} else if value.Valid {
-			od.outbound_transaction_deals = new(int)
-			*od.outbound_transaction_deals = int(value.Int64)
+			od.outbound_transaction_deals = new(uint64)
+			*od.outbound_transaction_deals = uint64(value.Int64)
 		}
 	}
 	return nil

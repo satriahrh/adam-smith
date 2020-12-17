@@ -44,12 +44,12 @@ type BrandMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *int
+	id              *uint64
 	code            *string
 	name            *string
 	clearedFields   map[string]struct{}
-	products        map[int]struct{}
-	removedproducts map[int]struct{}
+	products        map[uint64]struct{}
+	removedproducts map[uint64]struct{}
 	clearedproducts bool
 	done            bool
 	oldValue        func(context.Context) (*Brand, error)
@@ -76,7 +76,7 @@ func newBrandMutation(c config, op Op, opts ...brandOption) *BrandMutation {
 }
 
 // withBrandID sets the id field of the mutation.
-func withBrandID(id int) brandOption {
+func withBrandID(id uint64) brandOption {
 	return func(m *BrandMutation) {
 		var (
 			err   error
@@ -128,7 +128,7 @@ func (m BrandMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *BrandMutation) ID() (id int, exists bool) {
+func (m *BrandMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -210,9 +210,9 @@ func (m *BrandMutation) ResetName() {
 }
 
 // AddProductIDs adds the products edge to Product by ids.
-func (m *BrandMutation) AddProductIDs(ids ...int) {
+func (m *BrandMutation) AddProductIDs(ids ...uint64) {
 	if m.products == nil {
-		m.products = make(map[int]struct{})
+		m.products = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.products[ids[i]] = struct{}{}
@@ -230,9 +230,9 @@ func (m *BrandMutation) ProductsCleared() bool {
 }
 
 // RemoveProductIDs removes the products edge to Product by ids.
-func (m *BrandMutation) RemoveProductIDs(ids ...int) {
+func (m *BrandMutation) RemoveProductIDs(ids ...uint64) {
 	if m.removedproducts == nil {
-		m.removedproducts = make(map[int]struct{})
+		m.removedproducts = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removedproducts[ids[i]] = struct{}{}
@@ -240,7 +240,7 @@ func (m *BrandMutation) RemoveProductIDs(ids ...int) {
 }
 
 // RemovedProducts returns the removed ids of products.
-func (m *BrandMutation) RemovedProductsIDs() (ids []int) {
+func (m *BrandMutation) RemovedProductsIDs() (ids []uint64) {
 	for id := range m.removedproducts {
 		ids = append(ids, id)
 	}
@@ -248,7 +248,7 @@ func (m *BrandMutation) RemovedProductsIDs() (ids []int) {
 }
 
 // ProductsIDs returns the products ids in the mutation.
-func (m *BrandMutation) ProductsIDs() (ids []int) {
+func (m *BrandMutation) ProductsIDs() (ids []uint64) {
 	for id := range m.products {
 		ids = append(ids, id)
 	}
@@ -485,15 +485,15 @@ type OutboundDealMutation struct {
 	config
 	op                 Op
 	typ                string
-	id                 *int
+	id                 *uint64
 	quantity           *uint
 	addquantity        *uint
 	amount             *uint
 	addamount          *uint
 	clearedFields      map[string]struct{}
-	variation          *int
+	variation          *uint64
 	clearedvariation   bool
-	transaction        *int
+	transaction        *uint64
 	clearedtransaction bool
 	done               bool
 	oldValue           func(context.Context) (*OutboundDeal, error)
@@ -520,7 +520,7 @@ func newOutboundDealMutation(c config, op Op, opts ...outbounddealOption) *Outbo
 }
 
 // withOutboundDealID sets the id field of the mutation.
-func withOutboundDealID(id int) outbounddealOption {
+func withOutboundDealID(id uint64) outbounddealOption {
 	return func(m *OutboundDealMutation) {
 		var (
 			err   error
@@ -572,7 +572,7 @@ func (m OutboundDealMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *OutboundDealMutation) ID() (id int, exists bool) {
+func (m *OutboundDealMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -694,7 +694,7 @@ func (m *OutboundDealMutation) ResetAmount() {
 }
 
 // SetVariationID sets the variation edge to Variation by id.
-func (m *OutboundDealMutation) SetVariationID(id int) {
+func (m *OutboundDealMutation) SetVariationID(id uint64) {
 	m.variation = &id
 }
 
@@ -709,7 +709,7 @@ func (m *OutboundDealMutation) VariationCleared() bool {
 }
 
 // VariationID returns the variation id in the mutation.
-func (m *OutboundDealMutation) VariationID() (id int, exists bool) {
+func (m *OutboundDealMutation) VariationID() (id uint64, exists bool) {
 	if m.variation != nil {
 		return *m.variation, true
 	}
@@ -719,7 +719,7 @@ func (m *OutboundDealMutation) VariationID() (id int, exists bool) {
 // VariationIDs returns the variation ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // VariationID instead. It exists only for internal usage by the builders.
-func (m *OutboundDealMutation) VariationIDs() (ids []int) {
+func (m *OutboundDealMutation) VariationIDs() (ids []uint64) {
 	if id := m.variation; id != nil {
 		ids = append(ids, *id)
 	}
@@ -733,7 +733,7 @@ func (m *OutboundDealMutation) ResetVariation() {
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (m *OutboundDealMutation) SetTransactionID(id int) {
+func (m *OutboundDealMutation) SetTransactionID(id uint64) {
 	m.transaction = &id
 }
 
@@ -748,7 +748,7 @@ func (m *OutboundDealMutation) TransactionCleared() bool {
 }
 
 // TransactionID returns the transaction id in the mutation.
-func (m *OutboundDealMutation) TransactionID() (id int, exists bool) {
+func (m *OutboundDealMutation) TransactionID() (id uint64, exists bool) {
 	if m.transaction != nil {
 		return *m.transaction, true
 	}
@@ -758,7 +758,7 @@ func (m *OutboundDealMutation) TransactionID() (id int, exists bool) {
 // TransactionIDs returns the transaction ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // TransactionID instead. It exists only for internal usage by the builders.
-func (m *OutboundDealMutation) TransactionIDs() (ids []int) {
+func (m *OutboundDealMutation) TransactionIDs() (ids []uint64) {
 	if id := m.transaction; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1031,7 +1031,7 @@ type OutboundShippingMutation struct {
 	config
 	op                    Op
 	typ                   string
-	id                    *int
+	id                    *uint64
 	courier               *outboundshipping.Courier
 	courier_tracking_code *string
 	_type                 *outboundshipping.Type
@@ -1044,7 +1044,7 @@ type OutboundShippingMutation struct {
 	cost                  *uint
 	addcost               *uint
 	clearedFields         map[string]struct{}
-	transaction           *int
+	transaction           *uint64
 	clearedtransaction    bool
 	done                  bool
 	oldValue              func(context.Context) (*OutboundShipping, error)
@@ -1071,7 +1071,7 @@ func newOutboundShippingMutation(c config, op Op, opts ...outboundshippingOption
 }
 
 // withOutboundShippingID sets the id field of the mutation.
-func withOutboundShippingID(id int) outboundshippingOption {
+func withOutboundShippingID(id uint64) outboundshippingOption {
 	return func(m *OutboundShippingMutation) {
 		var (
 			err   error
@@ -1123,7 +1123,7 @@ func (m OutboundShippingMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *OutboundShippingMutation) ID() (id int, exists bool) {
+func (m *OutboundShippingMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1504,7 +1504,7 @@ func (m *OutboundShippingMutation) ResetCost() {
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (m *OutboundShippingMutation) SetTransactionID(id int) {
+func (m *OutboundShippingMutation) SetTransactionID(id uint64) {
 	m.transaction = &id
 }
 
@@ -1519,7 +1519,7 @@ func (m *OutboundShippingMutation) TransactionCleared() bool {
 }
 
 // TransactionID returns the transaction id in the mutation.
-func (m *OutboundShippingMutation) TransactionID() (id int, exists bool) {
+func (m *OutboundShippingMutation) TransactionID() (id uint64, exists bool) {
 	if m.transaction != nil {
 		return *m.transaction, true
 	}
@@ -1529,7 +1529,7 @@ func (m *OutboundShippingMutation) TransactionID() (id int, exists bool) {
 // TransactionIDs returns the transaction ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // TransactionID instead. It exists only for internal usage by the builders.
-func (m *OutboundShippingMutation) TransactionIDs() (ids []int) {
+func (m *OutboundShippingMutation) TransactionIDs() (ids []uint64) {
 	if id := m.transaction; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1903,7 +1903,7 @@ type OutboundTransactionMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *int
+	id              *uint64
 	channel         *outboundtransaction.Channel
 	invoice         *schema.OutboundTransactionInvoice
 	benefit         *schema.OutboundTransactionBenefit
@@ -1911,10 +1911,10 @@ type OutboundTransactionMutation struct {
 	amount          *uint
 	addamount       *uint
 	clearedFields   map[string]struct{}
-	deals           map[int]struct{}
-	removeddeals    map[int]struct{}
+	deals           map[uint64]struct{}
+	removeddeals    map[uint64]struct{}
 	cleareddeals    bool
-	shipping        *int
+	shipping        *uint64
 	clearedshipping bool
 	done            bool
 	oldValue        func(context.Context) (*OutboundTransaction, error)
@@ -1941,7 +1941,7 @@ func newOutboundTransactionMutation(c config, op Op, opts ...outboundtransaction
 }
 
 // withOutboundTransactionID sets the id field of the mutation.
-func withOutboundTransactionID(id int) outboundtransactionOption {
+func withOutboundTransactionID(id uint64) outboundtransactionOption {
 	return func(m *OutboundTransactionMutation) {
 		var (
 			err   error
@@ -1993,7 +1993,7 @@ func (m OutboundTransactionMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *OutboundTransactionMutation) ID() (id int, exists bool) {
+func (m *OutboundTransactionMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2206,9 +2206,9 @@ func (m *OutboundTransactionMutation) ResetAmount() {
 }
 
 // AddDealIDs adds the deals edge to OutboundDeal by ids.
-func (m *OutboundTransactionMutation) AddDealIDs(ids ...int) {
+func (m *OutboundTransactionMutation) AddDealIDs(ids ...uint64) {
 	if m.deals == nil {
-		m.deals = make(map[int]struct{})
+		m.deals = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.deals[ids[i]] = struct{}{}
@@ -2226,9 +2226,9 @@ func (m *OutboundTransactionMutation) DealsCleared() bool {
 }
 
 // RemoveDealIDs removes the deals edge to OutboundDeal by ids.
-func (m *OutboundTransactionMutation) RemoveDealIDs(ids ...int) {
+func (m *OutboundTransactionMutation) RemoveDealIDs(ids ...uint64) {
 	if m.removeddeals == nil {
-		m.removeddeals = make(map[int]struct{})
+		m.removeddeals = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removeddeals[ids[i]] = struct{}{}
@@ -2236,7 +2236,7 @@ func (m *OutboundTransactionMutation) RemoveDealIDs(ids ...int) {
 }
 
 // RemovedDeals returns the removed ids of deals.
-func (m *OutboundTransactionMutation) RemovedDealsIDs() (ids []int) {
+func (m *OutboundTransactionMutation) RemovedDealsIDs() (ids []uint64) {
 	for id := range m.removeddeals {
 		ids = append(ids, id)
 	}
@@ -2244,7 +2244,7 @@ func (m *OutboundTransactionMutation) RemovedDealsIDs() (ids []int) {
 }
 
 // DealsIDs returns the deals ids in the mutation.
-func (m *OutboundTransactionMutation) DealsIDs() (ids []int) {
+func (m *OutboundTransactionMutation) DealsIDs() (ids []uint64) {
 	for id := range m.deals {
 		ids = append(ids, id)
 	}
@@ -2259,7 +2259,7 @@ func (m *OutboundTransactionMutation) ResetDeals() {
 }
 
 // SetShippingID sets the shipping edge to OutboundShipping by id.
-func (m *OutboundTransactionMutation) SetShippingID(id int) {
+func (m *OutboundTransactionMutation) SetShippingID(id uint64) {
 	m.shipping = &id
 }
 
@@ -2274,7 +2274,7 @@ func (m *OutboundTransactionMutation) ShippingCleared() bool {
 }
 
 // ShippingID returns the shipping id in the mutation.
-func (m *OutboundTransactionMutation) ShippingID() (id int, exists bool) {
+func (m *OutboundTransactionMutation) ShippingID() (id uint64, exists bool) {
 	if m.shipping != nil {
 		return *m.shipping, true
 	}
@@ -2284,7 +2284,7 @@ func (m *OutboundTransactionMutation) ShippingID() (id int, exists bool) {
 // ShippingIDs returns the shipping ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // ShippingID instead. It exists only for internal usage by the builders.
-func (m *OutboundTransactionMutation) ShippingIDs() (ids []int) {
+func (m *OutboundTransactionMutation) ShippingIDs() (ids []uint64) {
 	if id := m.shipping; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2604,17 +2604,17 @@ type ProductMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *int
+	id                *uint64
 	sku               *string
 	name              *string
 	descriptions      *[]schema.ProductDescription
 	images            *schema.ProductImages
 	marketplaces      *schema.ProductMarketplace
 	clearedFields     map[string]struct{}
-	variations        map[int]struct{}
-	removedvariations map[int]struct{}
+	variations        map[uint64]struct{}
+	removedvariations map[uint64]struct{}
 	clearedvariations bool
-	brand             *int
+	brand             *uint64
 	clearedbrand      bool
 	done              bool
 	oldValue          func(context.Context) (*Product, error)
@@ -2641,7 +2641,7 @@ func newProductMutation(c config, op Op, opts ...productOption) *ProductMutation
 }
 
 // withProductID sets the id field of the mutation.
-func withProductID(id int) productOption {
+func withProductID(id uint64) productOption {
 	return func(m *ProductMutation) {
 		var (
 			err   error
@@ -2693,7 +2693,7 @@ func (m ProductMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *ProductMutation) ID() (id int, exists bool) {
+func (m *ProductMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2886,9 +2886,9 @@ func (m *ProductMutation) ResetMarketplaces() {
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (m *ProductMutation) AddVariationIDs(ids ...int) {
+func (m *ProductMutation) AddVariationIDs(ids ...uint64) {
 	if m.variations == nil {
-		m.variations = make(map[int]struct{})
+		m.variations = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.variations[ids[i]] = struct{}{}
@@ -2906,9 +2906,9 @@ func (m *ProductMutation) VariationsCleared() bool {
 }
 
 // RemoveVariationIDs removes the variations edge to Variation by ids.
-func (m *ProductMutation) RemoveVariationIDs(ids ...int) {
+func (m *ProductMutation) RemoveVariationIDs(ids ...uint64) {
 	if m.removedvariations == nil {
-		m.removedvariations = make(map[int]struct{})
+		m.removedvariations = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removedvariations[ids[i]] = struct{}{}
@@ -2916,7 +2916,7 @@ func (m *ProductMutation) RemoveVariationIDs(ids ...int) {
 }
 
 // RemovedVariations returns the removed ids of variations.
-func (m *ProductMutation) RemovedVariationsIDs() (ids []int) {
+func (m *ProductMutation) RemovedVariationsIDs() (ids []uint64) {
 	for id := range m.removedvariations {
 		ids = append(ids, id)
 	}
@@ -2924,7 +2924,7 @@ func (m *ProductMutation) RemovedVariationsIDs() (ids []int) {
 }
 
 // VariationsIDs returns the variations ids in the mutation.
-func (m *ProductMutation) VariationsIDs() (ids []int) {
+func (m *ProductMutation) VariationsIDs() (ids []uint64) {
 	for id := range m.variations {
 		ids = append(ids, id)
 	}
@@ -2939,7 +2939,7 @@ func (m *ProductMutation) ResetVariations() {
 }
 
 // SetBrandID sets the brand edge to Brand by id.
-func (m *ProductMutation) SetBrandID(id int) {
+func (m *ProductMutation) SetBrandID(id uint64) {
 	m.brand = &id
 }
 
@@ -2954,7 +2954,7 @@ func (m *ProductMutation) BrandCleared() bool {
 }
 
 // BrandID returns the brand id in the mutation.
-func (m *ProductMutation) BrandID() (id int, exists bool) {
+func (m *ProductMutation) BrandID() (id uint64, exists bool) {
 	if m.brand != nil {
 		return *m.brand, true
 	}
@@ -2964,7 +2964,7 @@ func (m *ProductMutation) BrandID() (id int, exists bool) {
 // BrandIDs returns the brand ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // BrandID instead. It exists only for internal usage by the builders.
-func (m *ProductMutation) BrandIDs() (ids []int) {
+func (m *ProductMutation) BrandIDs() (ids []uint64) {
 	if id := m.brand; id != nil {
 		ids = append(ids, *id)
 	}
@@ -3269,12 +3269,12 @@ type VariantMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *int
+	id                *uint64
 	_type             *variant.Type
 	value             *string
 	clearedFields     map[string]struct{}
-	variations        map[int]struct{}
-	removedvariations map[int]struct{}
+	variations        map[uint64]struct{}
+	removedvariations map[uint64]struct{}
 	clearedvariations bool
 	done              bool
 	oldValue          func(context.Context) (*Variant, error)
@@ -3301,7 +3301,7 @@ func newVariantMutation(c config, op Op, opts ...variantOption) *VariantMutation
 }
 
 // withVariantID sets the id field of the mutation.
-func withVariantID(id int) variantOption {
+func withVariantID(id uint64) variantOption {
 	return func(m *VariantMutation) {
 		var (
 			err   error
@@ -3353,7 +3353,7 @@ func (m VariantMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *VariantMutation) ID() (id int, exists bool) {
+func (m *VariantMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3435,9 +3435,9 @@ func (m *VariantMutation) ResetValue() {
 }
 
 // AddVariationIDs adds the variations edge to Variation by ids.
-func (m *VariantMutation) AddVariationIDs(ids ...int) {
+func (m *VariantMutation) AddVariationIDs(ids ...uint64) {
 	if m.variations == nil {
-		m.variations = make(map[int]struct{})
+		m.variations = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.variations[ids[i]] = struct{}{}
@@ -3455,9 +3455,9 @@ func (m *VariantMutation) VariationsCleared() bool {
 }
 
 // RemoveVariationIDs removes the variations edge to Variation by ids.
-func (m *VariantMutation) RemoveVariationIDs(ids ...int) {
+func (m *VariantMutation) RemoveVariationIDs(ids ...uint64) {
 	if m.removedvariations == nil {
-		m.removedvariations = make(map[int]struct{})
+		m.removedvariations = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removedvariations[ids[i]] = struct{}{}
@@ -3465,7 +3465,7 @@ func (m *VariantMutation) RemoveVariationIDs(ids ...int) {
 }
 
 // RemovedVariations returns the removed ids of variations.
-func (m *VariantMutation) RemovedVariationsIDs() (ids []int) {
+func (m *VariantMutation) RemovedVariationsIDs() (ids []uint64) {
 	for id := range m.removedvariations {
 		ids = append(ids, id)
 	}
@@ -3473,7 +3473,7 @@ func (m *VariantMutation) RemovedVariationsIDs() (ids []int) {
 }
 
 // VariationsIDs returns the variations ids in the mutation.
-func (m *VariantMutation) VariationsIDs() (ids []int) {
+func (m *VariantMutation) VariationsIDs() (ids []uint64) {
 	for id := range m.variations {
 		ids = append(ids, id)
 	}
@@ -3710,25 +3710,25 @@ type VariationMutation struct {
 	config
 	op                    Op
 	typ                   string
-	id                    *int
+	id                    *uint64
 	images                *[]string
 	stock                 *uint8
 	addstock              *uint8
 	price                 *uint
 	addprice              *uint
 	clearedFields         map[string]struct{}
-	parent                *int
+	parent                *uint64
 	clearedparent         bool
-	children              map[int]struct{}
-	removedchildren       map[int]struct{}
+	children              map[uint64]struct{}
+	removedchildren       map[uint64]struct{}
 	clearedchildren       bool
-	product               *int
+	product               *uint64
 	clearedproduct        bool
-	variant               map[int]struct{}
-	removedvariant        map[int]struct{}
+	variant               map[uint64]struct{}
+	removedvariant        map[uint64]struct{}
 	clearedvariant        bool
-	outbound_deals        map[int]struct{}
-	removedoutbound_deals map[int]struct{}
+	outbound_deals        map[uint64]struct{}
+	removedoutbound_deals map[uint64]struct{}
 	clearedoutbound_deals bool
 	done                  bool
 	oldValue              func(context.Context) (*Variation, error)
@@ -3755,7 +3755,7 @@ func newVariationMutation(c config, op Op, opts ...variationOption) *VariationMu
 }
 
 // withVariationID sets the id field of the mutation.
-func withVariationID(id int) variationOption {
+func withVariationID(id uint64) variationOption {
 	return func(m *VariationMutation) {
 		var (
 			err   error
@@ -3807,7 +3807,7 @@ func (m VariationMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *VariationMutation) ID() (id int, exists bool) {
+func (m *VariationMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3979,7 +3979,7 @@ func (m *VariationMutation) ResetPrice() {
 }
 
 // SetParentID sets the parent edge to Variation by id.
-func (m *VariationMutation) SetParentID(id int) {
+func (m *VariationMutation) SetParentID(id uint64) {
 	m.parent = &id
 }
 
@@ -3994,7 +3994,7 @@ func (m *VariationMutation) ParentCleared() bool {
 }
 
 // ParentID returns the parent id in the mutation.
-func (m *VariationMutation) ParentID() (id int, exists bool) {
+func (m *VariationMutation) ParentID() (id uint64, exists bool) {
 	if m.parent != nil {
 		return *m.parent, true
 	}
@@ -4004,7 +4004,7 @@ func (m *VariationMutation) ParentID() (id int, exists bool) {
 // ParentIDs returns the parent ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // ParentID instead. It exists only for internal usage by the builders.
-func (m *VariationMutation) ParentIDs() (ids []int) {
+func (m *VariationMutation) ParentIDs() (ids []uint64) {
 	if id := m.parent; id != nil {
 		ids = append(ids, *id)
 	}
@@ -4018,9 +4018,9 @@ func (m *VariationMutation) ResetParent() {
 }
 
 // AddChildIDs adds the children edge to Variation by ids.
-func (m *VariationMutation) AddChildIDs(ids ...int) {
+func (m *VariationMutation) AddChildIDs(ids ...uint64) {
 	if m.children == nil {
-		m.children = make(map[int]struct{})
+		m.children = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.children[ids[i]] = struct{}{}
@@ -4038,9 +4038,9 @@ func (m *VariationMutation) ChildrenCleared() bool {
 }
 
 // RemoveChildIDs removes the children edge to Variation by ids.
-func (m *VariationMutation) RemoveChildIDs(ids ...int) {
+func (m *VariationMutation) RemoveChildIDs(ids ...uint64) {
 	if m.removedchildren == nil {
-		m.removedchildren = make(map[int]struct{})
+		m.removedchildren = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removedchildren[ids[i]] = struct{}{}
@@ -4048,7 +4048,7 @@ func (m *VariationMutation) RemoveChildIDs(ids ...int) {
 }
 
 // RemovedChildren returns the removed ids of children.
-func (m *VariationMutation) RemovedChildrenIDs() (ids []int) {
+func (m *VariationMutation) RemovedChildrenIDs() (ids []uint64) {
 	for id := range m.removedchildren {
 		ids = append(ids, id)
 	}
@@ -4056,7 +4056,7 @@ func (m *VariationMutation) RemovedChildrenIDs() (ids []int) {
 }
 
 // ChildrenIDs returns the children ids in the mutation.
-func (m *VariationMutation) ChildrenIDs() (ids []int) {
+func (m *VariationMutation) ChildrenIDs() (ids []uint64) {
 	for id := range m.children {
 		ids = append(ids, id)
 	}
@@ -4071,7 +4071,7 @@ func (m *VariationMutation) ResetChildren() {
 }
 
 // SetProductID sets the product edge to Product by id.
-func (m *VariationMutation) SetProductID(id int) {
+func (m *VariationMutation) SetProductID(id uint64) {
 	m.product = &id
 }
 
@@ -4086,7 +4086,7 @@ func (m *VariationMutation) ProductCleared() bool {
 }
 
 // ProductID returns the product id in the mutation.
-func (m *VariationMutation) ProductID() (id int, exists bool) {
+func (m *VariationMutation) ProductID() (id uint64, exists bool) {
 	if m.product != nil {
 		return *m.product, true
 	}
@@ -4096,7 +4096,7 @@ func (m *VariationMutation) ProductID() (id int, exists bool) {
 // ProductIDs returns the product ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
 // ProductID instead. It exists only for internal usage by the builders.
-func (m *VariationMutation) ProductIDs() (ids []int) {
+func (m *VariationMutation) ProductIDs() (ids []uint64) {
 	if id := m.product; id != nil {
 		ids = append(ids, *id)
 	}
@@ -4110,9 +4110,9 @@ func (m *VariationMutation) ResetProduct() {
 }
 
 // AddVariantIDs adds the variant edge to Variant by ids.
-func (m *VariationMutation) AddVariantIDs(ids ...int) {
+func (m *VariationMutation) AddVariantIDs(ids ...uint64) {
 	if m.variant == nil {
-		m.variant = make(map[int]struct{})
+		m.variant = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.variant[ids[i]] = struct{}{}
@@ -4130,9 +4130,9 @@ func (m *VariationMutation) VariantCleared() bool {
 }
 
 // RemoveVariantIDs removes the variant edge to Variant by ids.
-func (m *VariationMutation) RemoveVariantIDs(ids ...int) {
+func (m *VariationMutation) RemoveVariantIDs(ids ...uint64) {
 	if m.removedvariant == nil {
-		m.removedvariant = make(map[int]struct{})
+		m.removedvariant = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removedvariant[ids[i]] = struct{}{}
@@ -4140,7 +4140,7 @@ func (m *VariationMutation) RemoveVariantIDs(ids ...int) {
 }
 
 // RemovedVariant returns the removed ids of variant.
-func (m *VariationMutation) RemovedVariantIDs() (ids []int) {
+func (m *VariationMutation) RemovedVariantIDs() (ids []uint64) {
 	for id := range m.removedvariant {
 		ids = append(ids, id)
 	}
@@ -4148,7 +4148,7 @@ func (m *VariationMutation) RemovedVariantIDs() (ids []int) {
 }
 
 // VariantIDs returns the variant ids in the mutation.
-func (m *VariationMutation) VariantIDs() (ids []int) {
+func (m *VariationMutation) VariantIDs() (ids []uint64) {
 	for id := range m.variant {
 		ids = append(ids, id)
 	}
@@ -4163,9 +4163,9 @@ func (m *VariationMutation) ResetVariant() {
 }
 
 // AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (m *VariationMutation) AddOutboundDealIDs(ids ...int) {
+func (m *VariationMutation) AddOutboundDealIDs(ids ...uint64) {
 	if m.outbound_deals == nil {
-		m.outbound_deals = make(map[int]struct{})
+		m.outbound_deals = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.outbound_deals[ids[i]] = struct{}{}
@@ -4183,9 +4183,9 @@ func (m *VariationMutation) OutboundDealsCleared() bool {
 }
 
 // RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
-func (m *VariationMutation) RemoveOutboundDealIDs(ids ...int) {
+func (m *VariationMutation) RemoveOutboundDealIDs(ids ...uint64) {
 	if m.removedoutbound_deals == nil {
-		m.removedoutbound_deals = make(map[int]struct{})
+		m.removedoutbound_deals = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.removedoutbound_deals[ids[i]] = struct{}{}
@@ -4193,7 +4193,7 @@ func (m *VariationMutation) RemoveOutboundDealIDs(ids ...int) {
 }
 
 // RemovedOutboundDeals returns the removed ids of outbound_deals.
-func (m *VariationMutation) RemovedOutboundDealsIDs() (ids []int) {
+func (m *VariationMutation) RemovedOutboundDealsIDs() (ids []uint64) {
 	for id := range m.removedoutbound_deals {
 		ids = append(ids, id)
 	}
@@ -4201,7 +4201,7 @@ func (m *VariationMutation) RemovedOutboundDealsIDs() (ids []int) {
 }
 
 // OutboundDealsIDs returns the outbound_deals ids in the mutation.
-func (m *VariationMutation) OutboundDealsIDs() (ids []int) {
+func (m *VariationMutation) OutboundDealsIDs() (ids []uint64) {
 	for id := range m.outbound_deals {
 		ids = append(ids, id)
 	}

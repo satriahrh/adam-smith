@@ -123,8 +123,8 @@ func (odq *OutboundDealQuery) FirstX(ctx context.Context) *OutboundDeal {
 }
 
 // FirstID returns the first OutboundDeal id in the query. Returns *NotFoundError when no id was found.
-func (odq *OutboundDealQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (odq *OutboundDealQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = odq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -136,7 +136,7 @@ func (odq *OutboundDealQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (odq *OutboundDealQuery) FirstIDX(ctx context.Context) int {
+func (odq *OutboundDealQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := odq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -170,8 +170,8 @@ func (odq *OutboundDealQuery) OnlyX(ctx context.Context) *OutboundDeal {
 }
 
 // OnlyID returns the only OutboundDeal id in the query, returns an error if not exactly one id was returned.
-func (odq *OutboundDealQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (odq *OutboundDealQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = odq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -187,7 +187,7 @@ func (odq *OutboundDealQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (odq *OutboundDealQuery) OnlyIDX(ctx context.Context) int {
+func (odq *OutboundDealQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := odq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -213,8 +213,8 @@ func (odq *OutboundDealQuery) AllX(ctx context.Context) []*OutboundDeal {
 }
 
 // IDs executes the query and returns a list of OutboundDeal ids.
-func (odq *OutboundDealQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (odq *OutboundDealQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := odq.Select(outbounddeal.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func (odq *OutboundDealQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (odq *OutboundDealQuery) IDsX(ctx context.Context) []int {
+func (odq *OutboundDealQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := odq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -409,8 +409,8 @@ func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, erro
 	}
 
 	if query := odq.withVariation; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*OutboundDeal)
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*OutboundDeal)
 		for i := range nodes {
 			if fk := nodes[i].outbound_deal_variation; fk != nil {
 				ids = append(ids, *fk)
@@ -434,8 +434,8 @@ func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, erro
 	}
 
 	if query := odq.withTransaction; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*OutboundDeal)
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*OutboundDeal)
 		for i := range nodes {
 			if fk := nodes[i].outbound_transaction_deals; fk != nil {
 				ids = append(ids, *fk)
@@ -480,7 +480,7 @@ func (odq *OutboundDealQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   outbounddeal.Table,
 			Columns: outbounddeal.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		},

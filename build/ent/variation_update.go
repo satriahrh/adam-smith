@@ -84,13 +84,13 @@ func (vu *VariationUpdate) AddPrice(u uint) *VariationUpdate {
 }
 
 // SetParentID sets the parent edge to Variation by id.
-func (vu *VariationUpdate) SetParentID(id int) *VariationUpdate {
+func (vu *VariationUpdate) SetParentID(id uint64) *VariationUpdate {
 	vu.mutation.SetParentID(id)
 	return vu
 }
 
 // SetNillableParentID sets the parent edge to Variation by id if the given value is not nil.
-func (vu *VariationUpdate) SetNillableParentID(id *int) *VariationUpdate {
+func (vu *VariationUpdate) SetNillableParentID(id *uint64) *VariationUpdate {
 	if id != nil {
 		vu = vu.SetParentID(*id)
 	}
@@ -103,14 +103,14 @@ func (vu *VariationUpdate) SetParent(v *Variation) *VariationUpdate {
 }
 
 // AddChildIDs adds the children edge to Variation by ids.
-func (vu *VariationUpdate) AddChildIDs(ids ...int) *VariationUpdate {
+func (vu *VariationUpdate) AddChildIDs(ids ...uint64) *VariationUpdate {
 	vu.mutation.AddChildIDs(ids...)
 	return vu
 }
 
 // AddChildren adds the children edges to Variation.
 func (vu *VariationUpdate) AddChildren(v ...*Variation) *VariationUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -118,13 +118,13 @@ func (vu *VariationUpdate) AddChildren(v ...*Variation) *VariationUpdate {
 }
 
 // SetProductID sets the product edge to Product by id.
-func (vu *VariationUpdate) SetProductID(id int) *VariationUpdate {
+func (vu *VariationUpdate) SetProductID(id uint64) *VariationUpdate {
 	vu.mutation.SetProductID(id)
 	return vu
 }
 
 // SetNillableProductID sets the product edge to Product by id if the given value is not nil.
-func (vu *VariationUpdate) SetNillableProductID(id *int) *VariationUpdate {
+func (vu *VariationUpdate) SetNillableProductID(id *uint64) *VariationUpdate {
 	if id != nil {
 		vu = vu.SetProductID(*id)
 	}
@@ -137,14 +137,14 @@ func (vu *VariationUpdate) SetProduct(p *Product) *VariationUpdate {
 }
 
 // AddVariantIDs adds the variant edge to Variant by ids.
-func (vu *VariationUpdate) AddVariantIDs(ids ...int) *VariationUpdate {
+func (vu *VariationUpdate) AddVariantIDs(ids ...uint64) *VariationUpdate {
 	vu.mutation.AddVariantIDs(ids...)
 	return vu
 }
 
 // AddVariant adds the variant edges to Variant.
 func (vu *VariationUpdate) AddVariant(v ...*Variant) *VariationUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -152,14 +152,14 @@ func (vu *VariationUpdate) AddVariant(v ...*Variant) *VariationUpdate {
 }
 
 // AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (vu *VariationUpdate) AddOutboundDealIDs(ids ...int) *VariationUpdate {
+func (vu *VariationUpdate) AddOutboundDealIDs(ids ...uint64) *VariationUpdate {
 	vu.mutation.AddOutboundDealIDs(ids...)
 	return vu
 }
 
 // AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
 func (vu *VariationUpdate) AddOutboundDeals(o ...*OutboundDeal) *VariationUpdate {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -184,14 +184,14 @@ func (vu *VariationUpdate) ClearChildren() *VariationUpdate {
 }
 
 // RemoveChildIDs removes the children edge to Variation by ids.
-func (vu *VariationUpdate) RemoveChildIDs(ids ...int) *VariationUpdate {
+func (vu *VariationUpdate) RemoveChildIDs(ids ...uint64) *VariationUpdate {
 	vu.mutation.RemoveChildIDs(ids...)
 	return vu
 }
 
 // RemoveChildren removes children edges to Variation.
 func (vu *VariationUpdate) RemoveChildren(v ...*Variation) *VariationUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -211,14 +211,14 @@ func (vu *VariationUpdate) ClearVariant() *VariationUpdate {
 }
 
 // RemoveVariantIDs removes the variant edge to Variant by ids.
-func (vu *VariationUpdate) RemoveVariantIDs(ids ...int) *VariationUpdate {
+func (vu *VariationUpdate) RemoveVariantIDs(ids ...uint64) *VariationUpdate {
 	vu.mutation.RemoveVariantIDs(ids...)
 	return vu
 }
 
 // RemoveVariant removes variant edges to Variant.
 func (vu *VariationUpdate) RemoveVariant(v ...*Variant) *VariationUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -232,14 +232,14 @@ func (vu *VariationUpdate) ClearOutboundDeals() *VariationUpdate {
 }
 
 // RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
-func (vu *VariationUpdate) RemoveOutboundDealIDs(ids ...int) *VariationUpdate {
+func (vu *VariationUpdate) RemoveOutboundDealIDs(ids ...uint64) *VariationUpdate {
 	vu.mutation.RemoveOutboundDealIDs(ids...)
 	return vu
 }
 
 // RemoveOutboundDeals removes outbound_deals edges to OutboundDeal.
 func (vu *VariationUpdate) RemoveOutboundDeals(o ...*OutboundDeal) *VariationUpdate {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -303,7 +303,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   variation.Table,
 			Columns: variation.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variation.FieldID,
 			},
 		},
@@ -365,7 +365,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -381,7 +381,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -400,7 +400,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -416,7 +416,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -435,7 +435,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -454,7 +454,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -470,7 +470,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -489,7 +489,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -505,7 +505,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -524,7 +524,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -543,7 +543,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -559,7 +559,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -578,7 +578,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -661,13 +661,13 @@ func (vuo *VariationUpdateOne) AddPrice(u uint) *VariationUpdateOne {
 }
 
 // SetParentID sets the parent edge to Variation by id.
-func (vuo *VariationUpdateOne) SetParentID(id int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) SetParentID(id uint64) *VariationUpdateOne {
 	vuo.mutation.SetParentID(id)
 	return vuo
 }
 
 // SetNillableParentID sets the parent edge to Variation by id if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillableParentID(id *int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) SetNillableParentID(id *uint64) *VariationUpdateOne {
 	if id != nil {
 		vuo = vuo.SetParentID(*id)
 	}
@@ -680,14 +680,14 @@ func (vuo *VariationUpdateOne) SetParent(v *Variation) *VariationUpdateOne {
 }
 
 // AddChildIDs adds the children edge to Variation by ids.
-func (vuo *VariationUpdateOne) AddChildIDs(ids ...int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) AddChildIDs(ids ...uint64) *VariationUpdateOne {
 	vuo.mutation.AddChildIDs(ids...)
 	return vuo
 }
 
 // AddChildren adds the children edges to Variation.
 func (vuo *VariationUpdateOne) AddChildren(v ...*Variation) *VariationUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -695,13 +695,13 @@ func (vuo *VariationUpdateOne) AddChildren(v ...*Variation) *VariationUpdateOne 
 }
 
 // SetProductID sets the product edge to Product by id.
-func (vuo *VariationUpdateOne) SetProductID(id int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) SetProductID(id uint64) *VariationUpdateOne {
 	vuo.mutation.SetProductID(id)
 	return vuo
 }
 
 // SetNillableProductID sets the product edge to Product by id if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillableProductID(id *int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) SetNillableProductID(id *uint64) *VariationUpdateOne {
 	if id != nil {
 		vuo = vuo.SetProductID(*id)
 	}
@@ -714,14 +714,14 @@ func (vuo *VariationUpdateOne) SetProduct(p *Product) *VariationUpdateOne {
 }
 
 // AddVariantIDs adds the variant edge to Variant by ids.
-func (vuo *VariationUpdateOne) AddVariantIDs(ids ...int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) AddVariantIDs(ids ...uint64) *VariationUpdateOne {
 	vuo.mutation.AddVariantIDs(ids...)
 	return vuo
 }
 
 // AddVariant adds the variant edges to Variant.
 func (vuo *VariationUpdateOne) AddVariant(v ...*Variant) *VariationUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -729,14 +729,14 @@ func (vuo *VariationUpdateOne) AddVariant(v ...*Variant) *VariationUpdateOne {
 }
 
 // AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (vuo *VariationUpdateOne) AddOutboundDealIDs(ids ...int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) AddOutboundDealIDs(ids ...uint64) *VariationUpdateOne {
 	vuo.mutation.AddOutboundDealIDs(ids...)
 	return vuo
 }
 
 // AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
 func (vuo *VariationUpdateOne) AddOutboundDeals(o ...*OutboundDeal) *VariationUpdateOne {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -761,14 +761,14 @@ func (vuo *VariationUpdateOne) ClearChildren() *VariationUpdateOne {
 }
 
 // RemoveChildIDs removes the children edge to Variation by ids.
-func (vuo *VariationUpdateOne) RemoveChildIDs(ids ...int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) RemoveChildIDs(ids ...uint64) *VariationUpdateOne {
 	vuo.mutation.RemoveChildIDs(ids...)
 	return vuo
 }
 
 // RemoveChildren removes children edges to Variation.
 func (vuo *VariationUpdateOne) RemoveChildren(v ...*Variation) *VariationUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -788,14 +788,14 @@ func (vuo *VariationUpdateOne) ClearVariant() *VariationUpdateOne {
 }
 
 // RemoveVariantIDs removes the variant edge to Variant by ids.
-func (vuo *VariationUpdateOne) RemoveVariantIDs(ids ...int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) RemoveVariantIDs(ids ...uint64) *VariationUpdateOne {
 	vuo.mutation.RemoveVariantIDs(ids...)
 	return vuo
 }
 
 // RemoveVariant removes variant edges to Variant.
 func (vuo *VariationUpdateOne) RemoveVariant(v ...*Variant) *VariationUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -809,14 +809,14 @@ func (vuo *VariationUpdateOne) ClearOutboundDeals() *VariationUpdateOne {
 }
 
 // RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
-func (vuo *VariationUpdateOne) RemoveOutboundDealIDs(ids ...int) *VariationUpdateOne {
+func (vuo *VariationUpdateOne) RemoveOutboundDealIDs(ids ...uint64) *VariationUpdateOne {
 	vuo.mutation.RemoveOutboundDealIDs(ids...)
 	return vuo
 }
 
 // RemoveOutboundDeals removes outbound_deals edges to OutboundDeal.
 func (vuo *VariationUpdateOne) RemoveOutboundDeals(o ...*OutboundDeal) *VariationUpdateOne {
-	ids := make([]int, len(o))
+	ids := make([]uint64, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -880,7 +880,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Table:   variation.Table,
 			Columns: variation.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variation.FieldID,
 			},
 		},
@@ -940,7 +940,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -956,7 +956,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -975,7 +975,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -991,7 +991,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -1010,7 +1010,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variation.FieldID,
 				},
 			},
@@ -1029,7 +1029,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -1045,7 +1045,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -1064,7 +1064,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -1080,7 +1080,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -1099,7 +1099,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: variant.FieldID,
 				},
 			},
@@ -1118,7 +1118,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -1134,7 +1134,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},
@@ -1153,7 +1153,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outbounddeal.FieldID,
 				},
 			},

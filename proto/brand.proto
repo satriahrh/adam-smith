@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package="github.com/satriahrh/adam-smith/build/proto";
 
 message Brand {
-  int32 id = 1;
+  uint64 id = 1;
   string code = 2;
   string name = 3;
 }
