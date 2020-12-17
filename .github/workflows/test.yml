@@ -14,4 +14,4 @@ jobs:
           make setup
       - name: The vet
         run: |
-          go list ./... | grep -v vendor | xargs go vet -v
+          go list ./... | grep -v vendor | grep -v build | xargs go vet -v
