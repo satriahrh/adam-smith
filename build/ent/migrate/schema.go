@@ -149,6 +149,7 @@ var (
 		{Name: "price", Type: field.TypeUint},
 		{Name: "product_variations", Type: field.TypeUint64, Nullable: true},
 		{Name: "variation_children", Type: field.TypeUint64, Nullable: true},
+		{Name: "variation_variant", Type: field.TypeUint64, Nullable: true},
 	}
 	// VariationsTable holds the schema information for the "variations" table.
 	VariationsTable = &schema.Table{
@@ -170,32 +171,12 @@ var (
 				RefColumns: []*schema.Column{VariationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
-		},
-	}
-	// VariantVariationsColumns holds the columns for the "variant_variations" table.
-	VariantVariationsColumns = []*schema.Column{
-		{Name: "variant_id", Type: field.TypeInt},
-		{Name: "variation_id", Type: field.TypeInt},
-	}
-	// VariantVariationsTable holds the schema information for the "variant_variations" table.
-	VariantVariationsTable = &schema.Table{
-		Name:       "variant_variations",
-		Columns:    VariantVariationsColumns,
-		PrimaryKey: []*schema.Column{VariantVariationsColumns[0], VariantVariationsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:  "variant_variations_variant_id",
-				Columns: []*schema.Column{VariantVariationsColumns[0]},
+				Symbol:  "variations_variants_variant",
+				Columns: []*schema.Column{VariationsColumns[6]},
 
 				RefColumns: []*schema.Column{VariantsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:  "variant_variations_variation_id",
-				Columns: []*schema.Column{VariantVariationsColumns[1]},
-
-				RefColumns: []*schema.Column{VariationsColumns[0]},
-				OnDelete:   schema.Cascade,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -208,7 +189,6 @@ var (
 		ProductsTable,
 		VariantsTable,
 		VariationsTable,
-		VariantVariationsTable,
 	}
 )
 
@@ -219,6 +199,5 @@ func init() {
 	ProductsTable.ForeignKeys[0].RefTable = BrandsTable
 	VariationsTable.ForeignKeys[0].RefTable = ProductsTable
 	VariationsTable.ForeignKeys[1].RefTable = VariationsTable
-	VariantVariationsTable.ForeignKeys[0].RefTable = VariantsTable
-	VariantVariationsTable.ForeignKeys[1].RefTable = VariationsTable
+	VariationsTable.ForeignKeys[2].RefTable = VariantsTable
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/satriahrh/adam-smith/build/ent/product"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/build/ent/variation"
 )
 
@@ -28,6 +29,7 @@ type Variation struct {
 	Edges              VariationEdges `json:"edges"`
 	product_variations *uint64
 	variation_children *uint64
+	variation_variant  *uint64
 }
 
 // VariationEdges holds the relations/edges for other nodes in the graph.
@@ -36,10 +38,10 @@ type VariationEdges struct {
 	Parent *Variation
 	// Children holds the value of the children edge.
 	Children []*Variation
+	// Variant holds the value of the variant edge.
+	Variant *Variant
 	// Product holds the value of the product edge.
 	Product *Product
-	// Variant holds the value of the variant edge.
-	Variant []*Variant
 	// OutboundDeals holds the value of the outbound_deals edge.
 	OutboundDeals []*OutboundDeal
 	// loadedTypes holds the information for reporting if a
@@ -70,10 +72,24 @@ func (e VariationEdges) ChildrenOrErr() ([]*Variation, error) {
 	return nil, &NotLoadedError{edge: "children"}
 }
 
+// VariantOrErr returns the Variant value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e VariationEdges) VariantOrErr() (*Variant, error) {
+	if e.loadedTypes[2] {
+		if e.Variant == nil {
+			// The edge variant was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: variant.Label}
+		}
+		return e.Variant, nil
+	}
+	return nil, &NotLoadedError{edge: "variant"}
+}
+
 // ProductOrErr returns the Product value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e VariationEdges) ProductOrErr() (*Product, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.Product == nil {
 			// The edge product was loaded in eager-loading,
 			// but was not found.
@@ -82,15 +98,6 @@ func (e VariationEdges) ProductOrErr() (*Product, error) {
 		return e.Product, nil
 	}
 	return nil, &NotLoadedError{edge: "product"}
-}
-
-// VariantOrErr returns the Variant value or an error if the edge
-// was not loaded in eager-loading.
-func (e VariationEdges) VariantOrErr() ([]*Variant, error) {
-	if e.loadedTypes[3] {
-		return e.Variant, nil
-	}
-	return nil, &NotLoadedError{edge: "variant"}
 }
 
 // OutboundDealsOrErr returns the OutboundDeals value or an error if the edge
@@ -117,6 +124,7 @@ func (*Variation) fkValues() []interface{} {
 	return []interface{}{
 		&sql.NullInt64{}, // product_variations
 		&sql.NullInt64{}, // variation_children
+		&sql.NullInt64{}, // variation_variant
 	}
 }
 
@@ -164,6 +172,12 @@ func (v *Variation) assignValues(values ...interface{}) error {
 			v.variation_children = new(uint64)
 			*v.variation_children = uint64(value.Int64)
 		}
+		if value, ok := values[2].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field variation_variant", value)
+		} else if value.Valid {
+			v.variation_variant = new(uint64)
+			*v.variation_variant = uint64(value.Int64)
+		}
 	}
 	return nil
 }
@@ -178,14 +192,14 @@ func (v *Variation) QueryChildren() *VariationQuery {
 	return (&VariationClient{config: v.config}).QueryChildren(v)
 }
 
-// QueryProduct queries the product edge of the Variation.
-func (v *Variation) QueryProduct() *ProductQuery {
-	return (&VariationClient{config: v.config}).QueryProduct(v)
-}
-
 // QueryVariant queries the variant edge of the Variation.
 func (v *Variation) QueryVariant() *VariantQuery {
 	return (&VariationClient{config: v.config}).QueryVariant(v)
+}
+
+// QueryProduct queries the product edge of the Variation.
+func (v *Variation) QueryProduct() *ProductQuery {
+	return (&VariationClient{config: v.config}).QueryProduct(v)
 }
 
 // QueryOutboundDeals queries the outbound_deals edge of the Variation.

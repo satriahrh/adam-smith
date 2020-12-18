@@ -327,6 +327,34 @@ func HasChildrenWith(preds ...predicate.Variation) predicate.Variation {
 	})
 }
 
+// HasVariant applies the HasEdge predicate on the "variant" edge.
+func HasVariant() predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(VariantTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariantTable, VariantColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVariantWith applies the HasEdge predicate on the "variant" edge with a given conditions (other predicates).
+func HasVariantWith(preds ...predicate.Variant) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(VariantInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariantTable, VariantColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasProduct applies the HasEdge predicate on the "product" edge.
 func HasProduct() predicate.Variation {
 	return predicate.Variation(func(s *sql.Selector) {
@@ -346,34 +374,6 @@ func HasProductWith(preds ...predicate.Product) predicate.Variation {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ProductInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, ProductTable, ProductColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasVariant applies the HasEdge predicate on the "variant" edge.
-func HasVariant() predicate.Variation {
-	return predicate.Variation(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariantTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, VariantTable, VariantPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasVariantWith applies the HasEdge predicate on the "variant" edge with a given conditions (other predicates).
-func HasVariantWith(preds ...predicate.Variant) predicate.Variation {
-	return predicate.Variation(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariantInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, VariantTable, VariantPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

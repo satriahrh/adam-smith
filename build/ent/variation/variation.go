@@ -18,10 +18,10 @@ const (
 	EdgeParent = "parent"
 	// EdgeChildren holds the string denoting the children edge name in mutations.
 	EdgeChildren = "children"
-	// EdgeProduct holds the string denoting the product edge name in mutations.
-	EdgeProduct = "product"
 	// EdgeVariant holds the string denoting the variant edge name in mutations.
 	EdgeVariant = "variant"
+	// EdgeProduct holds the string denoting the product edge name in mutations.
+	EdgeProduct = "product"
 	// EdgeOutboundDeals holds the string denoting the outbound_deals edge name in mutations.
 	EdgeOutboundDeals = "outbound_deals"
 
@@ -35,6 +35,13 @@ const (
 	ChildrenTable = "variations"
 	// ChildrenColumn is the table column denoting the children relation/edge.
 	ChildrenColumn = "variation_children"
+	// VariantTable is the table the holds the variant relation/edge.
+	VariantTable = "variations"
+	// VariantInverseTable is the table name for the Variant entity.
+	// It exists in this package in order to avoid circular dependency with the "variant" package.
+	VariantInverseTable = "variants"
+	// VariantColumn is the table column denoting the variant relation/edge.
+	VariantColumn = "variation_variant"
 	// ProductTable is the table the holds the product relation/edge.
 	ProductTable = "variations"
 	// ProductInverseTable is the table name for the Product entity.
@@ -42,11 +49,6 @@ const (
 	ProductInverseTable = "products"
 	// ProductColumn is the table column denoting the product relation/edge.
 	ProductColumn = "product_variations"
-	// VariantTable is the table the holds the variant relation/edge. The primary key declared below.
-	VariantTable = "variant_variations"
-	// VariantInverseTable is the table name for the Variant entity.
-	// It exists in this package in order to avoid circular dependency with the "variant" package.
-	VariantInverseTable = "variants"
 	// OutboundDealsTable is the table the holds the outbound_deals relation/edge.
 	OutboundDealsTable = "outbound_deals"
 	// OutboundDealsInverseTable is the table name for the OutboundDeal entity.
@@ -68,13 +70,8 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"product_variations",
 	"variation_children",
+	"variation_variant",
 }
-
-var (
-	// VariantPrimaryKey and VariantColumn2 are the table columns denoting the
-	// primary key for the variant relation (M2M).
-	VariantPrimaryKey = []string{"variant_id", "variation_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

@@ -263,7 +263,7 @@ func HasVariations() predicate.Variant {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(VariationsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, VariationsTable, VariationsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, VariationsTable, VariationsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -275,7 +275,7 @@ func HasVariationsWith(preds ...predicate.Variation) predicate.Variant {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(VariationsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, VariationsTable, VariationsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, VariationsTable, VariationsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

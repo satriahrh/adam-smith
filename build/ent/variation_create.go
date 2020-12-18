@@ -90,6 +90,25 @@ func (vc *VariationCreate) AddChildren(v ...*Variation) *VariationCreate {
 	return vc.AddChildIDs(ids...)
 }
 
+// SetVariantID sets the variant edge to Variant by id.
+func (vc *VariationCreate) SetVariantID(id uint64) *VariationCreate {
+	vc.mutation.SetVariantID(id)
+	return vc
+}
+
+// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
+func (vc *VariationCreate) SetNillableVariantID(id *uint64) *VariationCreate {
+	if id != nil {
+		vc = vc.SetVariantID(*id)
+	}
+	return vc
+}
+
+// SetVariant sets the variant edge to Variant.
+func (vc *VariationCreate) SetVariant(v *Variant) *VariationCreate {
+	return vc.SetVariantID(v.ID)
+}
+
 // SetProductID sets the product edge to Product by id.
 func (vc *VariationCreate) SetProductID(id uint64) *VariationCreate {
 	vc.mutation.SetProductID(id)
@@ -107,21 +126,6 @@ func (vc *VariationCreate) SetNillableProductID(id *uint64) *VariationCreate {
 // SetProduct sets the product edge to Product.
 func (vc *VariationCreate) SetProduct(p *Product) *VariationCreate {
 	return vc.SetProductID(p.ID)
-}
-
-// AddVariantIDs adds the variant edge to Variant by ids.
-func (vc *VariationCreate) AddVariantIDs(ids ...uint64) *VariationCreate {
-	vc.mutation.AddVariantIDs(ids...)
-	return vc
-}
-
-// AddVariant adds the variant edges to Variant.
-func (vc *VariationCreate) AddVariant(v ...*Variant) *VariationCreate {
-	ids := make([]uint64, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return vc.AddVariantIDs(ids...)
 }
 
 // AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
@@ -298,6 +302,25 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := vc.mutation.VariantIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   variation.VariantTable,
+			Columns: []string{variation.VariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := vc.mutation.ProductIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -309,25 +332,6 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
 					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := vc.mutation.VariantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   variation.VariantTable,
-			Columns: variation.VariantPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variant.FieldID,
 				},
 			},
 		}

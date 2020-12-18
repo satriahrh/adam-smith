@@ -181,10 +181,10 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if vu.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variant.VariationsTable,
-			Columns: variant.VariationsPrimaryKey,
+			Columns: []string{variant.VariationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -197,10 +197,10 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.RemovedVariationsIDs(); len(nodes) > 0 && !vu.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variant.VariationsTable,
-			Columns: variant.VariationsPrimaryKey,
+			Columns: []string{variant.VariationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -216,10 +216,10 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.VariationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variant.VariationsTable,
-			Columns: variant.VariationsPrimaryKey,
+			Columns: []string{variant.VariationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -403,10 +403,10 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 	}
 	if vuo.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variant.VariationsTable,
-			Columns: variant.VariationsPrimaryKey,
+			Columns: []string{variant.VariationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -419,10 +419,10 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 	}
 	if nodes := vuo.mutation.RemovedVariationsIDs(); len(nodes) > 0 && !vuo.mutation.VariationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variant.VariationsTable,
-			Columns: variant.VariationsPrimaryKey,
+			Columns: []string{variant.VariationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -438,10 +438,10 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 	}
 	if nodes := vuo.mutation.VariationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   variant.VariationsTable,
-			Columns: variant.VariationsPrimaryKey,
+			Columns: []string{variant.VariationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

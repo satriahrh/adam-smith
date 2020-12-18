@@ -29,11 +29,11 @@ func (Variation) Edges() []ent.Edge {
 		edge.To("children", Variation.Type).
 			From("parent").
 			Unique(),
+		edge.To("variant", Variant.Type).
+			Unique(),
 		edge.From("product", Product.Type).
 			Ref("variations").
 			Unique(),
-		edge.From("variant", Variant.Type).
-			Ref("variations"),
 		edge.From("outbound_deals", OutboundDeal.Type).
 			Ref("variation"),
 	}

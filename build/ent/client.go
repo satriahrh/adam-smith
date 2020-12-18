@@ -818,7 +818,7 @@ func (c *VariantClient) QueryVariations(v *Variant) *VariationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variant.Table, variant.FieldID, id),
 			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, variant.VariationsTable, variant.VariationsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, variant.VariationsTable, variant.VariationsColumn),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil
@@ -946,6 +946,22 @@ func (c *VariationClient) QueryChildren(v *Variation) *VariationQuery {
 	return query
 }
 
+// QueryVariant queries the variant edge of a Variation.
+func (c *VariationClient) QueryVariant(v *Variation) *VariantQuery {
+	query := &VariantQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(variation.Table, variation.FieldID, id),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, variation.VariantTable, variation.VariantColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryProduct queries the product edge of a Variation.
 func (c *VariationClient) QueryProduct(v *Variation) *ProductQuery {
 	query := &ProductQuery{config: c.config}
@@ -955,22 +971,6 @@ func (c *VariationClient) QueryProduct(v *Variation) *ProductQuery {
 			sqlgraph.From(variation.Table, variation.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, variation.ProductTable, variation.ProductColumn),
-		)
-		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryVariant queries the variant edge of a Variation.
-func (c *VariationClient) QueryVariant(v *Variation) *VariantQuery {
-	query := &VariantQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := v.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, id),
-			sqlgraph.To(variant.Table, variant.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, variation.VariantTable, variation.VariantPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil
