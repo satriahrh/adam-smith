@@ -6,15 +6,15 @@ import (
 	"github.com/satriahrh/adam-smith/build/proto"
 )
 
-func (c *catalog) AddBrand(ctx context.Context, protoBrand *proto.Brand) error {
-	brand, err := c.ent.Brand.Create().
-		SetCode(protoBrand.Code).
-		SetName(protoBrand.Name).
+func (c *catalog) AddBrand(ctx context.Context, brand *proto.Brand) error {
+	createdBrand, err := c.ent.Brand.Create().
+		SetCode(brand.Code).
+		SetName(brand.Name).
 		Save(ctx)
 	if err != nil {
 		return err
 	}
 
-	protoBrand.Id = brand.ID
+	brand.Id = createdBrand.ID
 	return nil
 }

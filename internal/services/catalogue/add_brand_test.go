@@ -10,25 +10,25 @@ import (
 func (s *Suite) TestAddBrand() {
 	s.Run("NoError", func() {
 		ctx := context.TODO()
-		protoBrand := &proto.Brand{Name: "Savan", Code: "savan"}
+		brand := &proto.Brand{Name: "Savan", Code: "savan"}
 		s.sqlmock.ExpectBegin()
 		s.sqlmock.ExpectExec("INSERT INTO `brands`").
 			WithArgs("savan", "Savan").
 			WillReturnResult(sqlmock.NewResult(123, 1))
 		s.sqlmock.ExpectCommit()
-		err := s.subject.AddBrand(ctx, protoBrand)
+		err := s.subject.AddBrand(ctx, brand)
 		s.NoError(err)
-		s.Equal(uint64(123), protoBrand.Id)
+		s.Equal(uint64(123), brand.Id)
 	})
 	s.Run("Error", func() {
 		ctx := context.TODO()
-		protoBrand := &proto.Brand{Name: "Savan", Code: "savan"}
+		brand := &proto.Brand{Name: "Savan", Code: "savan"}
 		s.sqlmock.ExpectBegin()
 		s.sqlmock.ExpectExec("INSERT INTO `brands`").
 			WithArgs("savan", "Savan").
 			WillReturnError(errors.New("unexpected error"))
 		s.sqlmock.ExpectRollback()
-		err := s.subject.AddBrand(ctx, protoBrand)
+		err := s.subject.AddBrand(ctx, brand)
 		s.EqualError(err, "insert node to table \"brands\": unexpected error")
 	})
 }
