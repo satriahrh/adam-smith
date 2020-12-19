@@ -8,5 +8,6 @@ require (
 	github.com/go-sql-driver/mysql v1.5.1-0.20200311113236-681ffa848bae
 	github.com/golang/protobuf v1.4.1
 	github.com/stretchr/testify v1.6.1
+	go.uber.org/zap v1.10.0
 	google.golang.org/protobuf v1.25.0
 )

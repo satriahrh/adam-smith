@@ -5,6 +5,7 @@ import (
 
 	"github.com/satriahrh/adam-smith/build/proto"
 	"github.com/satriahrh/adam-smith/ent/schema"
+	"go.uber.org/zap"
 )
 
 func (c *catalog) AddProduct(ctx context.Context, brandId uint64, product *proto.Product) (err error) {
@@ -23,6 +24,7 @@ func (c *catalog) AddProduct(ctx context.Context, brandId uint64, product *proto
 		).
 		Save(ctx)
 	if err != nil {
+		c.logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return err
 	}
 	product.Id = createdProduct.ID

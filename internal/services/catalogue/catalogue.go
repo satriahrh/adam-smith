@@ -5,6 +5,7 @@ import (
 
 	"github.com/satriahrh/adam-smith/build/ent"
 	"github.com/satriahrh/adam-smith/build/proto"
+	"go.uber.org/zap"
 )
 
 type Catalogue interface {
@@ -13,9 +14,10 @@ type Catalogue interface {
 }
 
 type catalog struct {
-	ent *ent.Client
+	ent    *ent.Client
+	logger *zap.Logger
 }
 
-func New(ent *ent.Client) Catalogue {
-	return &catalog{ent}
+func New(ent *ent.Client, logger *zap.Logger) Catalogue {
+	return &catalog{ent, logger}
 }

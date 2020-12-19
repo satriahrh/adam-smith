@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/satriahrh/adam-smith/build/proto"
+	"go.uber.org/zap"
 )
 
 func (c *catalog) AddBrand(ctx context.Context, brand *proto.Brand) error {
@@ -12,6 +13,7 @@ func (c *catalog) AddBrand(ctx context.Context, brand *proto.Brand) error {
 		SetName(brand.Name).
 		Save(ctx)
 	if err != nil {
+		c.logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return err
 	}
 

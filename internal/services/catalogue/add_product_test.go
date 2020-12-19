@@ -1,7 +1,6 @@
 package catalogue_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
@@ -36,7 +35,6 @@ func (s *Suite) TestAddProduct() {
 		Bukalapak: "https://bklpk.com/3",
 	}
 	s.Run("NoError", func() {
-		ctx := context.TODO()
 		brandId := uint64(321)
 		product := &proto.Product{
 			Sku:          "kdsk",
@@ -57,12 +55,11 @@ func (s *Suite) TestAddProduct() {
 			).
 			WillReturnResult(sqlmock.NewResult(123, 1))
 		s.sqlmock.ExpectCommit()
-		err := s.subject.AddProduct(ctx, brandId, product)
+		err := s.subject.AddProduct(s.context, brandId, product)
 		s.NoError(err)
 		s.Equal(uint64(123), product.Id)
 	})
 	s.Run("Error", func() {
-		ctx := context.TODO()
 		brandId := uint64(321)
 		product := &proto.Product{
 			Sku:          "kdsk",
@@ -83,7 +80,7 @@ func (s *Suite) TestAddProduct() {
 			).
 			WillReturnError(fmt.Errorf("unexpected error"))
 		s.sqlmock.ExpectRollback()
-		err := s.subject.AddProduct(ctx, brandId, product)
+		err := s.subject.AddProduct(s.context, brandId, product)
 		s.EqualError(err, "insert node to table \"products\": unexpected error")
 	})
 }
