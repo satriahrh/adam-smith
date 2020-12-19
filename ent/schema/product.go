@@ -17,8 +17,8 @@ type ProductDescription struct {
 	Body    string `json:"body"`
 }
 
-// ProductMarketplace marketplace details of the product being sold
-type ProductMarketplace struct {
+// ProductMarketplaces marketplace details of the product being sold
+type ProductMarketplaces struct {
 	Tokopedia string `json:"tokopedia,omitempty"`
 	Shopee    string `json:"shopee,omitempty"`
 	Bukalapak string `json:"bukalapak,omitempty"`
@@ -38,7 +38,7 @@ func (Product) Fields() []ent.Field {
 		field.String("name"),
 		field.JSON("descriptions", []ProductDescription{}),
 		field.JSON("images", ProductImages{}),
-		field.JSON("marketplaces", ProductMarketplace{}),
+		field.JSON("marketplaces", ProductMarketplaces{}),
 	}
 }
 

@@ -2609,7 +2609,7 @@ type ProductMutation struct {
 	name              *string
 	descriptions      *[]schema.ProductDescription
 	images            *schema.ProductImages
-	marketplaces      *schema.ProductMarketplace
+	marketplaces      *schema.ProductMarketplaces
 	clearedFields     map[string]struct{}
 	variations        map[uint64]struct{}
 	removedvariations map[uint64]struct{}
@@ -2849,12 +2849,12 @@ func (m *ProductMutation) ResetImages() {
 }
 
 // SetMarketplaces sets the marketplaces field.
-func (m *ProductMutation) SetMarketplaces(sm schema.ProductMarketplace) {
+func (m *ProductMutation) SetMarketplaces(sm schema.ProductMarketplaces) {
 	m.marketplaces = &sm
 }
 
 // Marketplaces returns the marketplaces value in the mutation.
-func (m *ProductMutation) Marketplaces() (r schema.ProductMarketplace, exists bool) {
+func (m *ProductMutation) Marketplaces() (r schema.ProductMarketplaces, exists bool) {
 	v := m.marketplaces
 	if v == nil {
 		return
@@ -2866,7 +2866,7 @@ func (m *ProductMutation) Marketplaces() (r schema.ProductMarketplace, exists bo
 // If the Product object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *ProductMutation) OldMarketplaces(ctx context.Context) (v schema.ProductMarketplace, err error) {
+func (m *ProductMutation) OldMarketplaces(ctx context.Context) (v schema.ProductMarketplaces, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldMarketplaces is allowed only on UpdateOne operations")
 	}
@@ -3082,7 +3082,7 @@ func (m *ProductMutation) SetField(name string, value ent.Value) error {
 		m.SetImages(v)
 		return nil
 	case product.FieldMarketplaces:
-		v, ok := value.(schema.ProductMarketplace)
+		v, ok := value.(schema.ProductMarketplaces)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

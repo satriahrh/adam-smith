@@ -8,7 +8,7 @@ message Product {
   string name = 3;
   repeated ProductDescription descriptions = 4;
   ProductImages images = 5;
-  ProductMarketplace marketplaces = 6;
+  ProductMarketplaces marketplaces = 6;
 }
 
 message ProductDescription {
@@ -21,7 +21,7 @@ message ProductImages {
   repeated string displays = 2;
 }
 
-message ProductMarketplace {
+message ProductMarketplaces {
   string tokopedia = 1;
   string shopee = 2;
   string bukalapak = 3;

@@ -47,7 +47,7 @@ func (pc *ProductCreate) SetImages(si schema.ProductImages) *ProductCreate {
 }
 
 // SetMarketplaces sets the marketplaces field.
-func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplace) *ProductCreate {
+func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplaces) *ProductCreate {
 	pc.mutation.SetMarketplaces(sm)
 	return pc
 }

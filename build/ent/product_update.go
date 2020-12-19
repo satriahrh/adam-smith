@@ -48,7 +48,7 @@ func (pu *ProductUpdate) SetImages(si schema.ProductImages) *ProductUpdate {
 }
 
 // SetMarketplaces sets the marketplaces field.
-func (pu *ProductUpdate) SetMarketplaces(sm schema.ProductMarketplace) *ProductUpdate {
+func (pu *ProductUpdate) SetMarketplaces(sm schema.ProductMarketplaces) *ProductUpdate {
 	pu.mutation.SetMarketplaces(sm)
 	return pu
 }
@@ -342,7 +342,7 @@ func (puo *ProductUpdateOne) SetImages(si schema.ProductImages) *ProductUpdateOn
 }
 
 // SetMarketplaces sets the marketplaces field.
-func (puo *ProductUpdateOne) SetMarketplaces(sm schema.ProductMarketplace) *ProductUpdateOne {
+func (puo *ProductUpdateOne) SetMarketplaces(sm schema.ProductMarketplaces) *ProductUpdateOne {
 	puo.mutation.SetMarketplaces(sm)
 	return puo
 }

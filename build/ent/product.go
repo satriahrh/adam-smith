@@ -27,7 +27,7 @@ type Product struct {
 	// Images holds the value of the "images" field.
 	Images schema.ProductImages `json:"images,omitempty"`
 	// Marketplaces holds the value of the "marketplaces" field.
-	Marketplaces schema.ProductMarketplace `json:"marketplaces,omitempty"`
+	Marketplaces schema.ProductMarketplaces `json:"marketplaces,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
 	Edges          ProductEdges `json:"edges"`
