@@ -10,5 +10,7 @@ generate-ent:
 	go generate ent/generate.go
 generate-proto:
 	protoc --proto_path=proto --go_out=build/proto --go_opt=paths=source_relative proto/*.proto
+test:
+	go run github.com/ory/go-acc --ignore build ./... -- -v
 %:
 	@:
