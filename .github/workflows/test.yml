@@ -29,3 +29,6 @@ jobs:
       - name: The Test
         run: |
           make test
+      - name: Upload Coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash)
