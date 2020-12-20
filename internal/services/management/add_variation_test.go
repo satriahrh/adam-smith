@@ -37,7 +37,7 @@ func (s *Suite) TestAddVariation() {
 			WillReturnError(errors.New("Error 1062: Duplicated"))
 		s.sqlmock.ExpectRollback()
 		err := s.subject.AddVariation(s.context, variation)
-		s.EqualError(err, "these value is already created")
+		s.EqualError(err, "variation with given values is already existed")
 	})
 }
 

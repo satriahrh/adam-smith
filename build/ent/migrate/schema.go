@@ -107,7 +107,7 @@ var (
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "sku", Type: field.TypeString, Unique: true},
+		{Name: "sku", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "descriptions", Type: field.TypeJSON},
 		{Name: "images", Type: field.TypeJSON},
@@ -126,6 +126,13 @@ var (
 
 				RefColumns: []*schema.Column{BrandsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "product_sku_brand_products",
+				Unique:  true,
+				Columns: []*schema.Column{ProductsColumns[1], ProductsColumns[6]},
 			},
 		},
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/facebook/ent"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
+	"github.com/facebook/ent/schema/index"
 )
 
 // Product holds the schema definition for the Product entity.
@@ -34,7 +35,7 @@ type ProductImages struct {
 func (Product) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("sku").
-			Unique().Immutable(),
+			Immutable(),
 		field.String("name"),
 		field.JSON("descriptions", []ProductDescription{}),
 		field.JSON("images", ProductImages{}),
@@ -49,5 +50,12 @@ func (Product) Edges() []ent.Edge {
 		edge.From("brand", Brand.Type).
 			Ref("products").
 			Unique(),
+	}
+}
+
+// Indexes of the Product.
+func (Product) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("sku").Edges("brand").Unique(),
 	}
 }

@@ -18,14 +18,14 @@ func (s *Suite) TestAddBrand() {
 		s.NoError(err)
 		s.Equal(uint64(123), brand.Id)
 	})
-	s.Run("Error", func() {
+	s.Run("DuplicatedError", func() {
 		brand := &proto.Brand{Name: "Savan", Code: "savan"}
 		s.sqlmock.ExpectBegin()
 		s.sqlmock.ExpectExec("INSERT INTO `brands`").
 			WithArgs("savan", "Savan").
-			WillReturnError(errors.New("unexpected error"))
+			WillReturnError(errors.New("Error 1062: Duplicated"))
 		s.sqlmock.ExpectRollback()
 		err := s.subject.AddBrand(s.context, brand)
-		s.EqualError(err, "insert node to table \"brands\": unexpected error")
+		s.EqualError(err, "brand with given code is already existed")
 	})
 }
