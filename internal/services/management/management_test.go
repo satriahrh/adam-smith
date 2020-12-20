@@ -1,4 +1,4 @@
-package catalogue_test
+package management_test
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/satriahrh/adam-smith/build/ent"
-	"github.com/satriahrh/adam-smith/internal/services/catalogue"
+	"github.com/satriahrh/adam-smith/internal/services/management"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
 )
 
 type Suite struct {
 	suite.Suite
-	subject catalogue.Catalogue
+	subject management.Catalogue
 	sqlmock sqlmock.Sqlmock
 	context context.Context
 }
@@ -26,7 +26,7 @@ func (s *Suite) SetupSuite() {
 	db, mock, _ := sqlmock.New()
 
 	logger, _ := zap.NewDevelopment([]zap.Option{}...)
-	s.subject = catalogue.New(
+	s.subject = management.New(
 		ent.NewClient([]ent.Option{
 			ent.Driver(
 				sql.OpenDB("mysql", db),

@@ -1,4 +1,4 @@
-package catalogue
+package management
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func (c *catalog) AddProduct(ctx context.Context, brandId uint64, product *proto.Product) (err error) {
-	createdProduct, err := c.ent.Product.Create().
+func (m *management) AddProduct(ctx context.Context, brandId uint64, product *proto.Product) (err error) {
+	createdProduct, err := m.ent.Product.Create().
 		SetBrandID(brandId).
 		SetName(product.GetName()).
 		SetSku(product.GetSku()).
@@ -24,7 +24,7 @@ func (c *catalog) AddProduct(ctx context.Context, brandId uint64, product *proto
 		).
 		Save(ctx)
 	if err != nil {
-		c.logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+		m.logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return err
 	}
 	product.Id = createdProduct.ID

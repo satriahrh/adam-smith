@@ -1,4 +1,4 @@
-package catalogue
+package management
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func (c *catalog) AddVariant(ctx context.Context, productID uint64, variationID uint64, variant *proto.Variant) (err error) {
-	createdVariant, err := c.ent.Variant.Create().
+func (m *management) AddVariant(ctx context.Context, productID uint64, variationID uint64, variant *proto.Variant) (err error) {
+	createdVariant, err := m.ent.Variant.Create().
 		SetImages(variant.GetImages()).
 		SetStock(variant.GetStock()).
 		SetPrice(variant.GetPrice()).
@@ -15,7 +15,7 @@ func (c *catalog) AddVariant(ctx context.Context, productID uint64, variationID 
 		SetVariationID(variationID).
 		Save(ctx)
 	if err != nil {
-		c.logger.Error("Error when creating variant", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+		m.logger.Error("Error when creating variant", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return err
 	}
 	variant.Id = createdVariant.ID

@@ -1,4 +1,4 @@
-package catalogue_test
+package management_test
 
 import (
 	"errors"
