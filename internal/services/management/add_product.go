@@ -8,9 +8,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func (m *management) AddProduct(ctx context.Context, brandId uint64, product *proto.Product) (err error) {
+func (m *management) AddProduct(ctx context.Context, brandID uint64, product *proto.Product) (err error) {
 	createdProduct, err := m.ent.Product.Create().
-		SetBrandID(brandId).
+		SetBrandID(brandID).
 		SetName(product.GetName()).
 		SetSku(product.GetSku()).
 		SetDescriptions(

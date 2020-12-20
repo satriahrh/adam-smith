@@ -10,7 +10,7 @@ import (
 
 type Management interface {
 	AddBrand(ctx context.Context, brand *proto.Brand) (err error)
-	AddProduct(ctx context.Context, brandId uint64, product *proto.Product) (err error)
+	AddProduct(ctx context.Context, brandID uint64, product *proto.Product) (err error)
 	AddVariant(ctx context.Context, productID uint64, variationID uint64, variant *proto.Variant) (err error)
 	AddVariation(ctx context.Context, variation *proto.Variation) (err error)
 }
