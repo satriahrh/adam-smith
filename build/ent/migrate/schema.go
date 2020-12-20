@@ -171,7 +171,7 @@ var (
 	// VariationsColumns holds the columns for the "variations" table.
 	VariationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"color", "size"}},
+		{Name: "type", Type: field.TypeString},
 		{Name: "value", Type: field.TypeString},
 	}
 	// VariationsTable holds the schema information for the "variations" table.

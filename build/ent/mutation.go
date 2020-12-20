@@ -4257,7 +4257,7 @@ type VariationMutation struct {
 	op              Op
 	typ             string
 	id              *uint64
-	_type           *variation.Type
+	_type           *string
 	value           *string
 	clearedFields   map[string]struct{}
 	variants        map[uint64]struct{}
@@ -4348,12 +4348,12 @@ func (m *VariationMutation) ID() (id uint64, exists bool) {
 }
 
 // SetType sets the type field.
-func (m *VariationMutation) SetType(v variation.Type) {
-	m._type = &v
+func (m *VariationMutation) SetType(s string) {
+	m._type = &s
 }
 
 // GetType returns the type value in the mutation.
-func (m *VariationMutation) GetType() (r variation.Type, exists bool) {
+func (m *VariationMutation) GetType() (r string, exists bool) {
 	v := m._type
 	if v == nil {
 		return
@@ -4365,7 +4365,7 @@ func (m *VariationMutation) GetType() (r variation.Type, exists bool) {
 // If the Variation object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariationMutation) OldType(ctx context.Context) (v variation.Type, err error) {
+func (m *VariationMutation) OldType(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldType is allowed only on UpdateOne operations")
 	}
@@ -4530,7 +4530,7 @@ func (m *VariationMutation) OldField(ctx context.Context, name string) (ent.Valu
 func (m *VariationMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case variation.FieldType:
-		v, ok := value.(variation.Type)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

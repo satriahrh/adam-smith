@@ -21,8 +21,8 @@ type VariationCreate struct {
 }
 
 // SetType sets the type field.
-func (vc *VariationCreate) SetType(v variation.Type) *VariationCreate {
-	vc.mutation.SetType(v)
+func (vc *VariationCreate) SetType(s string) *VariationCreate {
+	vc.mutation.SetType(s)
 	return vc
 }
 
@@ -109,6 +109,11 @@ func (vc *VariationCreate) check() error {
 	if _, ok := vc.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New("ent: missing required field \"value\"")}
 	}
+	if v, ok := vc.mutation.Value(); ok {
+		if err := variation.ValueValidator(v); err != nil {
+			return &ValidationError{Name: "value", err: fmt.Errorf("ent: validator failed for field \"value\": %w", err)}
+		}
+	}
 	return nil
 }
 
@@ -138,7 +143,7 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 	)
 	if value, ok := vc.mutation.GetType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: variation.FieldType,
 		})

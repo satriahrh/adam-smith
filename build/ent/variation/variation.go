@@ -2,10 +2,6 @@
 
 package variation
 
-import (
-	"fmt"
-)
-
 const (
 	// Label holds the string label denoting the variation type in the database.
 	Label = "variation"
@@ -47,25 +43,9 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-// Type defines the type for the type enum field.
-type Type string
-
-// Type values.
-const (
-	TypeColor Type = "color"
-	TypeSize  Type = "size"
+var (
+	// TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	TypeValidator func(string) error
+	// ValueValidator is a validator for the "value" field. It is called by the builders before save.
+	ValueValidator func(string) error
 )
-
-func (_type Type) String() string {
-	return string(_type)
-}
-
-// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
-func TypeValidator(_type Type) error {
-	switch _type {
-	case TypeColor, TypeSize:
-		return nil
-	default:
-		return fmt.Errorf("variation: invalid enum value for type field: %q", _type)
-	}
-}

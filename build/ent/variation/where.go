@@ -91,6 +91,13 @@ func IDLTE(id uint64) predicate.Variation {
 	})
 }
 
+// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
+func Type(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldType), v))
+	})
+}
+
 // Value applies equality check predicate on the "value" field. It's identical to ValueEQ.
 func Value(v string) predicate.Variation {
 	return predicate.Variation(func(s *sql.Selector) {
@@ -99,21 +106,21 @@ func Value(v string) predicate.Variation {
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v Type) predicate.Variation {
+func TypeEQ(v string) predicate.Variation {
 	return predicate.Variation(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldType), v))
 	})
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v Type) predicate.Variation {
+func TypeNEQ(v string) predicate.Variation {
 	return predicate.Variation(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldType), v))
 	})
 }
 
 // TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...Type) predicate.Variation {
+func TypeIn(vs ...string) predicate.Variation {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -130,7 +137,7 @@ func TypeIn(vs ...Type) predicate.Variation {
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...Type) predicate.Variation {
+func TypeNotIn(vs ...string) predicate.Variation {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -143,6 +150,69 @@ func TypeNotIn(vs ...Type) predicate.Variation {
 			return
 		}
 		s.Where(sql.NotIn(s.C(FieldType), v...))
+	})
+}
+
+// TypeGT applies the GT predicate on the "type" field.
+func TypeGT(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldType), v))
+	})
+}
+
+// TypeGTE applies the GTE predicate on the "type" field.
+func TypeGTE(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldType), v))
+	})
+}
+
+// TypeLT applies the LT predicate on the "type" field.
+func TypeLT(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldType), v))
+	})
+}
+
+// TypeLTE applies the LTE predicate on the "type" field.
+func TypeLTE(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldType), v))
+	})
+}
+
+// TypeContains applies the Contains predicate on the "type" field.
+func TypeContains(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldType), v))
+	})
+}
+
+// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
+func TypeHasPrefix(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldType), v))
+	})
+}
+
+// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
+func TypeHasSuffix(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldType), v))
+	})
+}
+
+// TypeEqualFold applies the EqualFold predicate on the "type" field.
+func TypeEqualFold(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldType), v))
+	})
+}
+
+// TypeContainsFold applies the ContainsFold predicate on the "type" field.
+func TypeContainsFold(v string) predicate.Variation {
+	return predicate.Variation(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldType), v))
 	})
 }
 

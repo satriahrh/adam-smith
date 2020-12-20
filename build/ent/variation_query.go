@@ -276,7 +276,7 @@ func (vq *VariationQuery) WithVariants(opts ...func(*VariantQuery)) *VariationQu
 // Example:
 //
 //	var v []struct {
-//		Type variation.Type `json:"type,omitempty"`
+//		Type string `json:"type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -302,7 +302,7 @@ func (vq *VariationQuery) GroupBy(field string, fields ...string) *VariationGrou
 // Example:
 //
 //	var v []struct {
-//		Type variation.Type `json:"type,omitempty"`
+//		Type string `json:"type,omitempty"`
 //	}
 //
 //	client.Variation.Query().

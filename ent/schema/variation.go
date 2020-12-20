@@ -15,9 +15,10 @@ type Variation struct {
 // Fields of the Variant.
 func (v Variation) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("type").
-			Values(v.EnumType()...),
-		field.String("value"),
+		field.String("type").
+			NotEmpty(),
+		field.String("value").
+			NotEmpty(),
 	}
 }
 

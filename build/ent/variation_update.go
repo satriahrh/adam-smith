@@ -28,8 +28,8 @@ func (vu *VariationUpdate) Where(ps ...predicate.Variation) *VariationUpdate {
 }
 
 // SetType sets the type field.
-func (vu *VariationUpdate) SetType(v variation.Type) *VariationUpdate {
-	vu.mutation.SetType(v)
+func (vu *VariationUpdate) SetType(s string) *VariationUpdate {
+	vu.mutation.SetType(s)
 	return vu
 }
 
@@ -144,6 +144,11 @@ func (vu *VariationUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
 		}
 	}
+	if v, ok := vu.mutation.Value(); ok {
+		if err := variation.ValueValidator(v); err != nil {
+			return &ValidationError{Name: "value", err: fmt.Errorf("ent: validator failed for field \"value\": %w", err)}
+		}
+	}
 	return nil
 }
 
@@ -167,7 +172,7 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := vu.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: variation.FieldType,
 		})
@@ -252,8 +257,8 @@ type VariationUpdateOne struct {
 }
 
 // SetType sets the type field.
-func (vuo *VariationUpdateOne) SetType(v variation.Type) *VariationUpdateOne {
-	vuo.mutation.SetType(v)
+func (vuo *VariationUpdateOne) SetType(s string) *VariationUpdateOne {
+	vuo.mutation.SetType(s)
 	return vuo
 }
 
@@ -368,6 +373,11 @@ func (vuo *VariationUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
 		}
 	}
+	if v, ok := vuo.mutation.Value(); ok {
+		if err := variation.ValueValidator(v); err != nil {
+			return &ValidationError{Name: "value", err: fmt.Errorf("ent: validator failed for field \"value\": %w", err)}
+		}
+	}
 	return nil
 }
 
@@ -389,7 +399,7 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 	_spec.Node.ID.Value = id
 	if value, ok := vuo.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: variation.FieldType,
 		})

@@ -16,7 +16,7 @@ type Variation struct {
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
 	// Type holds the value of the "type" field.
-	Type variation.Type `json:"type,omitempty"`
+	Type string `json:"type,omitempty"`
 	// Value holds the value of the "value" field.
 	Value string `json:"value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -66,7 +66,7 @@ func (v *Variation) assignValues(values ...interface{}) error {
 	if value, ok := values[0].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field type", values[0])
 	} else if value.Valid {
-		v.Type = variation.Type(value.String)
+		v.Type = value.String
 	}
 	if value, ok := values[1].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field value", values[1])
@@ -105,7 +105,7 @@ func (v *Variation) String() string {
 	builder.WriteString("Variation(")
 	builder.WriteString(fmt.Sprintf("id=%v", v.ID))
 	builder.WriteString(", type=")
-	builder.WriteString(fmt.Sprintf("%v", v.Type))
+	builder.WriteString(v.Type)
 	builder.WriteString(", value=")
 	builder.WriteString(v.Value)
 	builder.WriteByte(')')

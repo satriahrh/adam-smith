@@ -5,6 +5,7 @@ package ent
 import (
 	"github.com/satriahrh/adam-smith/build/ent/brand"
 	"github.com/satriahrh/adam-smith/build/ent/variant"
+	"github.com/satriahrh/adam-smith/build/ent/variation"
 	"github.com/satriahrh/adam-smith/ent/schema"
 )
 
@@ -32,4 +33,14 @@ func init() {
 	variantDescPrice := variantFields[2].Descriptor()
 	// variant.DefaultPrice holds the default value on creation for the price field.
 	variant.DefaultPrice = variantDescPrice.Default.(uint)
+	variationFields := schema.Variation{}.Fields()
+	_ = variationFields
+	// variationDescType is the schema descriptor for type field.
+	variationDescType := variationFields[0].Descriptor()
+	// variation.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	variation.TypeValidator = variationDescType.Validators[0].(func(string) error)
+	// variationDescValue is the schema descriptor for value field.
+	variationDescValue := variationFields[1].Descriptor()
+	// variation.ValueValidator is a validator for the "value" field. It is called by the builders before save.
+	variation.ValueValidator = variationDescValue.Validators[0].(func(string) error)
 }

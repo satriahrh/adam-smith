@@ -1,0 +1,9 @@
+syntax = 'proto3';
+
+option go_package = 'github.com/satriahrh/adam-smith/build/proto';
+
+message Variation {
+  uint64 id = 1;
+  string type = 2;
+  string value = 3;
+}
