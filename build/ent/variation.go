@@ -3,13 +3,10 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/facebook/ent/dialect/sql"
-	"github.com/satriahrh/adam-smith/build/ent/product"
-	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/build/ent/variation"
 )
 
@@ -18,113 +15,39 @@ type Variation struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// Images holds the value of the "images" field.
-	Images []string `json:"images,omitempty"`
-	// Stock holds the value of the "stock" field.
-	Stock uint8 `json:"stock,omitempty"`
-	// Price holds the value of the "price" field.
-	Price uint `json:"price,omitempty"`
+	// Type holds the value of the "type" field.
+	Type variation.Type `json:"type,omitempty"`
+	// Value holds the value of the "value" field.
+	Value string `json:"value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VariationQuery when eager-loading is set.
-	Edges              VariationEdges `json:"edges"`
-	product_variations *uint64
-	variation_children *uint64
-	variation_variant  *uint64
+	Edges VariationEdges `json:"edges"`
 }
 
 // VariationEdges holds the relations/edges for other nodes in the graph.
 type VariationEdges struct {
-	// Parent holds the value of the parent edge.
-	Parent *Variation
-	// Children holds the value of the children edge.
-	Children []*Variation
-	// Variant holds the value of the variant edge.
-	Variant *Variant
-	// Product holds the value of the product edge.
-	Product *Product
-	// OutboundDeals holds the value of the outbound_deals edge.
-	OutboundDeals []*OutboundDeal
+	// Variants holds the value of the variants edge.
+	Variants []*Variant
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [1]bool
 }
 
-// ParentOrErr returns the Parent value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e VariationEdges) ParentOrErr() (*Variation, error) {
+// VariantsOrErr returns the Variants value or an error if the edge
+// was not loaded in eager-loading.
+func (e VariationEdges) VariantsOrErr() ([]*Variant, error) {
 	if e.loadedTypes[0] {
-		if e.Parent == nil {
-			// The edge parent was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: variation.Label}
-		}
-		return e.Parent, nil
+		return e.Variants, nil
 	}
-	return nil, &NotLoadedError{edge: "parent"}
-}
-
-// ChildrenOrErr returns the Children value or an error if the edge
-// was not loaded in eager-loading.
-func (e VariationEdges) ChildrenOrErr() ([]*Variation, error) {
-	if e.loadedTypes[1] {
-		return e.Children, nil
-	}
-	return nil, &NotLoadedError{edge: "children"}
-}
-
-// VariantOrErr returns the Variant value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e VariationEdges) VariantOrErr() (*Variant, error) {
-	if e.loadedTypes[2] {
-		if e.Variant == nil {
-			// The edge variant was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: variant.Label}
-		}
-		return e.Variant, nil
-	}
-	return nil, &NotLoadedError{edge: "variant"}
-}
-
-// ProductOrErr returns the Product value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e VariationEdges) ProductOrErr() (*Product, error) {
-	if e.loadedTypes[3] {
-		if e.Product == nil {
-			// The edge product was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: product.Label}
-		}
-		return e.Product, nil
-	}
-	return nil, &NotLoadedError{edge: "product"}
-}
-
-// OutboundDealsOrErr returns the OutboundDeals value or an error if the edge
-// was not loaded in eager-loading.
-func (e VariationEdges) OutboundDealsOrErr() ([]*OutboundDeal, error) {
-	if e.loadedTypes[4] {
-		return e.OutboundDeals, nil
-	}
-	return nil, &NotLoadedError{edge: "outbound_deals"}
+	return nil, &NotLoadedError{edge: "variants"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Variation) scanValues() []interface{} {
 	return []interface{}{
-		&sql.NullInt64{}, // id
-		&[]byte{},        // images
-		&sql.NullInt64{}, // stock
-		&sql.NullInt64{}, // price
-	}
-}
-
-// fkValues returns the types for scanning foreign-keys values from sql.Rows.
-func (*Variation) fkValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{}, // product_variations
-		&sql.NullInt64{}, // variation_children
-		&sql.NullInt64{}, // variation_variant
+		&sql.NullInt64{},  // id
+		&sql.NullString{}, // type
+		&sql.NullString{}, // value
 	}
 }
 
@@ -140,71 +63,22 @@ func (v *Variation) assignValues(values ...interface{}) error {
 	}
 	v.ID = uint64(value.Int64)
 	values = values[1:]
-
-	if value, ok := values[0].(*[]byte); !ok {
-		return fmt.Errorf("unexpected type %T for field images", values[0])
-	} else if value != nil && len(*value) > 0 {
-		if err := json.Unmarshal(*value, &v.Images); err != nil {
-			return fmt.Errorf("unmarshal field images: %v", err)
-		}
-	}
-	if value, ok := values[1].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field stock", values[1])
+	if value, ok := values[0].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field type", values[0])
 	} else if value.Valid {
-		v.Stock = uint8(value.Int64)
+		v.Type = variation.Type(value.String)
 	}
-	if value, ok := values[2].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field price", values[2])
+	if value, ok := values[1].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field value", values[1])
 	} else if value.Valid {
-		v.Price = uint(value.Int64)
-	}
-	values = values[3:]
-	if len(values) == len(variation.ForeignKeys) {
-		if value, ok := values[0].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field product_variations", value)
-		} else if value.Valid {
-			v.product_variations = new(uint64)
-			*v.product_variations = uint64(value.Int64)
-		}
-		if value, ok := values[1].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field variation_children", value)
-		} else if value.Valid {
-			v.variation_children = new(uint64)
-			*v.variation_children = uint64(value.Int64)
-		}
-		if value, ok := values[2].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field variation_variant", value)
-		} else if value.Valid {
-			v.variation_variant = new(uint64)
-			*v.variation_variant = uint64(value.Int64)
-		}
+		v.Value = value.String
 	}
 	return nil
 }
 
-// QueryParent queries the parent edge of the Variation.
-func (v *Variation) QueryParent() *VariationQuery {
-	return (&VariationClient{config: v.config}).QueryParent(v)
-}
-
-// QueryChildren queries the children edge of the Variation.
-func (v *Variation) QueryChildren() *VariationQuery {
-	return (&VariationClient{config: v.config}).QueryChildren(v)
-}
-
-// QueryVariant queries the variant edge of the Variation.
-func (v *Variation) QueryVariant() *VariantQuery {
-	return (&VariationClient{config: v.config}).QueryVariant(v)
-}
-
-// QueryProduct queries the product edge of the Variation.
-func (v *Variation) QueryProduct() *ProductQuery {
-	return (&VariationClient{config: v.config}).QueryProduct(v)
-}
-
-// QueryOutboundDeals queries the outbound_deals edge of the Variation.
-func (v *Variation) QueryOutboundDeals() *OutboundDealQuery {
-	return (&VariationClient{config: v.config}).QueryOutboundDeals(v)
+// QueryVariants queries the variants edge of the Variation.
+func (v *Variation) QueryVariants() *VariantQuery {
+	return (&VariationClient{config: v.config}).QueryVariants(v)
 }
 
 // Update returns a builder for updating this Variation.
@@ -230,12 +104,10 @@ func (v *Variation) String() string {
 	var builder strings.Builder
 	builder.WriteString("Variation(")
 	builder.WriteString(fmt.Sprintf("id=%v", v.ID))
-	builder.WriteString(", images=")
-	builder.WriteString(fmt.Sprintf("%v", v.Images))
-	builder.WriteString(", stock=")
-	builder.WriteString(fmt.Sprintf("%v", v.Stock))
-	builder.WriteString(", price=")
-	builder.WriteString(fmt.Sprintf("%v", v.Price))
+	builder.WriteString(", type=")
+	builder.WriteString(fmt.Sprintf("%v", v.Type))
+	builder.WriteString(", value=")
+	builder.WriteString(v.Value)
 	builder.WriteByte(')')
 	return builder.String()
 }

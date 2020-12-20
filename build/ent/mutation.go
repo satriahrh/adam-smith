@@ -491,8 +491,13 @@ type OutboundDealMutation struct {
 	amount             *uint
 	addamount          *uint
 	clearedFields      map[string]struct{}
-	variation          *uint64
-	clearedvariation   bool
+	variant            *uint64
+	clearedvariant     bool
+	parent             *uint64
+	clearedparent      bool
+	children           map[uint64]struct{}
+	removedchildren    map[uint64]struct{}
+	clearedchildren    bool
 	transaction        *uint64
 	clearedtransaction bool
 	done               bool
@@ -693,43 +698,135 @@ func (m *OutboundDealMutation) ResetAmount() {
 	m.addamount = nil
 }
 
-// SetVariationID sets the variation edge to Variation by id.
-func (m *OutboundDealMutation) SetVariationID(id uint64) {
-	m.variation = &id
+// SetVariantID sets the variant edge to Variant by id.
+func (m *OutboundDealMutation) SetVariantID(id uint64) {
+	m.variant = &id
 }
 
-// ClearVariation clears the variation edge to Variation.
-func (m *OutboundDealMutation) ClearVariation() {
-	m.clearedvariation = true
+// ClearVariant clears the variant edge to Variant.
+func (m *OutboundDealMutation) ClearVariant() {
+	m.clearedvariant = true
 }
 
-// VariationCleared returns if the edge variation was cleared.
-func (m *OutboundDealMutation) VariationCleared() bool {
-	return m.clearedvariation
+// VariantCleared returns if the edge variant was cleared.
+func (m *OutboundDealMutation) VariantCleared() bool {
+	return m.clearedvariant
 }
 
-// VariationID returns the variation id in the mutation.
-func (m *OutboundDealMutation) VariationID() (id uint64, exists bool) {
-	if m.variation != nil {
-		return *m.variation, true
+// VariantID returns the variant id in the mutation.
+func (m *OutboundDealMutation) VariantID() (id uint64, exists bool) {
+	if m.variant != nil {
+		return *m.variant, true
 	}
 	return
 }
 
-// VariationIDs returns the variation ids in the mutation.
+// VariantIDs returns the variant ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
-// VariationID instead. It exists only for internal usage by the builders.
-func (m *OutboundDealMutation) VariationIDs() (ids []uint64) {
-	if id := m.variation; id != nil {
+// VariantID instead. It exists only for internal usage by the builders.
+func (m *OutboundDealMutation) VariantIDs() (ids []uint64) {
+	if id := m.variant; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetVariation reset all changes of the "variation" edge.
-func (m *OutboundDealMutation) ResetVariation() {
-	m.variation = nil
-	m.clearedvariation = false
+// ResetVariant reset all changes of the "variant" edge.
+func (m *OutboundDealMutation) ResetVariant() {
+	m.variant = nil
+	m.clearedvariant = false
+}
+
+// SetParentID sets the parent edge to OutboundDeal by id.
+func (m *OutboundDealMutation) SetParentID(id uint64) {
+	m.parent = &id
+}
+
+// ClearParent clears the parent edge to OutboundDeal.
+func (m *OutboundDealMutation) ClearParent() {
+	m.clearedparent = true
+}
+
+// ParentCleared returns if the edge parent was cleared.
+func (m *OutboundDealMutation) ParentCleared() bool {
+	return m.clearedparent
+}
+
+// ParentID returns the parent id in the mutation.
+func (m *OutboundDealMutation) ParentID() (id uint64, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the parent ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *OutboundDealMutation) ParentIDs() (ids []uint64) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent reset all changes of the "parent" edge.
+func (m *OutboundDealMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddChildIDs adds the children edge to OutboundDeal by ids.
+func (m *OutboundDealMutation) AddChildIDs(ids ...uint64) {
+	if m.children == nil {
+		m.children = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.children[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildren clears the children edge to OutboundDeal.
+func (m *OutboundDealMutation) ClearChildren() {
+	m.clearedchildren = true
+}
+
+// ChildrenCleared returns if the edge children was cleared.
+func (m *OutboundDealMutation) ChildrenCleared() bool {
+	return m.clearedchildren
+}
+
+// RemoveChildIDs removes the children edge to OutboundDeal by ids.
+func (m *OutboundDealMutation) RemoveChildIDs(ids ...uint64) {
+	if m.removedchildren == nil {
+		m.removedchildren = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.removedchildren[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildren returns the removed ids of children.
+func (m *OutboundDealMutation) RemovedChildrenIDs() (ids []uint64) {
+	for id := range m.removedchildren {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildrenIDs returns the children ids in the mutation.
+func (m *OutboundDealMutation) ChildrenIDs() (ids []uint64) {
+	for id := range m.children {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildren reset all changes of the "children" edge.
+func (m *OutboundDealMutation) ResetChildren() {
+	m.children = nil
+	m.clearedchildren = false
+	m.removedchildren = nil
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
@@ -930,9 +1027,15 @@ func (m *OutboundDealMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *OutboundDealMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.variation != nil {
-		edges = append(edges, outbounddeal.EdgeVariation)
+	edges := make([]string, 0, 4)
+	if m.variant != nil {
+		edges = append(edges, outbounddeal.EdgeVariant)
+	}
+	if m.parent != nil {
+		edges = append(edges, outbounddeal.EdgeParent)
+	}
+	if m.children != nil {
+		edges = append(edges, outbounddeal.EdgeChildren)
 	}
 	if m.transaction != nil {
 		edges = append(edges, outbounddeal.EdgeTransaction)
@@ -944,10 +1047,20 @@ func (m *OutboundDealMutation) AddedEdges() []string {
 // the given edge name.
 func (m *OutboundDealMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		if id := m.variation; id != nil {
+	case outbounddeal.EdgeVariant:
+		if id := m.variant; id != nil {
 			return []ent.Value{*id}
 		}
+	case outbounddeal.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case outbounddeal.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.children))
+		for id := range m.children {
+			ids = append(ids, id)
+		}
+		return ids
 	case outbounddeal.EdgeTransaction:
 		if id := m.transaction; id != nil {
 			return []ent.Value{*id}
@@ -959,7 +1072,10 @@ func (m *OutboundDealMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *OutboundDealMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
+	if m.removedchildren != nil {
+		edges = append(edges, outbounddeal.EdgeChildren)
+	}
 	return edges
 }
 
@@ -967,6 +1083,12 @@ func (m *OutboundDealMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *OutboundDealMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case outbounddeal.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.removedchildren))
+		for id := range m.removedchildren {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -974,9 +1096,15 @@ func (m *OutboundDealMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *OutboundDealMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedvariation {
-		edges = append(edges, outbounddeal.EdgeVariation)
+	edges := make([]string, 0, 4)
+	if m.clearedvariant {
+		edges = append(edges, outbounddeal.EdgeVariant)
+	}
+	if m.clearedparent {
+		edges = append(edges, outbounddeal.EdgeParent)
+	}
+	if m.clearedchildren {
+		edges = append(edges, outbounddeal.EdgeChildren)
 	}
 	if m.clearedtransaction {
 		edges = append(edges, outbounddeal.EdgeTransaction)
@@ -988,8 +1116,12 @@ func (m *OutboundDealMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *OutboundDealMutation) EdgeCleared(name string) bool {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		return m.clearedvariation
+	case outbounddeal.EdgeVariant:
+		return m.clearedvariant
+	case outbounddeal.EdgeParent:
+		return m.clearedparent
+	case outbounddeal.EdgeChildren:
+		return m.clearedchildren
 	case outbounddeal.EdgeTransaction:
 		return m.clearedtransaction
 	}
@@ -1000,8 +1132,11 @@ func (m *OutboundDealMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *OutboundDealMutation) ClearEdge(name string) error {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		m.ClearVariation()
+	case outbounddeal.EdgeVariant:
+		m.ClearVariant()
+		return nil
+	case outbounddeal.EdgeParent:
+		m.ClearParent()
 		return nil
 	case outbounddeal.EdgeTransaction:
 		m.ClearTransaction()
@@ -1015,8 +1150,14 @@ func (m *OutboundDealMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *OutboundDealMutation) ResetEdge(name string) error {
 	switch name {
-	case outbounddeal.EdgeVariation:
-		m.ResetVariation()
+	case outbounddeal.EdgeVariant:
+		m.ResetVariant()
+		return nil
+	case outbounddeal.EdgeParent:
+		m.ResetParent()
+		return nil
+	case outbounddeal.EdgeChildren:
+		m.ResetChildren()
 		return nil
 	case outbounddeal.EdgeTransaction:
 		m.ResetTransaction()
@@ -2602,23 +2743,23 @@ func (m *OutboundTransactionMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type ProductMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *uint64
-	sku               *string
-	name              *string
-	descriptions      *[]schema.ProductDescription
-	images            *schema.ProductImages
-	marketplaces      *schema.ProductMarketplaces
-	clearedFields     map[string]struct{}
-	variations        map[uint64]struct{}
-	removedvariations map[uint64]struct{}
-	clearedvariations bool
-	brand             *uint64
-	clearedbrand      bool
-	done              bool
-	oldValue          func(context.Context) (*Product, error)
-	predicates        []predicate.Product
+	op              Op
+	typ             string
+	id              *uint64
+	sku             *string
+	name            *string
+	descriptions    *[]schema.ProductDescription
+	images          *schema.ProductImages
+	marketplaces    *schema.ProductMarketplaces
+	clearedFields   map[string]struct{}
+	variants        map[uint64]struct{}
+	removedvariants map[uint64]struct{}
+	clearedvariants bool
+	brand           *uint64
+	clearedbrand    bool
+	done            bool
+	oldValue        func(context.Context) (*Product, error)
+	predicates      []predicate.Product
 }
 
 var _ ent.Mutation = (*ProductMutation)(nil)
@@ -2885,57 +3026,57 @@ func (m *ProductMutation) ResetMarketplaces() {
 	m.marketplaces = nil
 }
 
-// AddVariationIDs adds the variations edge to Variation by ids.
-func (m *ProductMutation) AddVariationIDs(ids ...uint64) {
-	if m.variations == nil {
-		m.variations = make(map[uint64]struct{})
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (m *ProductMutation) AddVariantIDs(ids ...uint64) {
+	if m.variants == nil {
+		m.variants = make(map[uint64]struct{})
 	}
 	for i := range ids {
-		m.variations[ids[i]] = struct{}{}
+		m.variants[ids[i]] = struct{}{}
 	}
 }
 
-// ClearVariations clears the variations edge to Variation.
-func (m *ProductMutation) ClearVariations() {
-	m.clearedvariations = true
+// ClearVariants clears the variants edge to Variant.
+func (m *ProductMutation) ClearVariants() {
+	m.clearedvariants = true
 }
 
-// VariationsCleared returns if the edge variations was cleared.
-func (m *ProductMutation) VariationsCleared() bool {
-	return m.clearedvariations
+// VariantsCleared returns if the edge variants was cleared.
+func (m *ProductMutation) VariantsCleared() bool {
+	return m.clearedvariants
 }
 
-// RemoveVariationIDs removes the variations edge to Variation by ids.
-func (m *ProductMutation) RemoveVariationIDs(ids ...uint64) {
-	if m.removedvariations == nil {
-		m.removedvariations = make(map[uint64]struct{})
+// RemoveVariantIDs removes the variants edge to Variant by ids.
+func (m *ProductMutation) RemoveVariantIDs(ids ...uint64) {
+	if m.removedvariants == nil {
+		m.removedvariants = make(map[uint64]struct{})
 	}
 	for i := range ids {
-		m.removedvariations[ids[i]] = struct{}{}
+		m.removedvariants[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedVariations returns the removed ids of variations.
-func (m *ProductMutation) RemovedVariationsIDs() (ids []uint64) {
-	for id := range m.removedvariations {
+// RemovedVariants returns the removed ids of variants.
+func (m *ProductMutation) RemovedVariantsIDs() (ids []uint64) {
+	for id := range m.removedvariants {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// VariationsIDs returns the variations ids in the mutation.
-func (m *ProductMutation) VariationsIDs() (ids []uint64) {
-	for id := range m.variations {
+// VariantsIDs returns the variants ids in the mutation.
+func (m *ProductMutation) VariantsIDs() (ids []uint64) {
+	for id := range m.variants {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetVariations reset all changes of the "variations" edge.
-func (m *ProductMutation) ResetVariations() {
-	m.variations = nil
-	m.clearedvariations = false
-	m.removedvariations = nil
+// ResetVariants reset all changes of the "variants" edge.
+func (m *ProductMutation) ResetVariants() {
+	m.variants = nil
+	m.clearedvariants = false
+	m.removedvariants = nil
 }
 
 // SetBrandID sets the brand edge to Brand by id.
@@ -3161,8 +3302,8 @@ func (m *ProductMutation) ResetField(name string) error {
 // mutation.
 func (m *ProductMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.variations != nil {
-		edges = append(edges, product.EdgeVariations)
+	if m.variants != nil {
+		edges = append(edges, product.EdgeVariants)
 	}
 	if m.brand != nil {
 		edges = append(edges, product.EdgeBrand)
@@ -3174,9 +3315,9 @@ func (m *ProductMutation) AddedEdges() []string {
 // the given edge name.
 func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case product.EdgeVariations:
-		ids := make([]ent.Value, 0, len(m.variations))
-		for id := range m.variations {
+	case product.EdgeVariants:
+		ids := make([]ent.Value, 0, len(m.variants))
+		for id := range m.variants {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3192,8 +3333,8 @@ func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *ProductMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedvariations != nil {
-		edges = append(edges, product.EdgeVariations)
+	if m.removedvariants != nil {
+		edges = append(edges, product.EdgeVariants)
 	}
 	return edges
 }
@@ -3202,9 +3343,9 @@ func (m *ProductMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case product.EdgeVariations:
-		ids := make([]ent.Value, 0, len(m.removedvariations))
-		for id := range m.removedvariations {
+	case product.EdgeVariants:
+		ids := make([]ent.Value, 0, len(m.removedvariants))
+		for id := range m.removedvariants {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3216,8 +3357,8 @@ func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *ProductMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedvariations {
-		edges = append(edges, product.EdgeVariations)
+	if m.clearedvariants {
+		edges = append(edges, product.EdgeVariants)
 	}
 	if m.clearedbrand {
 		edges = append(edges, product.EdgeBrand)
@@ -3229,8 +3370,8 @@ func (m *ProductMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *ProductMutation) EdgeCleared(name string) bool {
 	switch name {
-	case product.EdgeVariations:
-		return m.clearedvariations
+	case product.EdgeVariants:
+		return m.clearedvariants
 	case product.EdgeBrand:
 		return m.clearedbrand
 	}
@@ -3253,8 +3394,8 @@ func (m *ProductMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *ProductMutation) ResetEdge(name string) error {
 	switch name {
-	case product.EdgeVariations:
-		m.ResetVariations()
+	case product.EdgeVariants:
+		m.ResetVariants()
 		return nil
 	case product.EdgeBrand:
 		m.ResetBrand()
@@ -3267,18 +3408,30 @@ func (m *ProductMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type VariantMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *uint64
-	_type             *variant.Type
-	value             *string
-	clearedFields     map[string]struct{}
-	variations        map[uint64]struct{}
-	removedvariations map[uint64]struct{}
-	clearedvariations bool
-	done              bool
-	oldValue          func(context.Context) (*Variant, error)
-	predicates        []predicate.Variant
+	op                    Op
+	typ                   string
+	id                    *uint64
+	images                *[]string
+	stock                 *uint8
+	addstock              *uint8
+	price                 *uint
+	addprice              *uint
+	clearedFields         map[string]struct{}
+	parent                *uint64
+	clearedparent         bool
+	children              map[uint64]struct{}
+	removedchildren       map[uint64]struct{}
+	clearedchildren       bool
+	variation             *uint64
+	clearedvariation      bool
+	product               *uint64
+	clearedproduct        bool
+	outbound_deals        map[uint64]struct{}
+	removedoutbound_deals map[uint64]struct{}
+	clearedoutbound_deals bool
+	done                  bool
+	oldValue              func(context.Context) (*Variant, error)
+	predicates            []predicate.Variant
 }
 
 var _ ent.Mutation = (*VariantMutation)(nil)
@@ -3360,131 +3513,391 @@ func (m *VariantMutation) ID() (id uint64, exists bool) {
 	return *m.id, true
 }
 
-// SetType sets the type field.
-func (m *VariantMutation) SetType(v variant.Type) {
-	m._type = &v
+// SetImages sets the images field.
+func (m *VariantMutation) SetImages(s []string) {
+	m.images = &s
 }
 
-// GetType returns the type value in the mutation.
-func (m *VariantMutation) GetType() (r variant.Type, exists bool) {
-	v := m._type
+// Images returns the images value in the mutation.
+func (m *VariantMutation) Images() (r []string, exists bool) {
+	v := m.images
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldType returns the old type value of the Variant.
+// OldImages returns the old images value of the Variant.
 // If the Variant object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariantMutation) OldType(ctx context.Context) (v variant.Type, err error) {
+func (m *VariantMutation) OldImages(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldType is allowed only on UpdateOne operations")
+		return v, fmt.Errorf("OldImages is allowed only on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldType requires an ID field in the mutation")
+		return v, fmt.Errorf("OldImages requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
+		return v, fmt.Errorf("querying old value for OldImages: %w", err)
 	}
-	return oldValue.Type, nil
+	return oldValue.Images, nil
 }
 
-// ResetType reset all changes of the "type" field.
-func (m *VariantMutation) ResetType() {
-	m._type = nil
+// ClearImages clears the value of images.
+func (m *VariantMutation) ClearImages() {
+	m.images = nil
+	m.clearedFields[variant.FieldImages] = struct{}{}
 }
 
-// SetValue sets the value field.
-func (m *VariantMutation) SetValue(s string) {
-	m.value = &s
+// ImagesCleared returns if the field images was cleared in this mutation.
+func (m *VariantMutation) ImagesCleared() bool {
+	_, ok := m.clearedFields[variant.FieldImages]
+	return ok
 }
 
-// Value returns the value value in the mutation.
-func (m *VariantMutation) Value() (r string, exists bool) {
-	v := m.value
+// ResetImages reset all changes of the "images" field.
+func (m *VariantMutation) ResetImages() {
+	m.images = nil
+	delete(m.clearedFields, variant.FieldImages)
+}
+
+// SetStock sets the stock field.
+func (m *VariantMutation) SetStock(u uint8) {
+	m.stock = &u
+	m.addstock = nil
+}
+
+// Stock returns the stock value in the mutation.
+func (m *VariantMutation) Stock() (r uint8, exists bool) {
+	v := m.stock
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldValue returns the old value value of the Variant.
+// OldStock returns the old stock value of the Variant.
 // If the Variant object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariantMutation) OldValue(ctx context.Context) (v string, err error) {
+func (m *VariantMutation) OldStock(ctx context.Context) (v uint8, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldValue is allowed only on UpdateOne operations")
+		return v, fmt.Errorf("OldStock is allowed only on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldValue requires an ID field in the mutation")
+		return v, fmt.Errorf("OldStock requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldValue: %w", err)
+		return v, fmt.Errorf("querying old value for OldStock: %w", err)
 	}
-	return oldValue.Value, nil
+	return oldValue.Stock, nil
 }
 
-// ResetValue reset all changes of the "value" field.
-func (m *VariantMutation) ResetValue() {
-	m.value = nil
+// AddStock adds u to stock.
+func (m *VariantMutation) AddStock(u uint8) {
+	if m.addstock != nil {
+		*m.addstock += u
+	} else {
+		m.addstock = &u
+	}
 }
 
-// AddVariationIDs adds the variations edge to Variation by ids.
-func (m *VariantMutation) AddVariationIDs(ids ...uint64) {
-	if m.variations == nil {
-		m.variations = make(map[uint64]struct{})
+// AddedStock returns the value that was added to the stock field in this mutation.
+func (m *VariantMutation) AddedStock() (r uint8, exists bool) {
+	v := m.addstock
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStock reset all changes of the "stock" field.
+func (m *VariantMutation) ResetStock() {
+	m.stock = nil
+	m.addstock = nil
+}
+
+// SetPrice sets the price field.
+func (m *VariantMutation) SetPrice(u uint) {
+	m.price = &u
+	m.addprice = nil
+}
+
+// Price returns the price value in the mutation.
+func (m *VariantMutation) Price() (r uint, exists bool) {
+	v := m.price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrice returns the old price value of the Variant.
+// If the Variant object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *VariantMutation) OldPrice(ctx context.Context) (v uint, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPrice is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrice: %w", err)
+	}
+	return oldValue.Price, nil
+}
+
+// AddPrice adds u to price.
+func (m *VariantMutation) AddPrice(u uint) {
+	if m.addprice != nil {
+		*m.addprice += u
+	} else {
+		m.addprice = &u
+	}
+}
+
+// AddedPrice returns the value that was added to the price field in this mutation.
+func (m *VariantMutation) AddedPrice() (r uint, exists bool) {
+	v := m.addprice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPrice reset all changes of the "price" field.
+func (m *VariantMutation) ResetPrice() {
+	m.price = nil
+	m.addprice = nil
+}
+
+// SetParentID sets the parent edge to Variant by id.
+func (m *VariantMutation) SetParentID(id uint64) {
+	m.parent = &id
+}
+
+// ClearParent clears the parent edge to Variant.
+func (m *VariantMutation) ClearParent() {
+	m.clearedparent = true
+}
+
+// ParentCleared returns if the edge parent was cleared.
+func (m *VariantMutation) ParentCleared() bool {
+	return m.clearedparent
+}
+
+// ParentID returns the parent id in the mutation.
+func (m *VariantMutation) ParentID() (id uint64, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the parent ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *VariantMutation) ParentIDs() (ids []uint64) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent reset all changes of the "parent" edge.
+func (m *VariantMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddChildIDs adds the children edge to Variant by ids.
+func (m *VariantMutation) AddChildIDs(ids ...uint64) {
+	if m.children == nil {
+		m.children = make(map[uint64]struct{})
 	}
 	for i := range ids {
-		m.variations[ids[i]] = struct{}{}
+		m.children[ids[i]] = struct{}{}
 	}
 }
 
-// ClearVariations clears the variations edge to Variation.
-func (m *VariantMutation) ClearVariations() {
-	m.clearedvariations = true
+// ClearChildren clears the children edge to Variant.
+func (m *VariantMutation) ClearChildren() {
+	m.clearedchildren = true
 }
 
-// VariationsCleared returns if the edge variations was cleared.
-func (m *VariantMutation) VariationsCleared() bool {
-	return m.clearedvariations
+// ChildrenCleared returns if the edge children was cleared.
+func (m *VariantMutation) ChildrenCleared() bool {
+	return m.clearedchildren
 }
 
-// RemoveVariationIDs removes the variations edge to Variation by ids.
-func (m *VariantMutation) RemoveVariationIDs(ids ...uint64) {
-	if m.removedvariations == nil {
-		m.removedvariations = make(map[uint64]struct{})
+// RemoveChildIDs removes the children edge to Variant by ids.
+func (m *VariantMutation) RemoveChildIDs(ids ...uint64) {
+	if m.removedchildren == nil {
+		m.removedchildren = make(map[uint64]struct{})
 	}
 	for i := range ids {
-		m.removedvariations[ids[i]] = struct{}{}
+		m.removedchildren[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedVariations returns the removed ids of variations.
-func (m *VariantMutation) RemovedVariationsIDs() (ids []uint64) {
-	for id := range m.removedvariations {
+// RemovedChildren returns the removed ids of children.
+func (m *VariantMutation) RemovedChildrenIDs() (ids []uint64) {
+	for id := range m.removedchildren {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// VariationsIDs returns the variations ids in the mutation.
-func (m *VariantMutation) VariationsIDs() (ids []uint64) {
-	for id := range m.variations {
+// ChildrenIDs returns the children ids in the mutation.
+func (m *VariantMutation) ChildrenIDs() (ids []uint64) {
+	for id := range m.children {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetVariations reset all changes of the "variations" edge.
-func (m *VariantMutation) ResetVariations() {
-	m.variations = nil
-	m.clearedvariations = false
-	m.removedvariations = nil
+// ResetChildren reset all changes of the "children" edge.
+func (m *VariantMutation) ResetChildren() {
+	m.children = nil
+	m.clearedchildren = false
+	m.removedchildren = nil
+}
+
+// SetVariationID sets the variation edge to Variation by id.
+func (m *VariantMutation) SetVariationID(id uint64) {
+	m.variation = &id
+}
+
+// ClearVariation clears the variation edge to Variation.
+func (m *VariantMutation) ClearVariation() {
+	m.clearedvariation = true
+}
+
+// VariationCleared returns if the edge variation was cleared.
+func (m *VariantMutation) VariationCleared() bool {
+	return m.clearedvariation
+}
+
+// VariationID returns the variation id in the mutation.
+func (m *VariantMutation) VariationID() (id uint64, exists bool) {
+	if m.variation != nil {
+		return *m.variation, true
+	}
+	return
+}
+
+// VariationIDs returns the variation ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// VariationID instead. It exists only for internal usage by the builders.
+func (m *VariantMutation) VariationIDs() (ids []uint64) {
+	if id := m.variation; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVariation reset all changes of the "variation" edge.
+func (m *VariantMutation) ResetVariation() {
+	m.variation = nil
+	m.clearedvariation = false
+}
+
+// SetProductID sets the product edge to Product by id.
+func (m *VariantMutation) SetProductID(id uint64) {
+	m.product = &id
+}
+
+// ClearProduct clears the product edge to Product.
+func (m *VariantMutation) ClearProduct() {
+	m.clearedproduct = true
+}
+
+// ProductCleared returns if the edge product was cleared.
+func (m *VariantMutation) ProductCleared() bool {
+	return m.clearedproduct
+}
+
+// ProductID returns the product id in the mutation.
+func (m *VariantMutation) ProductID() (id uint64, exists bool) {
+	if m.product != nil {
+		return *m.product, true
+	}
+	return
+}
+
+// ProductIDs returns the product ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// ProductID instead. It exists only for internal usage by the builders.
+func (m *VariantMutation) ProductIDs() (ids []uint64) {
+	if id := m.product; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetProduct reset all changes of the "product" edge.
+func (m *VariantMutation) ResetProduct() {
+	m.product = nil
+	m.clearedproduct = false
+}
+
+// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
+func (m *VariantMutation) AddOutboundDealIDs(ids ...uint64) {
+	if m.outbound_deals == nil {
+		m.outbound_deals = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.outbound_deals[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOutboundDeals clears the outbound_deals edge to OutboundDeal.
+func (m *VariantMutation) ClearOutboundDeals() {
+	m.clearedoutbound_deals = true
+}
+
+// OutboundDealsCleared returns if the edge outbound_deals was cleared.
+func (m *VariantMutation) OutboundDealsCleared() bool {
+	return m.clearedoutbound_deals
+}
+
+// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
+func (m *VariantMutation) RemoveOutboundDealIDs(ids ...uint64) {
+	if m.removedoutbound_deals == nil {
+		m.removedoutbound_deals = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.removedoutbound_deals[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOutboundDeals returns the removed ids of outbound_deals.
+func (m *VariantMutation) RemovedOutboundDealsIDs() (ids []uint64) {
+	for id := range m.removedoutbound_deals {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OutboundDealsIDs returns the outbound_deals ids in the mutation.
+func (m *VariantMutation) OutboundDealsIDs() (ids []uint64) {
+	for id := range m.outbound_deals {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOutboundDeals reset all changes of the "outbound_deals" edge.
+func (m *VariantMutation) ResetOutboundDeals() {
+	m.outbound_deals = nil
+	m.clearedoutbound_deals = false
+	m.removedoutbound_deals = nil
 }
 
 // Op returns the operation name.
@@ -3501,12 +3914,15 @@ func (m *VariantMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *VariantMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m._type != nil {
-		fields = append(fields, variant.FieldType)
+	fields := make([]string, 0, 3)
+	if m.images != nil {
+		fields = append(fields, variant.FieldImages)
 	}
-	if m.value != nil {
-		fields = append(fields, variant.FieldValue)
+	if m.stock != nil {
+		fields = append(fields, variant.FieldStock)
+	}
+	if m.price != nil {
+		fields = append(fields, variant.FieldPrice)
 	}
 	return fields
 }
@@ -3516,10 +3932,12 @@ func (m *VariantMutation) Fields() []string {
 // not set, or was not define in the schema.
 func (m *VariantMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case variant.FieldType:
-		return m.GetType()
-	case variant.FieldValue:
-		return m.Value()
+	case variant.FieldImages:
+		return m.Images()
+	case variant.FieldStock:
+		return m.Stock()
+	case variant.FieldPrice:
+		return m.Price()
 	}
 	return nil, false
 }
@@ -3529,10 +3947,12 @@ func (m *VariantMutation) Field(name string) (ent.Value, bool) {
 // or the query to the database was failed.
 func (m *VariantMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case variant.FieldType:
-		return m.OldType(ctx)
-	case variant.FieldValue:
-		return m.OldValue(ctx)
+	case variant.FieldImages:
+		return m.OldImages(ctx)
+	case variant.FieldStock:
+		return m.OldStock(ctx)
+	case variant.FieldPrice:
+		return m.OldPrice(ctx)
 	}
 	return nil, fmt.Errorf("unknown Variant field %s", name)
 }
@@ -3542,19 +3962,26 @@ func (m *VariantMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type mismatch the field type.
 func (m *VariantMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case variant.FieldType:
-		v, ok := value.(variant.Type)
+	case variant.FieldImages:
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetType(v)
+		m.SetImages(v)
 		return nil
-	case variant.FieldValue:
-		v, ok := value.(string)
+	case variant.FieldStock:
+		v, ok := value.(uint8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetValue(v)
+		m.SetStock(v)
+		return nil
+	case variant.FieldPrice:
+		v, ok := value.(uint)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrice(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Variant field %s", name)
@@ -3563,13 +3990,26 @@ func (m *VariantMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented
 // or decremented during this mutation.
 func (m *VariantMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addstock != nil {
+		fields = append(fields, variant.FieldStock)
+	}
+	if m.addprice != nil {
+		fields = append(fields, variant.FieldPrice)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was in/decremented
 // from a field with the given name. The second value indicates
 // that this field was not set, or was not define in the schema.
 func (m *VariantMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case variant.FieldStock:
+		return m.AddedStock()
+	case variant.FieldPrice:
+		return m.AddedPrice()
+	}
 	return nil, false
 }
 
@@ -3578,6 +4018,20 @@ func (m *VariantMutation) AddedField(name string) (ent.Value, bool) {
 // type mismatch the field type.
 func (m *VariantMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case variant.FieldStock:
+		v, ok := value.(uint8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStock(v)
+		return nil
+	case variant.FieldPrice:
+		v, ok := value.(uint)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPrice(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Variant numeric field %s", name)
 }
@@ -3585,7 +4039,11 @@ func (m *VariantMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared
 // during this mutation.
 func (m *VariantMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(variant.FieldImages) {
+		fields = append(fields, variant.FieldImages)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicates if this field was
@@ -3598,6 +4056,11 @@ func (m *VariantMutation) FieldCleared(name string) bool {
 // ClearField clears the value for the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *VariantMutation) ClearField(name string) error {
+	switch name {
+	case variant.FieldImages:
+		m.ClearImages()
+		return nil
+	}
 	return fmt.Errorf("unknown Variant nullable field %s", name)
 }
 
@@ -3606,11 +4069,14 @@ func (m *VariantMutation) ClearField(name string) error {
 // defined in the schema.
 func (m *VariantMutation) ResetField(name string) error {
 	switch name {
-	case variant.FieldType:
-		m.ResetType()
+	case variant.FieldImages:
+		m.ResetImages()
 		return nil
-	case variant.FieldValue:
-		m.ResetValue()
+	case variant.FieldStock:
+		m.ResetStock()
+		return nil
+	case variant.FieldPrice:
+		m.ResetPrice()
 		return nil
 	}
 	return fmt.Errorf("unknown Variant field %s", name)
@@ -3619,9 +4085,21 @@ func (m *VariantMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *VariantMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.variations != nil {
-		edges = append(edges, variant.EdgeVariations)
+	edges := make([]string, 0, 5)
+	if m.parent != nil {
+		edges = append(edges, variant.EdgeParent)
+	}
+	if m.children != nil {
+		edges = append(edges, variant.EdgeChildren)
+	}
+	if m.variation != nil {
+		edges = append(edges, variant.EdgeVariation)
+	}
+	if m.product != nil {
+		edges = append(edges, variant.EdgeProduct)
+	}
+	if m.outbound_deals != nil {
+		edges = append(edges, variant.EdgeOutboundDeals)
 	}
 	return edges
 }
@@ -3630,9 +4108,27 @@ func (m *VariantMutation) AddedEdges() []string {
 // the given edge name.
 func (m *VariantMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case variant.EdgeVariations:
-		ids := make([]ent.Value, 0, len(m.variations))
-		for id := range m.variations {
+	case variant.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case variant.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.children))
+		for id := range m.children {
+			ids = append(ids, id)
+		}
+		return ids
+	case variant.EdgeVariation:
+		if id := m.variation; id != nil {
+			return []ent.Value{*id}
+		}
+	case variant.EdgeProduct:
+		if id := m.product; id != nil {
+			return []ent.Value{*id}
+		}
+	case variant.EdgeOutboundDeals:
+		ids := make([]ent.Value, 0, len(m.outbound_deals))
+		for id := range m.outbound_deals {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3643,9 +4139,12 @@ func (m *VariantMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *VariantMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedvariations != nil {
-		edges = append(edges, variant.EdgeVariations)
+	edges := make([]string, 0, 5)
+	if m.removedchildren != nil {
+		edges = append(edges, variant.EdgeChildren)
+	}
+	if m.removedoutbound_deals != nil {
+		edges = append(edges, variant.EdgeOutboundDeals)
 	}
 	return edges
 }
@@ -3654,9 +4153,15 @@ func (m *VariantMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *VariantMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case variant.EdgeVariations:
-		ids := make([]ent.Value, 0, len(m.removedvariations))
-		for id := range m.removedvariations {
+	case variant.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.removedchildren))
+		for id := range m.removedchildren {
+			ids = append(ids, id)
+		}
+		return ids
+	case variant.EdgeOutboundDeals:
+		ids := make([]ent.Value, 0, len(m.removedoutbound_deals))
+		for id := range m.removedoutbound_deals {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3667,9 +4172,21 @@ func (m *VariantMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *VariantMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedvariations {
-		edges = append(edges, variant.EdgeVariations)
+	edges := make([]string, 0, 5)
+	if m.clearedparent {
+		edges = append(edges, variant.EdgeParent)
+	}
+	if m.clearedchildren {
+		edges = append(edges, variant.EdgeChildren)
+	}
+	if m.clearedvariation {
+		edges = append(edges, variant.EdgeVariation)
+	}
+	if m.clearedproduct {
+		edges = append(edges, variant.EdgeProduct)
+	}
+	if m.clearedoutbound_deals {
+		edges = append(edges, variant.EdgeOutboundDeals)
 	}
 	return edges
 }
@@ -3678,8 +4195,16 @@ func (m *VariantMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *VariantMutation) EdgeCleared(name string) bool {
 	switch name {
-	case variant.EdgeVariations:
-		return m.clearedvariations
+	case variant.EdgeParent:
+		return m.clearedparent
+	case variant.EdgeChildren:
+		return m.clearedchildren
+	case variant.EdgeVariation:
+		return m.clearedvariation
+	case variant.EdgeProduct:
+		return m.clearedproduct
+	case variant.EdgeOutboundDeals:
+		return m.clearedoutbound_deals
 	}
 	return false
 }
@@ -3688,6 +4213,15 @@ func (m *VariantMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *VariantMutation) ClearEdge(name string) error {
 	switch name {
+	case variant.EdgeParent:
+		m.ClearParent()
+		return nil
+	case variant.EdgeVariation:
+		m.ClearVariation()
+		return nil
+	case variant.EdgeProduct:
+		m.ClearProduct()
+		return nil
 	}
 	return fmt.Errorf("unknown Variant unique edge %s", name)
 }
@@ -3697,8 +4231,20 @@ func (m *VariantMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *VariantMutation) ResetEdge(name string) error {
 	switch name {
-	case variant.EdgeVariations:
-		m.ResetVariations()
+	case variant.EdgeParent:
+		m.ResetParent()
+		return nil
+	case variant.EdgeChildren:
+		m.ResetChildren()
+		return nil
+	case variant.EdgeVariation:
+		m.ResetVariation()
+		return nil
+	case variant.EdgeProduct:
+		m.ResetProduct()
+		return nil
+	case variant.EdgeOutboundDeals:
+		m.ResetOutboundDeals()
 		return nil
 	}
 	return fmt.Errorf("unknown Variant edge %s", name)
@@ -3708,30 +4254,18 @@ func (m *VariantMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type VariationMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *uint64
-	images                *[]string
-	stock                 *uint8
-	addstock              *uint8
-	price                 *uint
-	addprice              *uint
-	clearedFields         map[string]struct{}
-	parent                *uint64
-	clearedparent         bool
-	children              map[uint64]struct{}
-	removedchildren       map[uint64]struct{}
-	clearedchildren       bool
-	variant               *uint64
-	clearedvariant        bool
-	product               *uint64
-	clearedproduct        bool
-	outbound_deals        map[uint64]struct{}
-	removedoutbound_deals map[uint64]struct{}
-	clearedoutbound_deals bool
-	done                  bool
-	oldValue              func(context.Context) (*Variation, error)
-	predicates            []predicate.Variation
+	op              Op
+	typ             string
+	id              *uint64
+	_type           *variation.Type
+	value           *string
+	clearedFields   map[string]struct{}
+	variants        map[uint64]struct{}
+	removedvariants map[uint64]struct{}
+	clearedvariants bool
+	done            bool
+	oldValue        func(context.Context) (*Variation, error)
+	predicates      []predicate.Variation
 }
 
 var _ ent.Mutation = (*VariationMutation)(nil)
@@ -3813,391 +4347,131 @@ func (m *VariationMutation) ID() (id uint64, exists bool) {
 	return *m.id, true
 }
 
-// SetImages sets the images field.
-func (m *VariationMutation) SetImages(s []string) {
-	m.images = &s
+// SetType sets the type field.
+func (m *VariationMutation) SetType(v variation.Type) {
+	m._type = &v
 }
 
-// Images returns the images value in the mutation.
-func (m *VariationMutation) Images() (r []string, exists bool) {
-	v := m.images
+// GetType returns the type value in the mutation.
+func (m *VariationMutation) GetType() (r variation.Type, exists bool) {
+	v := m._type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldImages returns the old images value of the Variation.
+// OldType returns the old type value of the Variation.
 // If the Variation object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariationMutation) OldImages(ctx context.Context) (v []string, err error) {
+func (m *VariationMutation) OldType(ctx context.Context) (v variation.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldImages is allowed only on UpdateOne operations")
+		return v, fmt.Errorf("OldType is allowed only on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldImages requires an ID field in the mutation")
+		return v, fmt.Errorf("OldType requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldImages: %w", err)
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
 	}
-	return oldValue.Images, nil
+	return oldValue.Type, nil
 }
 
-// ClearImages clears the value of images.
-func (m *VariationMutation) ClearImages() {
-	m.images = nil
-	m.clearedFields[variation.FieldImages] = struct{}{}
+// ResetType reset all changes of the "type" field.
+func (m *VariationMutation) ResetType() {
+	m._type = nil
 }
 
-// ImagesCleared returns if the field images was cleared in this mutation.
-func (m *VariationMutation) ImagesCleared() bool {
-	_, ok := m.clearedFields[variation.FieldImages]
-	return ok
+// SetValue sets the value field.
+func (m *VariationMutation) SetValue(s string) {
+	m.value = &s
 }
 
-// ResetImages reset all changes of the "images" field.
-func (m *VariationMutation) ResetImages() {
-	m.images = nil
-	delete(m.clearedFields, variation.FieldImages)
-}
-
-// SetStock sets the stock field.
-func (m *VariationMutation) SetStock(u uint8) {
-	m.stock = &u
-	m.addstock = nil
-}
-
-// Stock returns the stock value in the mutation.
-func (m *VariationMutation) Stock() (r uint8, exists bool) {
-	v := m.stock
+// Value returns the value value in the mutation.
+func (m *VariationMutation) Value() (r string, exists bool) {
+	v := m.value
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStock returns the old stock value of the Variation.
+// OldValue returns the old value value of the Variation.
 // If the Variation object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariationMutation) OldStock(ctx context.Context) (v uint8, err error) {
+func (m *VariationMutation) OldValue(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStock is allowed only on UpdateOne operations")
+		return v, fmt.Errorf("OldValue is allowed only on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStock requires an ID field in the mutation")
+		return v, fmt.Errorf("OldValue requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStock: %w", err)
+		return v, fmt.Errorf("querying old value for OldValue: %w", err)
 	}
-	return oldValue.Stock, nil
+	return oldValue.Value, nil
 }
 
-// AddStock adds u to stock.
-func (m *VariationMutation) AddStock(u uint8) {
-	if m.addstock != nil {
-		*m.addstock += u
-	} else {
-		m.addstock = &u
-	}
+// ResetValue reset all changes of the "value" field.
+func (m *VariationMutation) ResetValue() {
+	m.value = nil
 }
 
-// AddedStock returns the value that was added to the stock field in this mutation.
-func (m *VariationMutation) AddedStock() (r uint8, exists bool) {
-	v := m.addstock
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetStock reset all changes of the "stock" field.
-func (m *VariationMutation) ResetStock() {
-	m.stock = nil
-	m.addstock = nil
-}
-
-// SetPrice sets the price field.
-func (m *VariationMutation) SetPrice(u uint) {
-	m.price = &u
-	m.addprice = nil
-}
-
-// Price returns the price value in the mutation.
-func (m *VariationMutation) Price() (r uint, exists bool) {
-	v := m.price
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPrice returns the old price value of the Variation.
-// If the Variation object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariationMutation) OldPrice(ctx context.Context) (v uint, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPrice is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPrice requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPrice: %w", err)
-	}
-	return oldValue.Price, nil
-}
-
-// AddPrice adds u to price.
-func (m *VariationMutation) AddPrice(u uint) {
-	if m.addprice != nil {
-		*m.addprice += u
-	} else {
-		m.addprice = &u
-	}
-}
-
-// AddedPrice returns the value that was added to the price field in this mutation.
-func (m *VariationMutation) AddedPrice() (r uint, exists bool) {
-	v := m.addprice
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetPrice reset all changes of the "price" field.
-func (m *VariationMutation) ResetPrice() {
-	m.price = nil
-	m.addprice = nil
-}
-
-// SetParentID sets the parent edge to Variation by id.
-func (m *VariationMutation) SetParentID(id uint64) {
-	m.parent = &id
-}
-
-// ClearParent clears the parent edge to Variation.
-func (m *VariationMutation) ClearParent() {
-	m.clearedparent = true
-}
-
-// ParentCleared returns if the edge parent was cleared.
-func (m *VariationMutation) ParentCleared() bool {
-	return m.clearedparent
-}
-
-// ParentID returns the parent id in the mutation.
-func (m *VariationMutation) ParentID() (id uint64, exists bool) {
-	if m.parent != nil {
-		return *m.parent, true
-	}
-	return
-}
-
-// ParentIDs returns the parent ids in the mutation.
-// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
-// ParentID instead. It exists only for internal usage by the builders.
-func (m *VariationMutation) ParentIDs() (ids []uint64) {
-	if id := m.parent; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetParent reset all changes of the "parent" edge.
-func (m *VariationMutation) ResetParent() {
-	m.parent = nil
-	m.clearedparent = false
-}
-
-// AddChildIDs adds the children edge to Variation by ids.
-func (m *VariationMutation) AddChildIDs(ids ...uint64) {
-	if m.children == nil {
-		m.children = make(map[uint64]struct{})
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (m *VariationMutation) AddVariantIDs(ids ...uint64) {
+	if m.variants == nil {
+		m.variants = make(map[uint64]struct{})
 	}
 	for i := range ids {
-		m.children[ids[i]] = struct{}{}
+		m.variants[ids[i]] = struct{}{}
 	}
 }
 
-// ClearChildren clears the children edge to Variation.
-func (m *VariationMutation) ClearChildren() {
-	m.clearedchildren = true
+// ClearVariants clears the variants edge to Variant.
+func (m *VariationMutation) ClearVariants() {
+	m.clearedvariants = true
 }
 
-// ChildrenCleared returns if the edge children was cleared.
-func (m *VariationMutation) ChildrenCleared() bool {
-	return m.clearedchildren
+// VariantsCleared returns if the edge variants was cleared.
+func (m *VariationMutation) VariantsCleared() bool {
+	return m.clearedvariants
 }
 
-// RemoveChildIDs removes the children edge to Variation by ids.
-func (m *VariationMutation) RemoveChildIDs(ids ...uint64) {
-	if m.removedchildren == nil {
-		m.removedchildren = make(map[uint64]struct{})
+// RemoveVariantIDs removes the variants edge to Variant by ids.
+func (m *VariationMutation) RemoveVariantIDs(ids ...uint64) {
+	if m.removedvariants == nil {
+		m.removedvariants = make(map[uint64]struct{})
 	}
 	for i := range ids {
-		m.removedchildren[ids[i]] = struct{}{}
+		m.removedvariants[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedChildren returns the removed ids of children.
-func (m *VariationMutation) RemovedChildrenIDs() (ids []uint64) {
-	for id := range m.removedchildren {
+// RemovedVariants returns the removed ids of variants.
+func (m *VariationMutation) RemovedVariantsIDs() (ids []uint64) {
+	for id := range m.removedvariants {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ChildrenIDs returns the children ids in the mutation.
-func (m *VariationMutation) ChildrenIDs() (ids []uint64) {
-	for id := range m.children {
+// VariantsIDs returns the variants ids in the mutation.
+func (m *VariationMutation) VariantsIDs() (ids []uint64) {
+	for id := range m.variants {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetChildren reset all changes of the "children" edge.
-func (m *VariationMutation) ResetChildren() {
-	m.children = nil
-	m.clearedchildren = false
-	m.removedchildren = nil
-}
-
-// SetVariantID sets the variant edge to Variant by id.
-func (m *VariationMutation) SetVariantID(id uint64) {
-	m.variant = &id
-}
-
-// ClearVariant clears the variant edge to Variant.
-func (m *VariationMutation) ClearVariant() {
-	m.clearedvariant = true
-}
-
-// VariantCleared returns if the edge variant was cleared.
-func (m *VariationMutation) VariantCleared() bool {
-	return m.clearedvariant
-}
-
-// VariantID returns the variant id in the mutation.
-func (m *VariationMutation) VariantID() (id uint64, exists bool) {
-	if m.variant != nil {
-		return *m.variant, true
-	}
-	return
-}
-
-// VariantIDs returns the variant ids in the mutation.
-// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
-// VariantID instead. It exists only for internal usage by the builders.
-func (m *VariationMutation) VariantIDs() (ids []uint64) {
-	if id := m.variant; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetVariant reset all changes of the "variant" edge.
-func (m *VariationMutation) ResetVariant() {
-	m.variant = nil
-	m.clearedvariant = false
-}
-
-// SetProductID sets the product edge to Product by id.
-func (m *VariationMutation) SetProductID(id uint64) {
-	m.product = &id
-}
-
-// ClearProduct clears the product edge to Product.
-func (m *VariationMutation) ClearProduct() {
-	m.clearedproduct = true
-}
-
-// ProductCleared returns if the edge product was cleared.
-func (m *VariationMutation) ProductCleared() bool {
-	return m.clearedproduct
-}
-
-// ProductID returns the product id in the mutation.
-func (m *VariationMutation) ProductID() (id uint64, exists bool) {
-	if m.product != nil {
-		return *m.product, true
-	}
-	return
-}
-
-// ProductIDs returns the product ids in the mutation.
-// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
-// ProductID instead. It exists only for internal usage by the builders.
-func (m *VariationMutation) ProductIDs() (ids []uint64) {
-	if id := m.product; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetProduct reset all changes of the "product" edge.
-func (m *VariationMutation) ResetProduct() {
-	m.product = nil
-	m.clearedproduct = false
-}
-
-// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (m *VariationMutation) AddOutboundDealIDs(ids ...uint64) {
-	if m.outbound_deals == nil {
-		m.outbound_deals = make(map[uint64]struct{})
-	}
-	for i := range ids {
-		m.outbound_deals[ids[i]] = struct{}{}
-	}
-}
-
-// ClearOutboundDeals clears the outbound_deals edge to OutboundDeal.
-func (m *VariationMutation) ClearOutboundDeals() {
-	m.clearedoutbound_deals = true
-}
-
-// OutboundDealsCleared returns if the edge outbound_deals was cleared.
-func (m *VariationMutation) OutboundDealsCleared() bool {
-	return m.clearedoutbound_deals
-}
-
-// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
-func (m *VariationMutation) RemoveOutboundDealIDs(ids ...uint64) {
-	if m.removedoutbound_deals == nil {
-		m.removedoutbound_deals = make(map[uint64]struct{})
-	}
-	for i := range ids {
-		m.removedoutbound_deals[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedOutboundDeals returns the removed ids of outbound_deals.
-func (m *VariationMutation) RemovedOutboundDealsIDs() (ids []uint64) {
-	for id := range m.removedoutbound_deals {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// OutboundDealsIDs returns the outbound_deals ids in the mutation.
-func (m *VariationMutation) OutboundDealsIDs() (ids []uint64) {
-	for id := range m.outbound_deals {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetOutboundDeals reset all changes of the "outbound_deals" edge.
-func (m *VariationMutation) ResetOutboundDeals() {
-	m.outbound_deals = nil
-	m.clearedoutbound_deals = false
-	m.removedoutbound_deals = nil
+// ResetVariants reset all changes of the "variants" edge.
+func (m *VariationMutation) ResetVariants() {
+	m.variants = nil
+	m.clearedvariants = false
+	m.removedvariants = nil
 }
 
 // Op returns the operation name.
@@ -4214,15 +4488,12 @@ func (m *VariationMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *VariationMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.images != nil {
-		fields = append(fields, variation.FieldImages)
+	fields := make([]string, 0, 2)
+	if m._type != nil {
+		fields = append(fields, variation.FieldType)
 	}
-	if m.stock != nil {
-		fields = append(fields, variation.FieldStock)
-	}
-	if m.price != nil {
-		fields = append(fields, variation.FieldPrice)
+	if m.value != nil {
+		fields = append(fields, variation.FieldValue)
 	}
 	return fields
 }
@@ -4232,12 +4503,10 @@ func (m *VariationMutation) Fields() []string {
 // not set, or was not define in the schema.
 func (m *VariationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case variation.FieldImages:
-		return m.Images()
-	case variation.FieldStock:
-		return m.Stock()
-	case variation.FieldPrice:
-		return m.Price()
+	case variation.FieldType:
+		return m.GetType()
+	case variation.FieldValue:
+		return m.Value()
 	}
 	return nil, false
 }
@@ -4247,12 +4516,10 @@ func (m *VariationMutation) Field(name string) (ent.Value, bool) {
 // or the query to the database was failed.
 func (m *VariationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case variation.FieldImages:
-		return m.OldImages(ctx)
-	case variation.FieldStock:
-		return m.OldStock(ctx)
-	case variation.FieldPrice:
-		return m.OldPrice(ctx)
+	case variation.FieldType:
+		return m.OldType(ctx)
+	case variation.FieldValue:
+		return m.OldValue(ctx)
 	}
 	return nil, fmt.Errorf("unknown Variation field %s", name)
 }
@@ -4262,26 +4529,19 @@ func (m *VariationMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type mismatch the field type.
 func (m *VariationMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case variation.FieldImages:
-		v, ok := value.([]string)
+	case variation.FieldType:
+		v, ok := value.(variation.Type)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetImages(v)
+		m.SetType(v)
 		return nil
-	case variation.FieldStock:
-		v, ok := value.(uint8)
+	case variation.FieldValue:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStock(v)
-		return nil
-	case variation.FieldPrice:
-		v, ok := value.(uint)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPrice(v)
+		m.SetValue(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Variation field %s", name)
@@ -4290,26 +4550,13 @@ func (m *VariationMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented
 // or decremented during this mutation.
 func (m *VariationMutation) AddedFields() []string {
-	var fields []string
-	if m.addstock != nil {
-		fields = append(fields, variation.FieldStock)
-	}
-	if m.addprice != nil {
-		fields = append(fields, variation.FieldPrice)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was in/decremented
 // from a field with the given name. The second value indicates
 // that this field was not set, or was not define in the schema.
 func (m *VariationMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case variation.FieldStock:
-		return m.AddedStock()
-	case variation.FieldPrice:
-		return m.AddedPrice()
-	}
 	return nil, false
 }
 
@@ -4318,20 +4565,6 @@ func (m *VariationMutation) AddedField(name string) (ent.Value, bool) {
 // type mismatch the field type.
 func (m *VariationMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case variation.FieldStock:
-		v, ok := value.(uint8)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStock(v)
-		return nil
-	case variation.FieldPrice:
-		v, ok := value.(uint)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddPrice(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Variation numeric field %s", name)
 }
@@ -4339,11 +4572,7 @@ func (m *VariationMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared
 // during this mutation.
 func (m *VariationMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(variation.FieldImages) {
-		fields = append(fields, variation.FieldImages)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicates if this field was
@@ -4356,11 +4585,6 @@ func (m *VariationMutation) FieldCleared(name string) bool {
 // ClearField clears the value for the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *VariationMutation) ClearField(name string) error {
-	switch name {
-	case variation.FieldImages:
-		m.ClearImages()
-		return nil
-	}
 	return fmt.Errorf("unknown Variation nullable field %s", name)
 }
 
@@ -4369,14 +4593,11 @@ func (m *VariationMutation) ClearField(name string) error {
 // defined in the schema.
 func (m *VariationMutation) ResetField(name string) error {
 	switch name {
-	case variation.FieldImages:
-		m.ResetImages()
+	case variation.FieldType:
+		m.ResetType()
 		return nil
-	case variation.FieldStock:
-		m.ResetStock()
-		return nil
-	case variation.FieldPrice:
-		m.ResetPrice()
+	case variation.FieldValue:
+		m.ResetValue()
 		return nil
 	}
 	return fmt.Errorf("unknown Variation field %s", name)
@@ -4385,21 +4606,9 @@ func (m *VariationMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *VariationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.parent != nil {
-		edges = append(edges, variation.EdgeParent)
-	}
-	if m.children != nil {
-		edges = append(edges, variation.EdgeChildren)
-	}
-	if m.variant != nil {
-		edges = append(edges, variation.EdgeVariant)
-	}
-	if m.product != nil {
-		edges = append(edges, variation.EdgeProduct)
-	}
-	if m.outbound_deals != nil {
-		edges = append(edges, variation.EdgeOutboundDeals)
+	edges := make([]string, 0, 1)
+	if m.variants != nil {
+		edges = append(edges, variation.EdgeVariants)
 	}
 	return edges
 }
@@ -4408,27 +4617,9 @@ func (m *VariationMutation) AddedEdges() []string {
 // the given edge name.
 func (m *VariationMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case variation.EdgeParent:
-		if id := m.parent; id != nil {
-			return []ent.Value{*id}
-		}
-	case variation.EdgeChildren:
-		ids := make([]ent.Value, 0, len(m.children))
-		for id := range m.children {
-			ids = append(ids, id)
-		}
-		return ids
-	case variation.EdgeVariant:
-		if id := m.variant; id != nil {
-			return []ent.Value{*id}
-		}
-	case variation.EdgeProduct:
-		if id := m.product; id != nil {
-			return []ent.Value{*id}
-		}
-	case variation.EdgeOutboundDeals:
-		ids := make([]ent.Value, 0, len(m.outbound_deals))
-		for id := range m.outbound_deals {
+	case variation.EdgeVariants:
+		ids := make([]ent.Value, 0, len(m.variants))
+		for id := range m.variants {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4439,12 +4630,9 @@ func (m *VariationMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *VariationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.removedchildren != nil {
-		edges = append(edges, variation.EdgeChildren)
-	}
-	if m.removedoutbound_deals != nil {
-		edges = append(edges, variation.EdgeOutboundDeals)
+	edges := make([]string, 0, 1)
+	if m.removedvariants != nil {
+		edges = append(edges, variation.EdgeVariants)
 	}
 	return edges
 }
@@ -4453,15 +4641,9 @@ func (m *VariationMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *VariationMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case variation.EdgeChildren:
-		ids := make([]ent.Value, 0, len(m.removedchildren))
-		for id := range m.removedchildren {
-			ids = append(ids, id)
-		}
-		return ids
-	case variation.EdgeOutboundDeals:
-		ids := make([]ent.Value, 0, len(m.removedoutbound_deals))
-		for id := range m.removedoutbound_deals {
+	case variation.EdgeVariants:
+		ids := make([]ent.Value, 0, len(m.removedvariants))
+		for id := range m.removedvariants {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4472,21 +4654,9 @@ func (m *VariationMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *VariationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.clearedparent {
-		edges = append(edges, variation.EdgeParent)
-	}
-	if m.clearedchildren {
-		edges = append(edges, variation.EdgeChildren)
-	}
-	if m.clearedvariant {
-		edges = append(edges, variation.EdgeVariant)
-	}
-	if m.clearedproduct {
-		edges = append(edges, variation.EdgeProduct)
-	}
-	if m.clearedoutbound_deals {
-		edges = append(edges, variation.EdgeOutboundDeals)
+	edges := make([]string, 0, 1)
+	if m.clearedvariants {
+		edges = append(edges, variation.EdgeVariants)
 	}
 	return edges
 }
@@ -4495,16 +4665,8 @@ func (m *VariationMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *VariationMutation) EdgeCleared(name string) bool {
 	switch name {
-	case variation.EdgeParent:
-		return m.clearedparent
-	case variation.EdgeChildren:
-		return m.clearedchildren
-	case variation.EdgeVariant:
-		return m.clearedvariant
-	case variation.EdgeProduct:
-		return m.clearedproduct
-	case variation.EdgeOutboundDeals:
-		return m.clearedoutbound_deals
+	case variation.EdgeVariants:
+		return m.clearedvariants
 	}
 	return false
 }
@@ -4513,15 +4675,6 @@ func (m *VariationMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *VariationMutation) ClearEdge(name string) error {
 	switch name {
-	case variation.EdgeParent:
-		m.ClearParent()
-		return nil
-	case variation.EdgeVariant:
-		m.ClearVariant()
-		return nil
-	case variation.EdgeProduct:
-		m.ClearProduct()
-		return nil
 	}
 	return fmt.Errorf("unknown Variation unique edge %s", name)
 }
@@ -4531,20 +4684,8 @@ func (m *VariationMutation) ClearEdge(name string) error {
 // defined in the schema.
 func (m *VariationMutation) ResetEdge(name string) error {
 	switch name {
-	case variation.EdgeParent:
-		m.ResetParent()
-		return nil
-	case variation.EdgeChildren:
-		m.ResetChildren()
-		return nil
-	case variation.EdgeVariant:
-		m.ResetVariant()
-		return nil
-	case variation.EdgeProduct:
-		m.ResetProduct()
-		return nil
-	case variation.EdgeOutboundDeals:
-		m.ResetOutboundDeals()
+	case variation.EdgeVariants:
+		m.ResetVariants()
 		return nil
 	}
 	return fmt.Errorf("unknown Variation edge %s", name)

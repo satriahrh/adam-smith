@@ -12,20 +12,32 @@ const (
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
 
-	// EdgeVariation holds the string denoting the variation edge name in mutations.
-	EdgeVariation = "variation"
+	// EdgeVariant holds the string denoting the variant edge name in mutations.
+	EdgeVariant = "variant"
+	// EdgeParent holds the string denoting the parent edge name in mutations.
+	EdgeParent = "parent"
+	// EdgeChildren holds the string denoting the children edge name in mutations.
+	EdgeChildren = "children"
 	// EdgeTransaction holds the string denoting the transaction edge name in mutations.
 	EdgeTransaction = "transaction"
 
 	// Table holds the table name of the outbounddeal in the database.
 	Table = "outbound_deals"
-	// VariationTable is the table the holds the variation relation/edge.
-	VariationTable = "outbound_deals"
-	// VariationInverseTable is the table name for the Variation entity.
-	// It exists in this package in order to avoid circular dependency with the "variation" package.
-	VariationInverseTable = "variations"
-	// VariationColumn is the table column denoting the variation relation/edge.
-	VariationColumn = "outbound_deal_variation"
+	// VariantTable is the table the holds the variant relation/edge.
+	VariantTable = "outbound_deals"
+	// VariantInverseTable is the table name for the Variant entity.
+	// It exists in this package in order to avoid circular dependency with the "variant" package.
+	VariantInverseTable = "variants"
+	// VariantColumn is the table column denoting the variant relation/edge.
+	VariantColumn = "outbound_deal_variant"
+	// ParentTable is the table the holds the parent relation/edge.
+	ParentTable = "outbound_deals"
+	// ParentColumn is the table column denoting the parent relation/edge.
+	ParentColumn = "outbound_deal_children"
+	// ChildrenTable is the table the holds the children relation/edge.
+	ChildrenTable = "outbound_deals"
+	// ChildrenColumn is the table column denoting the children relation/edge.
+	ChildrenColumn = "outbound_deal_children"
 	// TransactionTable is the table the holds the transaction relation/edge.
 	TransactionTable = "outbound_deals"
 	// TransactionInverseTable is the table name for the OutboundTransaction entity.
@@ -44,7 +56,8 @@ var Columns = []string{
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the OutboundDeal type.
 var ForeignKeys = []string{
-	"outbound_deal_variation",
+	"outbound_deal_variant",
+	"outbound_deal_children",
 	"outbound_transaction_deals",
 }
 

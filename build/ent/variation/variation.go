@@ -2,75 +2,39 @@
 
 package variation
 
+import (
+	"fmt"
+)
+
 const (
 	// Label holds the string label denoting the variation type in the database.
 	Label = "variation"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldImages holds the string denoting the images field in the database.
-	FieldImages = "images"
-	// FieldStock holds the string denoting the stock field in the database.
-	FieldStock = "stock"
-	// FieldPrice holds the string denoting the price field in the database.
-	FieldPrice = "price"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
+	// FieldValue holds the string denoting the value field in the database.
+	FieldValue = "value"
 
-	// EdgeParent holds the string denoting the parent edge name in mutations.
-	EdgeParent = "parent"
-	// EdgeChildren holds the string denoting the children edge name in mutations.
-	EdgeChildren = "children"
-	// EdgeVariant holds the string denoting the variant edge name in mutations.
-	EdgeVariant = "variant"
-	// EdgeProduct holds the string denoting the product edge name in mutations.
-	EdgeProduct = "product"
-	// EdgeOutboundDeals holds the string denoting the outbound_deals edge name in mutations.
-	EdgeOutboundDeals = "outbound_deals"
+	// EdgeVariants holds the string denoting the variants edge name in mutations.
+	EdgeVariants = "variants"
 
 	// Table holds the table name of the variation in the database.
 	Table = "variations"
-	// ParentTable is the table the holds the parent relation/edge.
-	ParentTable = "variations"
-	// ParentColumn is the table column denoting the parent relation/edge.
-	ParentColumn = "variation_children"
-	// ChildrenTable is the table the holds the children relation/edge.
-	ChildrenTable = "variations"
-	// ChildrenColumn is the table column denoting the children relation/edge.
-	ChildrenColumn = "variation_children"
-	// VariantTable is the table the holds the variant relation/edge.
-	VariantTable = "variations"
-	// VariantInverseTable is the table name for the Variant entity.
+	// VariantsTable is the table the holds the variants relation/edge.
+	VariantsTable = "variants"
+	// VariantsInverseTable is the table name for the Variant entity.
 	// It exists in this package in order to avoid circular dependency with the "variant" package.
-	VariantInverseTable = "variants"
-	// VariantColumn is the table column denoting the variant relation/edge.
-	VariantColumn = "variation_variant"
-	// ProductTable is the table the holds the product relation/edge.
-	ProductTable = "variations"
-	// ProductInverseTable is the table name for the Product entity.
-	// It exists in this package in order to avoid circular dependency with the "product" package.
-	ProductInverseTable = "products"
-	// ProductColumn is the table column denoting the product relation/edge.
-	ProductColumn = "product_variations"
-	// OutboundDealsTable is the table the holds the outbound_deals relation/edge.
-	OutboundDealsTable = "outbound_deals"
-	// OutboundDealsInverseTable is the table name for the OutboundDeal entity.
-	// It exists in this package in order to avoid circular dependency with the "outbounddeal" package.
-	OutboundDealsInverseTable = "outbound_deals"
-	// OutboundDealsColumn is the table column denoting the outbound_deals relation/edge.
-	OutboundDealsColumn = "outbound_deal_variation"
+	VariantsInverseTable = "variants"
+	// VariantsColumn is the table column denoting the variants relation/edge.
+	VariantsColumn = "variant_variation"
 )
 
 // Columns holds all SQL columns for variation fields.
 var Columns = []string{
 	FieldID,
-	FieldImages,
-	FieldStock,
-	FieldPrice,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the Variation type.
-var ForeignKeys = []string{
-	"product_variations",
-	"variation_children",
-	"variation_variant",
+	FieldType,
+	FieldValue,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -80,17 +44,28 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
-var (
-	// DefaultStock holds the default value on creation for the stock field.
-	DefaultStock uint8
-	// DefaultPrice holds the default value on creation for the price field.
-	DefaultPrice uint
+// Type defines the type for the type enum field.
+type Type string
+
+// Type values.
+const (
+	TypeColor Type = "color"
+	TypeSize  Type = "size"
 )
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeColor, TypeSize:
+		return nil
+	default:
+		return fmt.Errorf("variation: invalid enum value for type field: %q", _type)
+	}
+}

@@ -11,7 +11,7 @@ import (
 	"github.com/facebook/ent/schema/field"
 	"github.com/satriahrh/adam-smith/build/ent/brand"
 	"github.com/satriahrh/adam-smith/build/ent/product"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/ent/schema"
 )
 
@@ -52,19 +52,19 @@ func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplaces) *Product
 	return pc
 }
 
-// AddVariationIDs adds the variations edge to Variation by ids.
-func (pc *ProductCreate) AddVariationIDs(ids ...uint64) *ProductCreate {
-	pc.mutation.AddVariationIDs(ids...)
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (pc *ProductCreate) AddVariantIDs(ids ...uint64) *ProductCreate {
+	pc.mutation.AddVariantIDs(ids...)
 	return pc
 }
 
-// AddVariations adds the variations edges to Variation.
-func (pc *ProductCreate) AddVariations(v ...*Variation) *ProductCreate {
+// AddVariants adds the variants edges to Variant.
+func (pc *ProductCreate) AddVariants(v ...*Variant) *ProductCreate {
 	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return pc.AddVariationIDs(ids...)
+	return pc.AddVariantIDs(ids...)
 }
 
 // SetBrandID sets the brand edge to Brand by id.
@@ -219,17 +219,17 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		})
 		_node.Marketplaces = value
 	}
-	if nodes := pc.mutation.VariationsIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.VariantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   product.VariationsTable,
-			Columns: []string{product.VariationsColumn},
+			Table:   product.VariantsTable,
+			Columns: []string{product.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: variation.FieldID,
+					Column: variant.FieldID,
 				},
 			},
 		}

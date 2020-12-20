@@ -9,8 +9,6 @@ import (
 
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
-	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
-	"github.com/satriahrh/adam-smith/build/ent/product"
 	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/build/ent/variation"
 )
@@ -22,125 +20,31 @@ type VariationCreate struct {
 	hooks    []Hook
 }
 
-// SetImages sets the images field.
-func (vc *VariationCreate) SetImages(s []string) *VariationCreate {
-	vc.mutation.SetImages(s)
+// SetType sets the type field.
+func (vc *VariationCreate) SetType(v variation.Type) *VariationCreate {
+	vc.mutation.SetType(v)
 	return vc
 }
 
-// SetStock sets the stock field.
-func (vc *VariationCreate) SetStock(u uint8) *VariationCreate {
-	vc.mutation.SetStock(u)
+// SetValue sets the value field.
+func (vc *VariationCreate) SetValue(s string) *VariationCreate {
+	vc.mutation.SetValue(s)
 	return vc
 }
 
-// SetNillableStock sets the stock field if the given value is not nil.
-func (vc *VariationCreate) SetNillableStock(u *uint8) *VariationCreate {
-	if u != nil {
-		vc.SetStock(*u)
-	}
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (vc *VariationCreate) AddVariantIDs(ids ...uint64) *VariationCreate {
+	vc.mutation.AddVariantIDs(ids...)
 	return vc
 }
 
-// SetPrice sets the price field.
-func (vc *VariationCreate) SetPrice(u uint) *VariationCreate {
-	vc.mutation.SetPrice(u)
-	return vc
-}
-
-// SetNillablePrice sets the price field if the given value is not nil.
-func (vc *VariationCreate) SetNillablePrice(u *uint) *VariationCreate {
-	if u != nil {
-		vc.SetPrice(*u)
-	}
-	return vc
-}
-
-// SetParentID sets the parent edge to Variation by id.
-func (vc *VariationCreate) SetParentID(id uint64) *VariationCreate {
-	vc.mutation.SetParentID(id)
-	return vc
-}
-
-// SetNillableParentID sets the parent edge to Variation by id if the given value is not nil.
-func (vc *VariationCreate) SetNillableParentID(id *uint64) *VariationCreate {
-	if id != nil {
-		vc = vc.SetParentID(*id)
-	}
-	return vc
-}
-
-// SetParent sets the parent edge to Variation.
-func (vc *VariationCreate) SetParent(v *Variation) *VariationCreate {
-	return vc.SetParentID(v.ID)
-}
-
-// AddChildIDs adds the children edge to Variation by ids.
-func (vc *VariationCreate) AddChildIDs(ids ...uint64) *VariationCreate {
-	vc.mutation.AddChildIDs(ids...)
-	return vc
-}
-
-// AddChildren adds the children edges to Variation.
-func (vc *VariationCreate) AddChildren(v ...*Variation) *VariationCreate {
+// AddVariants adds the variants edges to Variant.
+func (vc *VariationCreate) AddVariants(v ...*Variant) *VariationCreate {
 	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vc.AddChildIDs(ids...)
-}
-
-// SetVariantID sets the variant edge to Variant by id.
-func (vc *VariationCreate) SetVariantID(id uint64) *VariationCreate {
-	vc.mutation.SetVariantID(id)
-	return vc
-}
-
-// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
-func (vc *VariationCreate) SetNillableVariantID(id *uint64) *VariationCreate {
-	if id != nil {
-		vc = vc.SetVariantID(*id)
-	}
-	return vc
-}
-
-// SetVariant sets the variant edge to Variant.
-func (vc *VariationCreate) SetVariant(v *Variant) *VariationCreate {
-	return vc.SetVariantID(v.ID)
-}
-
-// SetProductID sets the product edge to Product by id.
-func (vc *VariationCreate) SetProductID(id uint64) *VariationCreate {
-	vc.mutation.SetProductID(id)
-	return vc
-}
-
-// SetNillableProductID sets the product edge to Product by id if the given value is not nil.
-func (vc *VariationCreate) SetNillableProductID(id *uint64) *VariationCreate {
-	if id != nil {
-		vc = vc.SetProductID(*id)
-	}
-	return vc
-}
-
-// SetProduct sets the product edge to Product.
-func (vc *VariationCreate) SetProduct(p *Product) *VariationCreate {
-	return vc.SetProductID(p.ID)
-}
-
-// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (vc *VariationCreate) AddOutboundDealIDs(ids ...uint64) *VariationCreate {
-	vc.mutation.AddOutboundDealIDs(ids...)
-	return vc
-}
-
-// AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
-func (vc *VariationCreate) AddOutboundDeals(o ...*OutboundDeal) *VariationCreate {
-	ids := make([]uint64, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return vc.AddOutboundDealIDs(ids...)
+	return vc.AddVariantIDs(ids...)
 }
 
 // Mutation returns the VariationMutation object of the builder.
@@ -154,7 +58,6 @@ func (vc *VariationCreate) Save(ctx context.Context) (*Variation, error) {
 		err  error
 		node *Variation
 	)
-	vc.defaults()
 	if len(vc.hooks) == 0 {
 		if err = vc.check(); err != nil {
 			return nil, err
@@ -193,25 +96,18 @@ func (vc *VariationCreate) SaveX(ctx context.Context) *Variation {
 	return v
 }
 
-// defaults sets the default values of the builder before save.
-func (vc *VariationCreate) defaults() {
-	if _, ok := vc.mutation.Stock(); !ok {
-		v := variation.DefaultStock
-		vc.mutation.SetStock(v)
-	}
-	if _, ok := vc.mutation.Price(); !ok {
-		v := variation.DefaultPrice
-		vc.mutation.SetPrice(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (vc *VariationCreate) check() error {
-	if _, ok := vc.mutation.Stock(); !ok {
-		return &ValidationError{Name: "stock", err: errors.New("ent: missing required field \"stock\"")}
+	if _, ok := vc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New("ent: missing required field \"type\"")}
 	}
-	if _, ok := vc.mutation.Price(); !ok {
-		return &ValidationError{Name: "price", err: errors.New("ent: missing required field \"price\"")}
+	if v, ok := vc.mutation.GetType(); ok {
+		if err := variation.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+		}
+	}
+	if _, ok := vc.mutation.Value(); !ok {
+		return &ValidationError{Name: "value", err: errors.New("ent: missing required field \"value\"")}
 	}
 	return nil
 }
@@ -240,117 +136,33 @@ func (vc *VariationCreate) createSpec() (*Variation, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := vc.mutation.Images(); ok {
+	if value, ok := vc.mutation.GetType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
+			Type:   field.TypeEnum,
 			Value:  value,
-			Column: variation.FieldImages,
+			Column: variation.FieldType,
 		})
-		_node.Images = value
+		_node.Type = value
 	}
-	if value, ok := vc.mutation.Stock(); ok {
+	if value, ok := vc.mutation.Value(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: variation.FieldStock,
+			Column: variation.FieldValue,
 		})
-		_node.Stock = value
+		_node.Value = value
 	}
-	if value, ok := vc.mutation.Price(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
-			Value:  value,
-			Column: variation.FieldPrice,
-		})
-		_node.Price = value
-	}
-	if nodes := vc.mutation.ParentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ParentTable,
-			Columns: []string{variation.ParentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := vc.mutation.ChildrenIDs(); len(nodes) > 0 {
+	if nodes := vc.mutation.VariantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := vc.mutation.VariantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   variation.VariantTable,
-			Columns: []string{variation.VariantColumn},
+			Inverse: true,
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
 					Column: variant.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := vc.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ProductTable,
-			Columns: []string{variation.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := vc.mutation.OutboundDealsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
 				},
 			},
 		}
@@ -376,7 +188,6 @@ func (vcb *VariationCreateBulk) Save(ctx context.Context) ([]*Variation, error) 
 	for i := range vcb.builders {
 		func(i int, root context.Context) {
 			builder := vcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*VariationMutation)
 				if !ok {

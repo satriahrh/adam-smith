@@ -11,7 +11,7 @@ import (
 	"github.com/facebook/ent/schema/field"
 	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
 	"github.com/satriahrh/adam-smith/build/ent/outboundtransaction"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 )
 
 // OutboundDealCreate is the builder for creating a OutboundDeal entity.
@@ -33,23 +33,57 @@ func (odc *OutboundDealCreate) SetAmount(u uint) *OutboundDealCreate {
 	return odc
 }
 
-// SetVariationID sets the variation edge to Variation by id.
-func (odc *OutboundDealCreate) SetVariationID(id uint64) *OutboundDealCreate {
-	odc.mutation.SetVariationID(id)
+// SetVariantID sets the variant edge to Variant by id.
+func (odc *OutboundDealCreate) SetVariantID(id uint64) *OutboundDealCreate {
+	odc.mutation.SetVariantID(id)
 	return odc
 }
 
-// SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (odc *OutboundDealCreate) SetNillableVariationID(id *uint64) *OutboundDealCreate {
+// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
+func (odc *OutboundDealCreate) SetNillableVariantID(id *uint64) *OutboundDealCreate {
 	if id != nil {
-		odc = odc.SetVariationID(*id)
+		odc = odc.SetVariantID(*id)
 	}
 	return odc
 }
 
-// SetVariation sets the variation edge to Variation.
-func (odc *OutboundDealCreate) SetVariation(v *Variation) *OutboundDealCreate {
-	return odc.SetVariationID(v.ID)
+// SetVariant sets the variant edge to Variant.
+func (odc *OutboundDealCreate) SetVariant(v *Variant) *OutboundDealCreate {
+	return odc.SetVariantID(v.ID)
+}
+
+// SetParentID sets the parent edge to OutboundDeal by id.
+func (odc *OutboundDealCreate) SetParentID(id uint64) *OutboundDealCreate {
+	odc.mutation.SetParentID(id)
+	return odc
+}
+
+// SetNillableParentID sets the parent edge to OutboundDeal by id if the given value is not nil.
+func (odc *OutboundDealCreate) SetNillableParentID(id *uint64) *OutboundDealCreate {
+	if id != nil {
+		odc = odc.SetParentID(*id)
+	}
+	return odc
+}
+
+// SetParent sets the parent edge to OutboundDeal.
+func (odc *OutboundDealCreate) SetParent(o *OutboundDeal) *OutboundDealCreate {
+	return odc.SetParentID(o.ID)
+}
+
+// AddChildIDs adds the children edge to OutboundDeal by ids.
+func (odc *OutboundDealCreate) AddChildIDs(ids ...uint64) *OutboundDealCreate {
+	odc.mutation.AddChildIDs(ids...)
+	return odc
+}
+
+// AddChildren adds the children edges to OutboundDeal.
+func (odc *OutboundDealCreate) AddChildren(o ...*OutboundDeal) *OutboundDealCreate {
+	ids := make([]uint64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return odc.AddChildIDs(ids...)
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
@@ -171,17 +205,55 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 		})
 		_node.Amount = value
 	}
-	if nodes := odc.mutation.VariationIDs(); len(nodes) > 0 {
+	if nodes := odc.mutation.VariantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: []string{outbounddeal.VariationColumn},
+			Table:   outbounddeal.VariantTable,
+			Columns: []string{outbounddeal.VariantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: variation.FieldID,
+					Column: variant.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := odc.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   outbounddeal.ParentTable,
+			Columns: []string{outbounddeal.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := odc.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
 				},
 			},
 		}

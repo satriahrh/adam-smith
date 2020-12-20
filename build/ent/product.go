@@ -36,8 +36,8 @@ type Product struct {
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// Variations holds the value of the variations edge.
-	Variations []*Variation
+	// Variants holds the value of the variants edge.
+	Variants []*Variant
 	// Brand holds the value of the brand edge.
 	Brand *Brand
 	// loadedTypes holds the information for reporting if a
@@ -45,13 +45,13 @@ type ProductEdges struct {
 	loadedTypes [2]bool
 }
 
-// VariationsOrErr returns the Variations value or an error if the edge
+// VariantsOrErr returns the Variants value or an error if the edge
 // was not loaded in eager-loading.
-func (e ProductEdges) VariationsOrErr() ([]*Variation, error) {
+func (e ProductEdges) VariantsOrErr() ([]*Variant, error) {
 	if e.loadedTypes[0] {
-		return e.Variations, nil
+		return e.Variants, nil
 	}
-	return nil, &NotLoadedError{edge: "variations"}
+	return nil, &NotLoadedError{edge: "variants"}
 }
 
 // BrandOrErr returns the Brand value or an error if the edge
@@ -145,9 +145,9 @@ func (pr *Product) assignValues(values ...interface{}) error {
 	return nil
 }
 
-// QueryVariations queries the variations edge of the Product.
-func (pr *Product) QueryVariations() *VariationQuery {
-	return (&ProductClient{config: pr.config}).QueryVariations(pr)
+// QueryVariants queries the variants edge of the Product.
+func (pr *Product) QueryVariants() *VariantQuery {
+	return (&ProductClient{config: pr.config}).QueryVariants(pr)
 }
 
 // QueryBrand queries the brand edge of the Product.

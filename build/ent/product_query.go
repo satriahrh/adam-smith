@@ -15,7 +15,7 @@ import (
 	"github.com/satriahrh/adam-smith/build/ent/brand"
 	"github.com/satriahrh/adam-smith/build/ent/predicate"
 	"github.com/satriahrh/adam-smith/build/ent/product"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 )
 
 // ProductQuery is the builder for querying Product entities.
@@ -26,9 +26,9 @@ type ProductQuery struct {
 	order      []OrderFunc
 	predicates []predicate.Product
 	// eager-loading edges.
-	withVariations *VariationQuery
-	withBrand      *BrandQuery
-	withFKs        bool
+	withVariants *VariantQuery
+	withBrand    *BrandQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,9 +58,9 @@ func (pq *ProductQuery) Order(o ...OrderFunc) *ProductQuery {
 	return pq
 }
 
-// QueryVariations chains the current query on the variations edge.
-func (pq *ProductQuery) QueryVariations() *VariationQuery {
-	query := &VariationQuery{config: pq.config}
+// QueryVariants chains the current query on the variants edge.
+func (pq *ProductQuery) QueryVariants() *VariantQuery {
+	query := &VariantQuery{config: pq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -71,8 +71,8 @@ func (pq *ProductQuery) QueryVariations() *VariationQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, selector),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, product.VariationsTable, product.VariationsColumn),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, product.VariantsTable, product.VariantsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -272,27 +272,27 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		return nil
 	}
 	return &ProductQuery{
-		config:         pq.config,
-		limit:          pq.limit,
-		offset:         pq.offset,
-		order:          append([]OrderFunc{}, pq.order...),
-		predicates:     append([]predicate.Product{}, pq.predicates...),
-		withVariations: pq.withVariations.Clone(),
-		withBrand:      pq.withBrand.Clone(),
+		config:       pq.config,
+		limit:        pq.limit,
+		offset:       pq.offset,
+		order:        append([]OrderFunc{}, pq.order...),
+		predicates:   append([]predicate.Product{}, pq.predicates...),
+		withVariants: pq.withVariants.Clone(),
+		withBrand:    pq.withBrand.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
 	}
 }
 
-//  WithVariations tells the query-builder to eager-loads the nodes that are connected to
-// the "variations" edge. The optional arguments used to configure the query builder of the edge.
-func (pq *ProductQuery) WithVariations(opts ...func(*VariationQuery)) *ProductQuery {
-	query := &VariationQuery{config: pq.config}
+//  WithVariants tells the query-builder to eager-loads the nodes that are connected to
+// the "variants" edge. The optional arguments used to configure the query builder of the edge.
+func (pq *ProductQuery) WithVariants(opts ...func(*VariantQuery)) *ProductQuery {
+	query := &VariantQuery{config: pq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withVariations = query
+	pq.withVariants = query
 	return pq
 }
 
@@ -375,7 +375,7 @@ func (pq *ProductQuery) sqlAll(ctx context.Context) ([]*Product, error) {
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
 		loadedTypes = [2]bool{
-			pq.withVariations != nil,
+			pq.withVariants != nil,
 			pq.withBrand != nil,
 		}
 	)
@@ -409,32 +409,32 @@ func (pq *ProductQuery) sqlAll(ctx context.Context) ([]*Product, error) {
 		return nodes, nil
 	}
 
-	if query := pq.withVariations; query != nil {
+	if query := pq.withVariants; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uint64]*Product)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Variations = []*Variation{}
+			nodes[i].Edges.Variants = []*Variant{}
 		}
 		query.withFKs = true
-		query.Where(predicate.Variation(func(s *sql.Selector) {
-			s.Where(sql.InValues(product.VariationsColumn, fks...))
+		query.Where(predicate.Variant(func(s *sql.Selector) {
+			s.Where(sql.InValues(product.VariantsColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.product_variations
+			fk := n.product_variants
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "product_variations" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "product_variants" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "product_variations" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "product_variants" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.Variations = append(node.Edges.Variations, n)
+			node.Edges.Variants = append(node.Edges.Variants, n)
 		}
 	}
 

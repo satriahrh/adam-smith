@@ -45,7 +45,7 @@ func (Product) Fields() []ent.Field {
 // Edges of the Product.
 func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("variations", Variation.Type),
+		edge.To("variants", Variant.Type),
 		edge.From("brand", Brand.Type).
 			Ref("products").
 			Unique(),

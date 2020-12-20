@@ -26,7 +26,8 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "quantity", Type: field.TypeUint},
 		{Name: "amount", Type: field.TypeUint},
-		{Name: "outbound_deal_variation", Type: field.TypeUint64, Nullable: true},
+		{Name: "outbound_deal_variant", Type: field.TypeUint64, Nullable: true},
+		{Name: "outbound_deal_children", Type: field.TypeUint64, Nullable: true},
 		{Name: "outbound_transaction_deals", Type: field.TypeUint64, Nullable: true},
 	}
 	// OutboundDealsTable holds the schema information for the "outbound_deals" table.
@@ -36,15 +37,22 @@ var (
 		PrimaryKey: []*schema.Column{OutboundDealsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:  "outbound_deals_variations_variation",
+				Symbol:  "outbound_deals_variants_variant",
 				Columns: []*schema.Column{OutboundDealsColumns[3]},
 
-				RefColumns: []*schema.Column{VariationsColumns[0]},
+				RefColumns: []*schema.Column{VariantsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "outbound_deals_outbound_deals_children",
+				Columns: []*schema.Column{OutboundDealsColumns[4]},
+
+				RefColumns: []*schema.Column{OutboundDealsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:  "outbound_deals_outbound_transactions_deals",
-				Columns: []*schema.Column{OutboundDealsColumns[4]},
+				Columns: []*schema.Column{OutboundDealsColumns[5]},
 
 				RefColumns: []*schema.Column{OutboundTransactionsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -124,59 +132,59 @@ var (
 	// VariantsColumns holds the columns for the "variants" table.
 	VariantsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"color", "size"}},
-		{Name: "value", Type: field.TypeString},
+		{Name: "images", Type: field.TypeJSON, Nullable: true},
+		{Name: "stock", Type: field.TypeUint8},
+		{Name: "price", Type: field.TypeUint},
+		{Name: "product_variants", Type: field.TypeUint64, Nullable: true},
+		{Name: "variant_children", Type: field.TypeUint64, Nullable: true},
+		{Name: "variant_variation", Type: field.TypeUint64, Nullable: true},
 	}
 	// VariantsTable holds the schema information for the "variants" table.
 	VariantsTable = &schema.Table{
-		Name:        "variants",
-		Columns:     VariantsColumns,
-		PrimaryKey:  []*schema.Column{VariantsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
-		Indexes: []*schema.Index{
+		Name:       "variants",
+		Columns:    VariantsColumns,
+		PrimaryKey: []*schema.Column{VariantsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
 			{
-				Name:    "variant_value",
-				Unique:  false,
-				Columns: []*schema.Column{VariantsColumns[2]},
+				Symbol:  "variants_products_variants",
+				Columns: []*schema.Column{VariantsColumns[4]},
+
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "variants_variants_children",
+				Columns: []*schema.Column{VariantsColumns[5]},
+
+				RefColumns: []*schema.Column{VariantsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "variants_variations_variation",
+				Columns: []*schema.Column{VariantsColumns[6]},
+
+				RefColumns: []*schema.Column{VariationsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
 	// VariationsColumns holds the columns for the "variations" table.
 	VariationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "images", Type: field.TypeJSON, Nullable: true},
-		{Name: "stock", Type: field.TypeUint8},
-		{Name: "price", Type: field.TypeUint},
-		{Name: "product_variations", Type: field.TypeUint64, Nullable: true},
-		{Name: "variation_children", Type: field.TypeUint64, Nullable: true},
-		{Name: "variation_variant", Type: field.TypeUint64, Nullable: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"color", "size"}},
+		{Name: "value", Type: field.TypeString},
 	}
 	// VariationsTable holds the schema information for the "variations" table.
 	VariationsTable = &schema.Table{
-		Name:       "variations",
-		Columns:    VariationsColumns,
-		PrimaryKey: []*schema.Column{VariationsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
+		Name:        "variations",
+		Columns:     VariationsColumns,
+		PrimaryKey:  []*schema.Column{VariationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+		Indexes: []*schema.Index{
 			{
-				Symbol:  "variations_products_variations",
-				Columns: []*schema.Column{VariationsColumns[4]},
-
-				RefColumns: []*schema.Column{ProductsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:  "variations_variations_children",
-				Columns: []*schema.Column{VariationsColumns[5]},
-
-				RefColumns: []*schema.Column{VariationsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:  "variations_variants_variant",
-				Columns: []*schema.Column{VariationsColumns[6]},
-
-				RefColumns: []*schema.Column{VariantsColumns[0]},
-				OnDelete:   schema.SetNull,
+				Name:    "variation_value",
+				Unique:  false,
+				Columns: []*schema.Column{VariationsColumns[2]},
 			},
 		},
 	}
@@ -193,11 +201,12 @@ var (
 )
 
 func init() {
-	OutboundDealsTable.ForeignKeys[0].RefTable = VariationsTable
-	OutboundDealsTable.ForeignKeys[1].RefTable = OutboundTransactionsTable
+	OutboundDealsTable.ForeignKeys[0].RefTable = VariantsTable
+	OutboundDealsTable.ForeignKeys[1].RefTable = OutboundDealsTable
+	OutboundDealsTable.ForeignKeys[2].RefTable = OutboundTransactionsTable
 	OutboundShippingsTable.ForeignKeys[0].RefTable = OutboundTransactionsTable
 	ProductsTable.ForeignKeys[0].RefTable = BrandsTable
-	VariationsTable.ForeignKeys[0].RefTable = ProductsTable
-	VariationsTable.ForeignKeys[1].RefTable = VariationsTable
-	VariationsTable.ForeignKeys[2].RefTable = VariantsTable
+	VariantsTable.ForeignKeys[0].RefTable = ProductsTable
+	VariantsTable.ForeignKeys[1].RefTable = VariantsTable
+	VariantsTable.ForeignKeys[2].RefTable = VariationsTable
 }

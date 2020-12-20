@@ -9,9 +9,7 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
-	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
 	"github.com/satriahrh/adam-smith/build/ent/predicate"
-	"github.com/satriahrh/adam-smith/build/ent/product"
 	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/build/ent/variation"
 )
@@ -29,145 +27,31 @@ func (vu *VariationUpdate) Where(ps ...predicate.Variation) *VariationUpdate {
 	return vu
 }
 
-// SetImages sets the images field.
-func (vu *VariationUpdate) SetImages(s []string) *VariationUpdate {
-	vu.mutation.SetImages(s)
+// SetType sets the type field.
+func (vu *VariationUpdate) SetType(v variation.Type) *VariationUpdate {
+	vu.mutation.SetType(v)
 	return vu
 }
 
-// ClearImages clears the value of images.
-func (vu *VariationUpdate) ClearImages() *VariationUpdate {
-	vu.mutation.ClearImages()
+// SetValue sets the value field.
+func (vu *VariationUpdate) SetValue(s string) *VariationUpdate {
+	vu.mutation.SetValue(s)
 	return vu
 }
 
-// SetStock sets the stock field.
-func (vu *VariationUpdate) SetStock(u uint8) *VariationUpdate {
-	vu.mutation.ResetStock()
-	vu.mutation.SetStock(u)
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (vu *VariationUpdate) AddVariantIDs(ids ...uint64) *VariationUpdate {
+	vu.mutation.AddVariantIDs(ids...)
 	return vu
 }
 
-// SetNillableStock sets the stock field if the given value is not nil.
-func (vu *VariationUpdate) SetNillableStock(u *uint8) *VariationUpdate {
-	if u != nil {
-		vu.SetStock(*u)
-	}
-	return vu
-}
-
-// AddStock adds u to stock.
-func (vu *VariationUpdate) AddStock(u uint8) *VariationUpdate {
-	vu.mutation.AddStock(u)
-	return vu
-}
-
-// SetPrice sets the price field.
-func (vu *VariationUpdate) SetPrice(u uint) *VariationUpdate {
-	vu.mutation.ResetPrice()
-	vu.mutation.SetPrice(u)
-	return vu
-}
-
-// SetNillablePrice sets the price field if the given value is not nil.
-func (vu *VariationUpdate) SetNillablePrice(u *uint) *VariationUpdate {
-	if u != nil {
-		vu.SetPrice(*u)
-	}
-	return vu
-}
-
-// AddPrice adds u to price.
-func (vu *VariationUpdate) AddPrice(u uint) *VariationUpdate {
-	vu.mutation.AddPrice(u)
-	return vu
-}
-
-// SetParentID sets the parent edge to Variation by id.
-func (vu *VariationUpdate) SetParentID(id uint64) *VariationUpdate {
-	vu.mutation.SetParentID(id)
-	return vu
-}
-
-// SetNillableParentID sets the parent edge to Variation by id if the given value is not nil.
-func (vu *VariationUpdate) SetNillableParentID(id *uint64) *VariationUpdate {
-	if id != nil {
-		vu = vu.SetParentID(*id)
-	}
-	return vu
-}
-
-// SetParent sets the parent edge to Variation.
-func (vu *VariationUpdate) SetParent(v *Variation) *VariationUpdate {
-	return vu.SetParentID(v.ID)
-}
-
-// AddChildIDs adds the children edge to Variation by ids.
-func (vu *VariationUpdate) AddChildIDs(ids ...uint64) *VariationUpdate {
-	vu.mutation.AddChildIDs(ids...)
-	return vu
-}
-
-// AddChildren adds the children edges to Variation.
-func (vu *VariationUpdate) AddChildren(v ...*Variation) *VariationUpdate {
+// AddVariants adds the variants edges to Variant.
+func (vu *VariationUpdate) AddVariants(v ...*Variant) *VariationUpdate {
 	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vu.AddChildIDs(ids...)
-}
-
-// SetVariantID sets the variant edge to Variant by id.
-func (vu *VariationUpdate) SetVariantID(id uint64) *VariationUpdate {
-	vu.mutation.SetVariantID(id)
-	return vu
-}
-
-// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
-func (vu *VariationUpdate) SetNillableVariantID(id *uint64) *VariationUpdate {
-	if id != nil {
-		vu = vu.SetVariantID(*id)
-	}
-	return vu
-}
-
-// SetVariant sets the variant edge to Variant.
-func (vu *VariationUpdate) SetVariant(v *Variant) *VariationUpdate {
-	return vu.SetVariantID(v.ID)
-}
-
-// SetProductID sets the product edge to Product by id.
-func (vu *VariationUpdate) SetProductID(id uint64) *VariationUpdate {
-	vu.mutation.SetProductID(id)
-	return vu
-}
-
-// SetNillableProductID sets the product edge to Product by id if the given value is not nil.
-func (vu *VariationUpdate) SetNillableProductID(id *uint64) *VariationUpdate {
-	if id != nil {
-		vu = vu.SetProductID(*id)
-	}
-	return vu
-}
-
-// SetProduct sets the product edge to Product.
-func (vu *VariationUpdate) SetProduct(p *Product) *VariationUpdate {
-	return vu.SetProductID(p.ID)
-}
-
-// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (vu *VariationUpdate) AddOutboundDealIDs(ids ...uint64) *VariationUpdate {
-	vu.mutation.AddOutboundDealIDs(ids...)
-	return vu
-}
-
-// AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
-func (vu *VariationUpdate) AddOutboundDeals(o ...*OutboundDeal) *VariationUpdate {
-	ids := make([]uint64, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return vu.AddOutboundDealIDs(ids...)
+	return vu.AddVariantIDs(ids...)
 }
 
 // Mutation returns the VariationMutation object of the builder.
@@ -175,64 +59,25 @@ func (vu *VariationUpdate) Mutation() *VariationMutation {
 	return vu.mutation
 }
 
-// ClearParent clears the "parent" edge to type Variation.
-func (vu *VariationUpdate) ClearParent() *VariationUpdate {
-	vu.mutation.ClearParent()
+// ClearVariants clears all "variants" edges to type Variant.
+func (vu *VariationUpdate) ClearVariants() *VariationUpdate {
+	vu.mutation.ClearVariants()
 	return vu
 }
 
-// ClearChildren clears all "children" edges to type Variation.
-func (vu *VariationUpdate) ClearChildren() *VariationUpdate {
-	vu.mutation.ClearChildren()
+// RemoveVariantIDs removes the variants edge to Variant by ids.
+func (vu *VariationUpdate) RemoveVariantIDs(ids ...uint64) *VariationUpdate {
+	vu.mutation.RemoveVariantIDs(ids...)
 	return vu
 }
 
-// RemoveChildIDs removes the children edge to Variation by ids.
-func (vu *VariationUpdate) RemoveChildIDs(ids ...uint64) *VariationUpdate {
-	vu.mutation.RemoveChildIDs(ids...)
-	return vu
-}
-
-// RemoveChildren removes children edges to Variation.
-func (vu *VariationUpdate) RemoveChildren(v ...*Variation) *VariationUpdate {
+// RemoveVariants removes variants edges to Variant.
+func (vu *VariationUpdate) RemoveVariants(v ...*Variant) *VariationUpdate {
 	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vu.RemoveChildIDs(ids...)
-}
-
-// ClearVariant clears the "variant" edge to type Variant.
-func (vu *VariationUpdate) ClearVariant() *VariationUpdate {
-	vu.mutation.ClearVariant()
-	return vu
-}
-
-// ClearProduct clears the "product" edge to type Product.
-func (vu *VariationUpdate) ClearProduct() *VariationUpdate {
-	vu.mutation.ClearProduct()
-	return vu
-}
-
-// ClearOutboundDeals clears all "outbound_deals" edges to type OutboundDeal.
-func (vu *VariationUpdate) ClearOutboundDeals() *VariationUpdate {
-	vu.mutation.ClearOutboundDeals()
-	return vu
-}
-
-// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
-func (vu *VariationUpdate) RemoveOutboundDealIDs(ids ...uint64) *VariationUpdate {
-	vu.mutation.RemoveOutboundDealIDs(ids...)
-	return vu
-}
-
-// RemoveOutboundDeals removes outbound_deals edges to OutboundDeal.
-func (vu *VariationUpdate) RemoveOutboundDeals(o ...*OutboundDeal) *VariationUpdate {
-	ids := make([]uint64, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return vu.RemoveOutboundDealIDs(ids...)
+	return vu.RemoveVariantIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -242,12 +87,18 @@ func (vu *VariationUpdate) Save(ctx context.Context) (int, error) {
 		affected int
 	)
 	if len(vu.hooks) == 0 {
+		if err = vu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = vu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*VariationMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = vu.check(); err != nil {
+				return 0, err
 			}
 			vu.mutation = mutation
 			affected, err = vu.sqlSave(ctx)
@@ -286,6 +137,16 @@ func (vu *VariationUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (vu *VariationUpdate) check() error {
+	if v, ok := vu.mutation.GetType(); ok {
+		if err := variation.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+		}
+	}
+	return nil
+}
+
 func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -304,142 +165,26 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := vu.mutation.Images(); ok {
+	if value, ok := vu.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
+			Type:   field.TypeEnum,
 			Value:  value,
-			Column: variation.FieldImages,
+			Column: variation.FieldType,
 		})
 	}
-	if vu.mutation.ImagesCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Column: variation.FieldImages,
-		})
-	}
-	if value, ok := vu.mutation.Stock(); ok {
+	if value, ok := vu.mutation.Value(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: variation.FieldStock,
+			Column: variation.FieldValue,
 		})
 	}
-	if value, ok := vu.mutation.AddedStock(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
-			Value:  value,
-			Column: variation.FieldStock,
-		})
-	}
-	if value, ok := vu.mutation.Price(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
-			Value:  value,
-			Column: variation.FieldPrice,
-		})
-	}
-	if value, ok := vu.mutation.AddedPrice(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
-			Value:  value,
-			Column: variation.FieldPrice,
-		})
-	}
-	if vu.mutation.ParentCleared() {
+	if vu.mutation.VariantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   variation.ParentTable,
-			Columns: []string{variation.ParentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vu.mutation.ParentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ParentTable,
-			Columns: []string{variation.ParentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vu.mutation.ChildrenCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vu.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !vu.mutation.ChildrenCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vu.mutation.ChildrenIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vu.mutation.VariantCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   variation.VariantTable,
-			Columns: []string{variation.VariantColumn},
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -450,12 +195,12 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.VariantIDs(); len(nodes) > 0 {
+	if nodes := vu.mutation.RemovedVariantsIDs(); len(nodes) > 0 && !vu.mutation.VariantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   variation.VariantTable,
-			Columns: []string{variation.VariantColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -467,89 +212,19 @@ func (vu *VariationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vu.mutation.ProductCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ProductTable,
-			Columns: []string{variation.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: product.FieldID,
-				},
-			},
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ProductTable,
-			Columns: []string{variation.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vu.mutation.OutboundDealsCleared() {
+	if nodes := vu.mutation.VariantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vu.mutation.RemovedOutboundDealsIDs(); len(nodes) > 0 && !vu.mutation.OutboundDealsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vu.mutation.OutboundDealsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
+					Column: variant.FieldID,
 				},
 			},
 		}
@@ -576,145 +251,31 @@ type VariationUpdateOne struct {
 	mutation *VariationMutation
 }
 
-// SetImages sets the images field.
-func (vuo *VariationUpdateOne) SetImages(s []string) *VariationUpdateOne {
-	vuo.mutation.SetImages(s)
+// SetType sets the type field.
+func (vuo *VariationUpdateOne) SetType(v variation.Type) *VariationUpdateOne {
+	vuo.mutation.SetType(v)
 	return vuo
 }
 
-// ClearImages clears the value of images.
-func (vuo *VariationUpdateOne) ClearImages() *VariationUpdateOne {
-	vuo.mutation.ClearImages()
+// SetValue sets the value field.
+func (vuo *VariationUpdateOne) SetValue(s string) *VariationUpdateOne {
+	vuo.mutation.SetValue(s)
 	return vuo
 }
 
-// SetStock sets the stock field.
-func (vuo *VariationUpdateOne) SetStock(u uint8) *VariationUpdateOne {
-	vuo.mutation.ResetStock()
-	vuo.mutation.SetStock(u)
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (vuo *VariationUpdateOne) AddVariantIDs(ids ...uint64) *VariationUpdateOne {
+	vuo.mutation.AddVariantIDs(ids...)
 	return vuo
 }
 
-// SetNillableStock sets the stock field if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillableStock(u *uint8) *VariationUpdateOne {
-	if u != nil {
-		vuo.SetStock(*u)
-	}
-	return vuo
-}
-
-// AddStock adds u to stock.
-func (vuo *VariationUpdateOne) AddStock(u uint8) *VariationUpdateOne {
-	vuo.mutation.AddStock(u)
-	return vuo
-}
-
-// SetPrice sets the price field.
-func (vuo *VariationUpdateOne) SetPrice(u uint) *VariationUpdateOne {
-	vuo.mutation.ResetPrice()
-	vuo.mutation.SetPrice(u)
-	return vuo
-}
-
-// SetNillablePrice sets the price field if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillablePrice(u *uint) *VariationUpdateOne {
-	if u != nil {
-		vuo.SetPrice(*u)
-	}
-	return vuo
-}
-
-// AddPrice adds u to price.
-func (vuo *VariationUpdateOne) AddPrice(u uint) *VariationUpdateOne {
-	vuo.mutation.AddPrice(u)
-	return vuo
-}
-
-// SetParentID sets the parent edge to Variation by id.
-func (vuo *VariationUpdateOne) SetParentID(id uint64) *VariationUpdateOne {
-	vuo.mutation.SetParentID(id)
-	return vuo
-}
-
-// SetNillableParentID sets the parent edge to Variation by id if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillableParentID(id *uint64) *VariationUpdateOne {
-	if id != nil {
-		vuo = vuo.SetParentID(*id)
-	}
-	return vuo
-}
-
-// SetParent sets the parent edge to Variation.
-func (vuo *VariationUpdateOne) SetParent(v *Variation) *VariationUpdateOne {
-	return vuo.SetParentID(v.ID)
-}
-
-// AddChildIDs adds the children edge to Variation by ids.
-func (vuo *VariationUpdateOne) AddChildIDs(ids ...uint64) *VariationUpdateOne {
-	vuo.mutation.AddChildIDs(ids...)
-	return vuo
-}
-
-// AddChildren adds the children edges to Variation.
-func (vuo *VariationUpdateOne) AddChildren(v ...*Variation) *VariationUpdateOne {
+// AddVariants adds the variants edges to Variant.
+func (vuo *VariationUpdateOne) AddVariants(v ...*Variant) *VariationUpdateOne {
 	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vuo.AddChildIDs(ids...)
-}
-
-// SetVariantID sets the variant edge to Variant by id.
-func (vuo *VariationUpdateOne) SetVariantID(id uint64) *VariationUpdateOne {
-	vuo.mutation.SetVariantID(id)
-	return vuo
-}
-
-// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillableVariantID(id *uint64) *VariationUpdateOne {
-	if id != nil {
-		vuo = vuo.SetVariantID(*id)
-	}
-	return vuo
-}
-
-// SetVariant sets the variant edge to Variant.
-func (vuo *VariationUpdateOne) SetVariant(v *Variant) *VariationUpdateOne {
-	return vuo.SetVariantID(v.ID)
-}
-
-// SetProductID sets the product edge to Product by id.
-func (vuo *VariationUpdateOne) SetProductID(id uint64) *VariationUpdateOne {
-	vuo.mutation.SetProductID(id)
-	return vuo
-}
-
-// SetNillableProductID sets the product edge to Product by id if the given value is not nil.
-func (vuo *VariationUpdateOne) SetNillableProductID(id *uint64) *VariationUpdateOne {
-	if id != nil {
-		vuo = vuo.SetProductID(*id)
-	}
-	return vuo
-}
-
-// SetProduct sets the product edge to Product.
-func (vuo *VariationUpdateOne) SetProduct(p *Product) *VariationUpdateOne {
-	return vuo.SetProductID(p.ID)
-}
-
-// AddOutboundDealIDs adds the outbound_deals edge to OutboundDeal by ids.
-func (vuo *VariationUpdateOne) AddOutboundDealIDs(ids ...uint64) *VariationUpdateOne {
-	vuo.mutation.AddOutboundDealIDs(ids...)
-	return vuo
-}
-
-// AddOutboundDeals adds the outbound_deals edges to OutboundDeal.
-func (vuo *VariationUpdateOne) AddOutboundDeals(o ...*OutboundDeal) *VariationUpdateOne {
-	ids := make([]uint64, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return vuo.AddOutboundDealIDs(ids...)
+	return vuo.AddVariantIDs(ids...)
 }
 
 // Mutation returns the VariationMutation object of the builder.
@@ -722,64 +283,25 @@ func (vuo *VariationUpdateOne) Mutation() *VariationMutation {
 	return vuo.mutation
 }
 
-// ClearParent clears the "parent" edge to type Variation.
-func (vuo *VariationUpdateOne) ClearParent() *VariationUpdateOne {
-	vuo.mutation.ClearParent()
+// ClearVariants clears all "variants" edges to type Variant.
+func (vuo *VariationUpdateOne) ClearVariants() *VariationUpdateOne {
+	vuo.mutation.ClearVariants()
 	return vuo
 }
 
-// ClearChildren clears all "children" edges to type Variation.
-func (vuo *VariationUpdateOne) ClearChildren() *VariationUpdateOne {
-	vuo.mutation.ClearChildren()
+// RemoveVariantIDs removes the variants edge to Variant by ids.
+func (vuo *VariationUpdateOne) RemoveVariantIDs(ids ...uint64) *VariationUpdateOne {
+	vuo.mutation.RemoveVariantIDs(ids...)
 	return vuo
 }
 
-// RemoveChildIDs removes the children edge to Variation by ids.
-func (vuo *VariationUpdateOne) RemoveChildIDs(ids ...uint64) *VariationUpdateOne {
-	vuo.mutation.RemoveChildIDs(ids...)
-	return vuo
-}
-
-// RemoveChildren removes children edges to Variation.
-func (vuo *VariationUpdateOne) RemoveChildren(v ...*Variation) *VariationUpdateOne {
+// RemoveVariants removes variants edges to Variant.
+func (vuo *VariationUpdateOne) RemoveVariants(v ...*Variant) *VariationUpdateOne {
 	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return vuo.RemoveChildIDs(ids...)
-}
-
-// ClearVariant clears the "variant" edge to type Variant.
-func (vuo *VariationUpdateOne) ClearVariant() *VariationUpdateOne {
-	vuo.mutation.ClearVariant()
-	return vuo
-}
-
-// ClearProduct clears the "product" edge to type Product.
-func (vuo *VariationUpdateOne) ClearProduct() *VariationUpdateOne {
-	vuo.mutation.ClearProduct()
-	return vuo
-}
-
-// ClearOutboundDeals clears all "outbound_deals" edges to type OutboundDeal.
-func (vuo *VariationUpdateOne) ClearOutboundDeals() *VariationUpdateOne {
-	vuo.mutation.ClearOutboundDeals()
-	return vuo
-}
-
-// RemoveOutboundDealIDs removes the outbound_deals edge to OutboundDeal by ids.
-func (vuo *VariationUpdateOne) RemoveOutboundDealIDs(ids ...uint64) *VariationUpdateOne {
-	vuo.mutation.RemoveOutboundDealIDs(ids...)
-	return vuo
-}
-
-// RemoveOutboundDeals removes outbound_deals edges to OutboundDeal.
-func (vuo *VariationUpdateOne) RemoveOutboundDeals(o ...*OutboundDeal) *VariationUpdateOne {
-	ids := make([]uint64, len(o))
-	for i := range o {
-		ids[i] = o[i].ID
-	}
-	return vuo.RemoveOutboundDealIDs(ids...)
+	return vuo.RemoveVariantIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -789,12 +311,18 @@ func (vuo *VariationUpdateOne) Save(ctx context.Context) (*Variation, error) {
 		node *Variation
 	)
 	if len(vuo.hooks) == 0 {
+		if err = vuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = vuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*VariationMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = vuo.check(); err != nil {
+				return nil, err
 			}
 			vuo.mutation = mutation
 			node, err = vuo.sqlSave(ctx)
@@ -833,6 +361,16 @@ func (vuo *VariationUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (vuo *VariationUpdateOne) check() error {
+	if v, ok := vuo.mutation.GetType(); ok {
+		if err := variation.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+		}
+	}
+	return nil
+}
+
 func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -849,142 +387,26 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Variation.ID for update")}
 	}
 	_spec.Node.ID.Value = id
-	if value, ok := vuo.mutation.Images(); ok {
+	if value, ok := vuo.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
+			Type:   field.TypeEnum,
 			Value:  value,
-			Column: variation.FieldImages,
+			Column: variation.FieldType,
 		})
 	}
-	if vuo.mutation.ImagesCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Column: variation.FieldImages,
-		})
-	}
-	if value, ok := vuo.mutation.Stock(); ok {
+	if value, ok := vuo.mutation.Value(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: variation.FieldStock,
+			Column: variation.FieldValue,
 		})
 	}
-	if value, ok := vuo.mutation.AddedStock(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
-			Value:  value,
-			Column: variation.FieldStock,
-		})
-	}
-	if value, ok := vuo.mutation.Price(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
-			Value:  value,
-			Column: variation.FieldPrice,
-		})
-	}
-	if value, ok := vuo.mutation.AddedPrice(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
-			Value:  value,
-			Column: variation.FieldPrice,
-		})
-	}
-	if vuo.mutation.ParentCleared() {
+	if vuo.mutation.VariantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   variation.ParentTable,
-			Columns: []string{variation.ParentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vuo.mutation.ParentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ParentTable,
-			Columns: []string{variation.ParentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vuo.mutation.ChildrenCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vuo.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !vuo.mutation.ChildrenCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vuo.mutation.ChildrenIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   variation.ChildrenTable,
-			Columns: []string{variation.ChildrenColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: variation.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vuo.mutation.VariantCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   variation.VariantTable,
-			Columns: []string{variation.VariantColumn},
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -995,12 +417,12 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.VariantIDs(); len(nodes) > 0 {
+	if nodes := vuo.mutation.RemovedVariantsIDs(); len(nodes) > 0 && !vuo.mutation.VariantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   variation.VariantTable,
-			Columns: []string{variation.VariantColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1012,89 +434,19 @@ func (vuo *VariationUpdateOne) sqlSave(ctx context.Context) (_node *Variation, e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vuo.mutation.ProductCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ProductTable,
-			Columns: []string{variation.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: product.FieldID,
-				},
-			},
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   variation.ProductTable,
-			Columns: []string{variation.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if vuo.mutation.OutboundDealsCleared() {
+	if nodes := vuo.mutation.VariantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
+			Table:   variation.VariantsTable,
+			Columns: []string{variation.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vuo.mutation.RemovedOutboundDealsIDs(); len(nodes) > 0 && !vuo.mutation.OutboundDealsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vuo.mutation.OutboundDealsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   variation.OutboundDealsTable,
-			Columns: []string{variation.OutboundDealsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: outbounddeal.FieldID,
+					Column: variant.FieldID,
 				},
 			},
 		}

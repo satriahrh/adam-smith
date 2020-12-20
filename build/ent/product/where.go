@@ -327,25 +327,25 @@ func NameContainsFold(v string) predicate.Product {
 	})
 }
 
-// HasVariations applies the HasEdge predicate on the "variations" edge.
-func HasVariations() predicate.Product {
+// HasVariants applies the HasEdge predicate on the "variants" edge.
+func HasVariants() predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, VariationsTable, VariationsColumn),
+			sqlgraph.To(VariantsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VariantsTable, VariantsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasVariationsWith applies the HasEdge predicate on the "variations" edge with a given conditions (other predicates).
-func HasVariationsWith(preds ...predicate.Variation) predicate.Product {
+// HasVariantsWith applies the HasEdge predicate on the "variants" edge with a given conditions (other predicates).
+func HasVariantsWith(preds ...predicate.Variant) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, VariationsTable, VariationsColumn),
+			sqlgraph.To(VariantsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VariantsTable, VariantsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

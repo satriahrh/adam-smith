@@ -18,20 +18,20 @@ const (
 	// FieldMarketplaces holds the string denoting the marketplaces field in the database.
 	FieldMarketplaces = "marketplaces"
 
-	// EdgeVariations holds the string denoting the variations edge name in mutations.
-	EdgeVariations = "variations"
+	// EdgeVariants holds the string denoting the variants edge name in mutations.
+	EdgeVariants = "variants"
 	// EdgeBrand holds the string denoting the brand edge name in mutations.
 	EdgeBrand = "brand"
 
 	// Table holds the table name of the product in the database.
 	Table = "products"
-	// VariationsTable is the table the holds the variations relation/edge.
-	VariationsTable = "variations"
-	// VariationsInverseTable is the table name for the Variation entity.
-	// It exists in this package in order to avoid circular dependency with the "variation" package.
-	VariationsInverseTable = "variations"
-	// VariationsColumn is the table column denoting the variations relation/edge.
-	VariationsColumn = "product_variations"
+	// VariantsTable is the table the holds the variants relation/edge.
+	VariantsTable = "variants"
+	// VariantsInverseTable is the table name for the Variant entity.
+	// It exists in this package in order to avoid circular dependency with the "variant" package.
+	VariantsInverseTable = "variants"
+	// VariantsColumn is the table column denoting the variants relation/edge.
+	VariantsColumn = "product_variants"
 	// BrandTable is the table the holds the brand relation/edge.
 	BrandTable = "products"
 	// BrandInverseTable is the table name for the Brand entity.

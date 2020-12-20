@@ -257,25 +257,81 @@ func AmountLTE(v uint) predicate.OutboundDeal {
 	})
 }
 
-// HasVariation applies the HasEdge predicate on the "variation" edge.
-func HasVariation() predicate.OutboundDeal {
+// HasVariant applies the HasEdge predicate on the "variant" edge.
+func HasVariant() predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
+			sqlgraph.To(VariantTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariantTable, VariantColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasVariationWith applies the HasEdge predicate on the "variation" edge with a given conditions (other predicates).
-func HasVariationWith(preds ...predicate.Variation) predicate.OutboundDeal {
+// HasVariantWith applies the HasEdge predicate on the "variant" edge with a given conditions (other predicates).
+func HasVariantWith(preds ...predicate.Variant) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
+			sqlgraph.To(VariantInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariantTable, VariantColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ParentTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.OutboundDeal) predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChildren applies the HasEdge predicate on the "children" edge.
+func HasChildren() predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChildrenTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChildrenWith applies the HasEdge predicate on the "children" edge with a given conditions (other predicates).
+func HasChildrenWith(preds ...predicate.OutboundDeal) predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
