@@ -12,7 +12,7 @@ import (
 func (m *management) AddBrand(ctx context.Context, brand *proto.Brand) error {
 	errorParseFromDictionary := func(err error) error {
 		return helper.ErrorParseFromDictionary(err, []helper.ErrorDictionaryItem{
-			{55, "Error 1062", fmt.Errorf("brand with given code is already existed")},
+			{From: 55, Value: "Error 1062", Error: fmt.Errorf("brand with given code is already existed")},
 		})
 	}
 
