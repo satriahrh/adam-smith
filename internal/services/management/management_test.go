@@ -17,7 +17,7 @@ import (
 
 type Suite struct {
 	suite.Suite
-	subject management.Catalogue
+	subject management.Management
 	sqlmock sqlmock.Sqlmock
 	context context.Context
 }
