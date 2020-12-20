@@ -33,7 +33,7 @@ func (Variation) Edges() []ent.Edge {
 // Indexes of the Variation.
 func (Variation) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("value"),
+		index.Fields("value", "type").Unique(),
 	}
 }
 

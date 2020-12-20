@@ -182,9 +182,9 @@ var (
 		ForeignKeys: []*schema.ForeignKey{},
 		Indexes: []*schema.Index{
 			{
-				Name:    "variation_value",
-				Unique:  false,
-				Columns: []*schema.Column{VariationsColumns[2]},
+				Name:    "variation_value_type",
+				Unique:  true,
+				Columns: []*schema.Column{VariationsColumns[2], VariationsColumns[1]},
 			},
 		},
 	}

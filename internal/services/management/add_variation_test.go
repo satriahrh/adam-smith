@@ -1,9 +1,9 @@
 package management_test
 
 import (
-	"fmt"
-	"github.com/DATA-DOG/go-sqlmock"
+	"errors"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/satriahrh/adam-smith/build/proto"
 )
 
@@ -24,7 +24,7 @@ func (s *Suite) TestAddVariation() {
 		s.NoError(err)
 		s.Equal(uint64(123), variation.Id)
 	})
-	s.Run("Error", func() {
+	s.Run("DuplicatedError", func() {
 		variation := &proto.Variation{
 			Type: "Warna",
 			Value: "Merah",
@@ -34,10 +34,10 @@ func (s *Suite) TestAddVariation() {
 			WithArgs(
 				"Warna", "Merah",
 			).
-			WillReturnError(fmt.Errorf("unexpected error"))
+			WillReturnError(errors.New("Error 1062: Duplicated"))
 		s.sqlmock.ExpectRollback()
 		err := s.subject.AddVariation(s.context, variation)
-		s.EqualError(err, "insert node to table \"variations\": unexpected error")
+		s.EqualError(err, "these value is already created")
 	})
 }
 
