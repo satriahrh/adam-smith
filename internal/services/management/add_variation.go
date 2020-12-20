@@ -12,7 +12,7 @@ import (
 func (m *management) AddVariation(ctx context.Context, variation *proto.Variation) (err error) {
 	errorParseFromDictionary := func(err error) error {
 		return helper.ErrorParseFromDictionary(err, []helper.ErrorDictionaryItem{
-			{59, "Error 1062", fmt.Errorf("variation with given values is already existed")},
+			{From: 59, Value: "Error 1062", Error: fmt.Errorf("variation with given values is already existed")},
 		})
 	}
 
