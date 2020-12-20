@@ -1,0 +1,10 @@
+syntax = 'proto3';
+
+option go_package = 'github.com/satriahrh/adam-smith/build/proto';
+
+message Variant {
+  uint64 id = 1;
+  repeated string images = 2;
+  uint32 stock = 3;
+  uint32 price = 4;
+}

@@ -28,11 +28,11 @@ func init() {
 	// variantDescStock is the schema descriptor for stock field.
 	variantDescStock := variantFields[1].Descriptor()
 	// variant.DefaultStock holds the default value on creation for the stock field.
-	variant.DefaultStock = variantDescStock.Default.(uint8)
+	variant.DefaultStock = variantDescStock.Default.(uint32)
 	// variantDescPrice is the schema descriptor for price field.
 	variantDescPrice := variantFields[2].Descriptor()
 	// variant.DefaultPrice holds the default value on creation for the price field.
-	variant.DefaultPrice = variantDescPrice.Default.(uint)
+	variant.DefaultPrice = variantDescPrice.Default.(uint32)
 	variationFields := schema.Variation{}.Fields()
 	_ = variationFields
 	// variationDescType is the schema descriptor for type field.

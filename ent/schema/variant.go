@@ -16,9 +16,9 @@ func (Variant) Fields() []ent.Field {
 	return []ent.Field{
 		field.Strings("images").
 			Optional(),
-		field.Uint8("stock").
+		field.Uint32("stock").
 			Default(0),
-		field.Uint("price").
+		field.Uint32("price").
 			Default(0),
 	}
 }

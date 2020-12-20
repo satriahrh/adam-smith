@@ -133,8 +133,8 @@ var (
 	VariantsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
-		{Name: "stock", Type: field.TypeUint8},
-		{Name: "price", Type: field.TypeUint},
+		{Name: "stock", Type: field.TypeUint32},
+		{Name: "price", Type: field.TypeUint32},
 		{Name: "product_variants", Type: field.TypeUint64, Nullable: true},
 		{Name: "variant_children", Type: field.TypeUint64, Nullable: true},
 		{Name: "variant_variation", Type: field.TypeUint64, Nullable: true},

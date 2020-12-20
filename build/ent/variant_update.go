@@ -42,14 +42,14 @@ func (vu *VariantUpdate) ClearImages() *VariantUpdate {
 }
 
 // SetStock sets the stock field.
-func (vu *VariantUpdate) SetStock(u uint8) *VariantUpdate {
+func (vu *VariantUpdate) SetStock(u uint32) *VariantUpdate {
 	vu.mutation.ResetStock()
 	vu.mutation.SetStock(u)
 	return vu
 }
 
 // SetNillableStock sets the stock field if the given value is not nil.
-func (vu *VariantUpdate) SetNillableStock(u *uint8) *VariantUpdate {
+func (vu *VariantUpdate) SetNillableStock(u *uint32) *VariantUpdate {
 	if u != nil {
 		vu.SetStock(*u)
 	}
@@ -57,20 +57,20 @@ func (vu *VariantUpdate) SetNillableStock(u *uint8) *VariantUpdate {
 }
 
 // AddStock adds u to stock.
-func (vu *VariantUpdate) AddStock(u uint8) *VariantUpdate {
+func (vu *VariantUpdate) AddStock(u uint32) *VariantUpdate {
 	vu.mutation.AddStock(u)
 	return vu
 }
 
 // SetPrice sets the price field.
-func (vu *VariantUpdate) SetPrice(u uint) *VariantUpdate {
+func (vu *VariantUpdate) SetPrice(u uint32) *VariantUpdate {
 	vu.mutation.ResetPrice()
 	vu.mutation.SetPrice(u)
 	return vu
 }
 
 // SetNillablePrice sets the price field if the given value is not nil.
-func (vu *VariantUpdate) SetNillablePrice(u *uint) *VariantUpdate {
+func (vu *VariantUpdate) SetNillablePrice(u *uint32) *VariantUpdate {
 	if u != nil {
 		vu.SetPrice(*u)
 	}
@@ -78,7 +78,7 @@ func (vu *VariantUpdate) SetNillablePrice(u *uint) *VariantUpdate {
 }
 
 // AddPrice adds u to price.
-func (vu *VariantUpdate) AddPrice(u uint) *VariantUpdate {
+func (vu *VariantUpdate) AddPrice(u uint32) *VariantUpdate {
 	vu.mutation.AddPrice(u)
 	return vu
 }
@@ -319,28 +319,28 @@ func (vu *VariantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := vu.mutation.Stock(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldStock,
 		})
 	}
 	if value, ok := vu.mutation.AddedStock(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldStock,
 		})
 	}
 	if value, ok := vu.mutation.Price(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldPrice,
 		})
 	}
 	if value, ok := vu.mutation.AddedPrice(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldPrice,
 		})
@@ -589,14 +589,14 @@ func (vuo *VariantUpdateOne) ClearImages() *VariantUpdateOne {
 }
 
 // SetStock sets the stock field.
-func (vuo *VariantUpdateOne) SetStock(u uint8) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) SetStock(u uint32) *VariantUpdateOne {
 	vuo.mutation.ResetStock()
 	vuo.mutation.SetStock(u)
 	return vuo
 }
 
 // SetNillableStock sets the stock field if the given value is not nil.
-func (vuo *VariantUpdateOne) SetNillableStock(u *uint8) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) SetNillableStock(u *uint32) *VariantUpdateOne {
 	if u != nil {
 		vuo.SetStock(*u)
 	}
@@ -604,20 +604,20 @@ func (vuo *VariantUpdateOne) SetNillableStock(u *uint8) *VariantUpdateOne {
 }
 
 // AddStock adds u to stock.
-func (vuo *VariantUpdateOne) AddStock(u uint8) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) AddStock(u uint32) *VariantUpdateOne {
 	vuo.mutation.AddStock(u)
 	return vuo
 }
 
 // SetPrice sets the price field.
-func (vuo *VariantUpdateOne) SetPrice(u uint) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) SetPrice(u uint32) *VariantUpdateOne {
 	vuo.mutation.ResetPrice()
 	vuo.mutation.SetPrice(u)
 	return vuo
 }
 
 // SetNillablePrice sets the price field if the given value is not nil.
-func (vuo *VariantUpdateOne) SetNillablePrice(u *uint) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) SetNillablePrice(u *uint32) *VariantUpdateOne {
 	if u != nil {
 		vuo.SetPrice(*u)
 	}
@@ -625,7 +625,7 @@ func (vuo *VariantUpdateOne) SetNillablePrice(u *uint) *VariantUpdateOne {
 }
 
 // AddPrice adds u to price.
-func (vuo *VariantUpdateOne) AddPrice(u uint) *VariantUpdateOne {
+func (vuo *VariantUpdateOne) AddPrice(u uint32) *VariantUpdateOne {
 	vuo.mutation.AddPrice(u)
 	return vuo
 }
@@ -864,28 +864,28 @@ func (vuo *VariantUpdateOne) sqlSave(ctx context.Context) (_node *Variant, err e
 	}
 	if value, ok := vuo.mutation.Stock(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldStock,
 		})
 	}
 	if value, ok := vuo.mutation.AddedStock(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldStock,
 		})
 	}
 	if value, ok := vuo.mutation.Price(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldPrice,
 		})
 	}
 	if value, ok := vuo.mutation.AddedPrice(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldPrice,
 		})

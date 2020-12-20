@@ -3412,10 +3412,10 @@ type VariantMutation struct {
 	typ                   string
 	id                    *uint64
 	images                *[]string
-	stock                 *uint8
-	addstock              *uint8
-	price                 *uint
-	addprice              *uint
+	stock                 *uint32
+	addstock              *uint32
+	price                 *uint32
+	addprice              *uint32
 	clearedFields         map[string]struct{}
 	parent                *uint64
 	clearedparent         bool
@@ -3564,13 +3564,13 @@ func (m *VariantMutation) ResetImages() {
 }
 
 // SetStock sets the stock field.
-func (m *VariantMutation) SetStock(u uint8) {
+func (m *VariantMutation) SetStock(u uint32) {
 	m.stock = &u
 	m.addstock = nil
 }
 
 // Stock returns the stock value in the mutation.
-func (m *VariantMutation) Stock() (r uint8, exists bool) {
+func (m *VariantMutation) Stock() (r uint32, exists bool) {
 	v := m.stock
 	if v == nil {
 		return
@@ -3582,7 +3582,7 @@ func (m *VariantMutation) Stock() (r uint8, exists bool) {
 // If the Variant object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariantMutation) OldStock(ctx context.Context) (v uint8, err error) {
+func (m *VariantMutation) OldStock(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldStock is allowed only on UpdateOne operations")
 	}
@@ -3597,7 +3597,7 @@ func (m *VariantMutation) OldStock(ctx context.Context) (v uint8, err error) {
 }
 
 // AddStock adds u to stock.
-func (m *VariantMutation) AddStock(u uint8) {
+func (m *VariantMutation) AddStock(u uint32) {
 	if m.addstock != nil {
 		*m.addstock += u
 	} else {
@@ -3606,7 +3606,7 @@ func (m *VariantMutation) AddStock(u uint8) {
 }
 
 // AddedStock returns the value that was added to the stock field in this mutation.
-func (m *VariantMutation) AddedStock() (r uint8, exists bool) {
+func (m *VariantMutation) AddedStock() (r uint32, exists bool) {
 	v := m.addstock
 	if v == nil {
 		return
@@ -3621,13 +3621,13 @@ func (m *VariantMutation) ResetStock() {
 }
 
 // SetPrice sets the price field.
-func (m *VariantMutation) SetPrice(u uint) {
+func (m *VariantMutation) SetPrice(u uint32) {
 	m.price = &u
 	m.addprice = nil
 }
 
 // Price returns the price value in the mutation.
-func (m *VariantMutation) Price() (r uint, exists bool) {
+func (m *VariantMutation) Price() (r uint32, exists bool) {
 	v := m.price
 	if v == nil {
 		return
@@ -3639,7 +3639,7 @@ func (m *VariantMutation) Price() (r uint, exists bool) {
 // If the Variant object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *VariantMutation) OldPrice(ctx context.Context) (v uint, err error) {
+func (m *VariantMutation) OldPrice(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldPrice is allowed only on UpdateOne operations")
 	}
@@ -3654,7 +3654,7 @@ func (m *VariantMutation) OldPrice(ctx context.Context) (v uint, err error) {
 }
 
 // AddPrice adds u to price.
-func (m *VariantMutation) AddPrice(u uint) {
+func (m *VariantMutation) AddPrice(u uint32) {
 	if m.addprice != nil {
 		*m.addprice += u
 	} else {
@@ -3663,7 +3663,7 @@ func (m *VariantMutation) AddPrice(u uint) {
 }
 
 // AddedPrice returns the value that was added to the price field in this mutation.
-func (m *VariantMutation) AddedPrice() (r uint, exists bool) {
+func (m *VariantMutation) AddedPrice() (r uint32, exists bool) {
 	v := m.addprice
 	if v == nil {
 		return
@@ -3970,14 +3970,14 @@ func (m *VariantMutation) SetField(name string, value ent.Value) error {
 		m.SetImages(v)
 		return nil
 	case variant.FieldStock:
-		v, ok := value.(uint8)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStock(v)
 		return nil
 	case variant.FieldPrice:
-		v, ok := value.(uint)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4019,14 +4019,14 @@ func (m *VariantMutation) AddedField(name string) (ent.Value, bool) {
 func (m *VariantMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case variant.FieldStock:
-		v, ok := value.(uint8)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStock(v)
 		return nil
 	case variant.FieldPrice:
-		v, ok := value.(uint)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

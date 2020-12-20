@@ -29,13 +29,13 @@ func (vc *VariantCreate) SetImages(s []string) *VariantCreate {
 }
 
 // SetStock sets the stock field.
-func (vc *VariantCreate) SetStock(u uint8) *VariantCreate {
+func (vc *VariantCreate) SetStock(u uint32) *VariantCreate {
 	vc.mutation.SetStock(u)
 	return vc
 }
 
 // SetNillableStock sets the stock field if the given value is not nil.
-func (vc *VariantCreate) SetNillableStock(u *uint8) *VariantCreate {
+func (vc *VariantCreate) SetNillableStock(u *uint32) *VariantCreate {
 	if u != nil {
 		vc.SetStock(*u)
 	}
@@ -43,13 +43,13 @@ func (vc *VariantCreate) SetNillableStock(u *uint8) *VariantCreate {
 }
 
 // SetPrice sets the price field.
-func (vc *VariantCreate) SetPrice(u uint) *VariantCreate {
+func (vc *VariantCreate) SetPrice(u uint32) *VariantCreate {
 	vc.mutation.SetPrice(u)
 	return vc
 }
 
 // SetNillablePrice sets the price field if the given value is not nil.
-func (vc *VariantCreate) SetNillablePrice(u *uint) *VariantCreate {
+func (vc *VariantCreate) SetNillablePrice(u *uint32) *VariantCreate {
 	if u != nil {
 		vc.SetPrice(*u)
 	}
@@ -250,7 +250,7 @@ func (vc *VariantCreate) createSpec() (*Variant, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := vc.mutation.Stock(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldStock,
 		})
@@ -258,7 +258,7 @@ func (vc *VariantCreate) createSpec() (*Variant, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := vc.mutation.Price(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: variant.FieldPrice,
 		})

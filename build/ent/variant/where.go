@@ -92,14 +92,14 @@ func IDLTE(id uint64) predicate.Variant {
 }
 
 // Stock applies equality check predicate on the "stock" field. It's identical to StockEQ.
-func Stock(v uint8) predicate.Variant {
+func Stock(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldStock), v))
 	})
 }
 
 // Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
-func Price(v uint) predicate.Variant {
+func Price(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPrice), v))
 	})
@@ -120,21 +120,21 @@ func ImagesNotNil() predicate.Variant {
 }
 
 // StockEQ applies the EQ predicate on the "stock" field.
-func StockEQ(v uint8) predicate.Variant {
+func StockEQ(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldStock), v))
 	})
 }
 
 // StockNEQ applies the NEQ predicate on the "stock" field.
-func StockNEQ(v uint8) predicate.Variant {
+func StockNEQ(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldStock), v))
 	})
 }
 
 // StockIn applies the In predicate on the "stock" field.
-func StockIn(vs ...uint8) predicate.Variant {
+func StockIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -151,7 +151,7 @@ func StockIn(vs ...uint8) predicate.Variant {
 }
 
 // StockNotIn applies the NotIn predicate on the "stock" field.
-func StockNotIn(vs ...uint8) predicate.Variant {
+func StockNotIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -168,49 +168,49 @@ func StockNotIn(vs ...uint8) predicate.Variant {
 }
 
 // StockGT applies the GT predicate on the "stock" field.
-func StockGT(v uint8) predicate.Variant {
+func StockGT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldStock), v))
 	})
 }
 
 // StockGTE applies the GTE predicate on the "stock" field.
-func StockGTE(v uint8) predicate.Variant {
+func StockGTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldStock), v))
 	})
 }
 
 // StockLT applies the LT predicate on the "stock" field.
-func StockLT(v uint8) predicate.Variant {
+func StockLT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldStock), v))
 	})
 }
 
 // StockLTE applies the LTE predicate on the "stock" field.
-func StockLTE(v uint8) predicate.Variant {
+func StockLTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldStock), v))
 	})
 }
 
 // PriceEQ applies the EQ predicate on the "price" field.
-func PriceEQ(v uint) predicate.Variant {
+func PriceEQ(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPrice), v))
 	})
 }
 
 // PriceNEQ applies the NEQ predicate on the "price" field.
-func PriceNEQ(v uint) predicate.Variant {
+func PriceNEQ(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldPrice), v))
 	})
 }
 
 // PriceIn applies the In predicate on the "price" field.
-func PriceIn(vs ...uint) predicate.Variant {
+func PriceIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -227,7 +227,7 @@ func PriceIn(vs ...uint) predicate.Variant {
 }
 
 // PriceNotIn applies the NotIn predicate on the "price" field.
-func PriceNotIn(vs ...uint) predicate.Variant {
+func PriceNotIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -244,28 +244,28 @@ func PriceNotIn(vs ...uint) predicate.Variant {
 }
 
 // PriceGT applies the GT predicate on the "price" field.
-func PriceGT(v uint) predicate.Variant {
+func PriceGT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldPrice), v))
 	})
 }
 
 // PriceGTE applies the GTE predicate on the "price" field.
-func PriceGTE(v uint) predicate.Variant {
+func PriceGTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldPrice), v))
 	})
 }
 
 // PriceLT applies the LT predicate on the "price" field.
-func PriceLT(v uint) predicate.Variant {
+func PriceLT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldPrice), v))
 	})
 }
 
 // PriceLTE applies the LTE predicate on the "price" field.
-func PriceLTE(v uint) predicate.Variant {
+func PriceLTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldPrice), v))
 	})

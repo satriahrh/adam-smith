@@ -90,7 +90,7 @@ func ValidColumn(column string) bool {
 
 var (
 	// DefaultStock holds the default value on creation for the stock field.
-	DefaultStock uint8
+	DefaultStock uint32
 	// DefaultPrice holds the default value on creation for the price field.
-	DefaultPrice uint
+	DefaultPrice uint32
 )
