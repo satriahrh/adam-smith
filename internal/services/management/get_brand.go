@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/satriahrh/adam-smith/build/ent"
 	"github.com/satriahrh/adam-smith/build/ent/brand"
@@ -17,7 +16,7 @@ func (m *management) GetBrand(ctx context.Context, brandID uint64, brandCode str
 		if err != nil {
 			err = func(err error) error {
 				return helper.ErrorParseFromDictionary(err, []helper.ErrorDictionaryItem{
-					{From: 0, Value: "ent: brand not found", Error: fmt.Errorf("no brand found with given id/code")},
+					{From: 0, Value: "ent: brand not found", Error: ErrorBrandNotFound},
 				})
 			}(err)
 		}

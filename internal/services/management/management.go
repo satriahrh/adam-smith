@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"errors"
 
 	"github.com/satriahrh/adam-smith/build/ent"
 	"github.com/satriahrh/adam-smith/build/proto"
@@ -25,3 +26,7 @@ type management struct {
 func New(ent *ent.Client, logger *zap.Logger) Management {
 	return &management{ent, logger}
 }
+
+var (
+	ErrorBrandNotFound = errors.New("brand not found with given id/code")
+)
