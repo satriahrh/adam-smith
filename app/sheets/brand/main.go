@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/satriahrh/adam-smith/internal/instrumentations"
 	"os"
 	"strconv"
 	"time"
@@ -24,27 +25,27 @@ func main() {
 		logger.Fatal("Error opening ent client.", zap.Error(err))
 	}
 	defer client.Close()
-	usecases.UpsertBrand(ctx, managementClient(ctx, client, logger), protoBrands(logger), logger)
+	usecases.UpsertBrand(ctx, managementClient(ctx, client), protoBrands())
 }
 
-func managementClient(ctx context.Context, client *ent.Client, logger *zap.Logger) management.Management {
+func managementClient(ctx context.Context, client *ent.Client) management.Management {
 	//Run the auto migration tool.
 	if err := client.Schema.Create(ctx); err != nil {
-		logger.Fatal("Error running auto migration tool.", zap.Error(err))
+		instrumentations.Logger.Fatal("Error running auto migration tool.", zap.Error(err))
 	}
 
-	return management.New(client, logger)
+	return management.New(client)
 }
 
-func protoBrands(logger *zap.Logger) []*proto.Brand {
+func protoBrands() []*proto.Brand {
 	args := os.Args
 	if len(args) != 2 {
-		logger.Fatal("No spreadsheet ID given")
+		instrumentations.Logger.Fatal("No spreadsheet ID given")
 	}
 	spreadsheetId := os.Args[1]
 	valueRange, err := sheets.Get(spreadsheetId, "brands")
 	if err != nil {
-		logger.Error("Error on getting spreadsheet", zap.Error(err))
+		instrumentations.Logger.Error("Error on getting spreadsheet", zap.Error(err))
 	}
 
 	protoBrands := make([]*proto.Brand, 0)
