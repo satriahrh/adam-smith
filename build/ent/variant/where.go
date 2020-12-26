@@ -9,28 +9,28 @@ import (
 )
 
 // ID filters vertices based on their identifier.
-func ID(id int) predicate.Variant {
+func ID(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Variant {
+func IDEQ(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Variant {
+func IDNEQ(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Variant {
+func IDIn(ids ...uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -47,7 +47,7 @@ func IDIn(ids ...int) predicate.Variant {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Variant {
+func IDNotIn(ids ...uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -64,56 +64,77 @@ func IDNotIn(ids ...int) predicate.Variant {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Variant {
+func IDGT(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Variant {
+func IDGTE(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Variant {
+func IDLT(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Variant {
+func IDLTE(id uint64) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
 }
 
-// Value applies equality check predicate on the "value" field. It's identical to ValueEQ.
-func Value(v string) predicate.Variant {
+// Stock applies equality check predicate on the "stock" field. It's identical to StockEQ.
+func Stock(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldValue), v))
+		s.Where(sql.EQ(s.C(FieldStock), v))
 	})
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v Type) predicate.Variant {
+// Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
+func Price(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), v))
+		s.Where(sql.EQ(s.C(FieldPrice), v))
 	})
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v Type) predicate.Variant {
+// ImagesIsNil applies the IsNil predicate on the "images" field.
+func ImagesIsNil() predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldType), v))
+		s.Where(sql.IsNull(s.C(FieldImages)))
 	})
 }
 
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...Type) predicate.Variant {
+// ImagesNotNil applies the NotNil predicate on the "images" field.
+func ImagesNotNil() predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldImages)))
+	})
+}
+
+// StockEQ applies the EQ predicate on the "stock" field.
+func StockEQ(v uint32) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldStock), v))
+	})
+}
+
+// StockNEQ applies the NEQ predicate on the "stock" field.
+func StockNEQ(v uint32) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldStock), v))
+	})
+}
+
+// StockIn applies the In predicate on the "stock" field.
+func StockIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -125,12 +146,12 @@ func TypeIn(vs ...Type) predicate.Variant {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldType), v...))
+		s.Where(sql.In(s.C(FieldStock), v...))
 	})
 }
 
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...Type) predicate.Variant {
+// StockNotIn applies the NotIn predicate on the "stock" field.
+func StockNotIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -142,26 +163,54 @@ func TypeNotIn(vs ...Type) predicate.Variant {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldType), v...))
+		s.Where(sql.NotIn(s.C(FieldStock), v...))
 	})
 }
 
-// ValueEQ applies the EQ predicate on the "value" field.
-func ValueEQ(v string) predicate.Variant {
+// StockGT applies the GT predicate on the "stock" field.
+func StockGT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldValue), v))
+		s.Where(sql.GT(s.C(FieldStock), v))
 	})
 }
 
-// ValueNEQ applies the NEQ predicate on the "value" field.
-func ValueNEQ(v string) predicate.Variant {
+// StockGTE applies the GTE predicate on the "stock" field.
+func StockGTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldValue), v))
+		s.Where(sql.GTE(s.C(FieldStock), v))
 	})
 }
 
-// ValueIn applies the In predicate on the "value" field.
-func ValueIn(vs ...string) predicate.Variant {
+// StockLT applies the LT predicate on the "stock" field.
+func StockLT(v uint32) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldStock), v))
+	})
+}
+
+// StockLTE applies the LTE predicate on the "stock" field.
+func StockLTE(v uint32) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldStock), v))
+	})
+}
+
+// PriceEQ applies the EQ predicate on the "price" field.
+func PriceEQ(v uint32) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPrice), v))
+	})
+}
+
+// PriceNEQ applies the NEQ predicate on the "price" field.
+func PriceNEQ(v uint32) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPrice), v))
+	})
+}
+
+// PriceIn applies the In predicate on the "price" field.
+func PriceIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -173,12 +222,12 @@ func ValueIn(vs ...string) predicate.Variant {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldValue), v...))
+		s.Where(sql.In(s.C(FieldPrice), v...))
 	})
 }
 
-// ValueNotIn applies the NotIn predicate on the "value" field.
-func ValueNotIn(vs ...string) predicate.Variant {
+// PriceNotIn applies the NotIn predicate on the "price" field.
+func PriceNotIn(vs ...uint32) predicate.Variant {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -190,92 +239,169 @@ func ValueNotIn(vs ...string) predicate.Variant {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldValue), v...))
+		s.Where(sql.NotIn(s.C(FieldPrice), v...))
 	})
 }
 
-// ValueGT applies the GT predicate on the "value" field.
-func ValueGT(v string) predicate.Variant {
+// PriceGT applies the GT predicate on the "price" field.
+func PriceGT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldValue), v))
+		s.Where(sql.GT(s.C(FieldPrice), v))
 	})
 }
 
-// ValueGTE applies the GTE predicate on the "value" field.
-func ValueGTE(v string) predicate.Variant {
+// PriceGTE applies the GTE predicate on the "price" field.
+func PriceGTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldValue), v))
+		s.Where(sql.GTE(s.C(FieldPrice), v))
 	})
 }
 
-// ValueLT applies the LT predicate on the "value" field.
-func ValueLT(v string) predicate.Variant {
+// PriceLT applies the LT predicate on the "price" field.
+func PriceLT(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldValue), v))
+		s.Where(sql.LT(s.C(FieldPrice), v))
 	})
 }
 
-// ValueLTE applies the LTE predicate on the "value" field.
-func ValueLTE(v string) predicate.Variant {
+// PriceLTE applies the LTE predicate on the "price" field.
+func PriceLTE(v uint32) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldValue), v))
+		s.Where(sql.LTE(s.C(FieldPrice), v))
 	})
 }
 
-// ValueContains applies the Contains predicate on the "value" field.
-func ValueContains(v string) predicate.Variant {
-	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldValue), v))
-	})
-}
-
-// ValueHasPrefix applies the HasPrefix predicate on the "value" field.
-func ValueHasPrefix(v string) predicate.Variant {
-	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldValue), v))
-	})
-}
-
-// ValueHasSuffix applies the HasSuffix predicate on the "value" field.
-func ValueHasSuffix(v string) predicate.Variant {
-	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldValue), v))
-	})
-}
-
-// ValueEqualFold applies the EqualFold predicate on the "value" field.
-func ValueEqualFold(v string) predicate.Variant {
-	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldValue), v))
-	})
-}
-
-// ValueContainsFold applies the ContainsFold predicate on the "value" field.
-func ValueContainsFold(v string) predicate.Variant {
-	return predicate.Variant(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldValue), v))
-	})
-}
-
-// HasVariations applies the HasEdge predicate on the "variations" edge.
-func HasVariations() predicate.Variant {
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, VariationsTable, VariationsPrimaryKey...),
+			sqlgraph.To(ParentTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasVariationsWith applies the HasEdge predicate on the "variations" edge with a given conditions (other predicates).
-func HasVariationsWith(preds ...predicate.Variation) predicate.Variant {
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.Variant) predicate.Variant {
 	return predicate.Variant(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, VariationsTable, VariationsPrimaryKey...),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChildren applies the HasEdge predicate on the "children" edge.
+func HasChildren() predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChildrenTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChildrenWith applies the HasEdge predicate on the "children" edge with a given conditions (other predicates).
+func HasChildrenWith(preds ...predicate.Variant) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVariation applies the HasEdge predicate on the "variation" edge.
+func HasVariation() predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(VariationTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVariationWith applies the HasEdge predicate on the "variation" edge with a given conditions (other predicates).
+func HasVariationWith(preds ...predicate.Variation) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(VariationInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasProduct applies the HasEdge predicate on the "product" edge.
+func HasProduct() predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ProductTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ProductTable, ProductColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProductWith applies the HasEdge predicate on the "product" edge with a given conditions (other predicates).
+func HasProductWith(preds ...predicate.Product) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ProductInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ProductTable, ProductColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOutboundDeals applies the HasEdge predicate on the "outbound_deals" edge.
+func HasOutboundDeals() predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(OutboundDealsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, OutboundDealsTable, OutboundDealsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOutboundDealsWith applies the HasEdge predicate on the "outbound_deals" edge with a given conditions (other predicates).
+func HasOutboundDealsWith(preds ...predicate.OutboundDeal) predicate.Variant {
+	return predicate.Variant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(OutboundDealsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, OutboundDealsTable, OutboundDealsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

@@ -9,28 +9,28 @@ import (
 )
 
 // ID filters vertices based on their identifier.
-func ID(id int) predicate.OutboundDeal {
+func ID(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.OutboundDeal {
+func IDEQ(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.OutboundDeal {
+func IDNEQ(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.OutboundDeal {
+func IDIn(ids ...uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -47,7 +47,7 @@ func IDIn(ids ...int) predicate.OutboundDeal {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.OutboundDeal {
+func IDNotIn(ids ...uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -64,28 +64,28 @@ func IDNotIn(ids ...int) predicate.OutboundDeal {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.OutboundDeal {
+func IDGT(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.OutboundDeal {
+func IDGTE(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.OutboundDeal {
+func IDLT(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.OutboundDeal {
+func IDLTE(id uint64) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -257,25 +257,81 @@ func AmountLTE(v uint) predicate.OutboundDeal {
 	})
 }
 
-// HasVariation applies the HasEdge predicate on the "variation" edge.
-func HasVariation() predicate.OutboundDeal {
+// HasVariant applies the HasEdge predicate on the "variant" edge.
+func HasVariant() predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
+			sqlgraph.To(VariantTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariantTable, VariantColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasVariationWith applies the HasEdge predicate on the "variation" edge with a given conditions (other predicates).
-func HasVariationWith(preds ...predicate.Variation) predicate.OutboundDeal {
+// HasVariantWith applies the HasEdge predicate on the "variant" edge with a given conditions (other predicates).
+func HasVariantWith(preds ...predicate.Variant) predicate.OutboundDeal {
 	return predicate.OutboundDeal(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, VariationTable, VariationColumn),
+			sqlgraph.To(VariantInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VariantTable, VariantColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ParentTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.OutboundDeal) predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChildren applies the HasEdge predicate on the "children" edge.
+func HasChildren() predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChildrenTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChildrenWith applies the HasEdge predicate on the "children" edge with a given conditions (other predicates).
+func HasChildrenWith(preds ...predicate.OutboundDeal) predicate.OutboundDeal {
+	return predicate.OutboundDeal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

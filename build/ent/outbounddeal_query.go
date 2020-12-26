@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -14,7 +15,7 @@ import (
 	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
 	"github.com/satriahrh/adam-smith/build/ent/outboundtransaction"
 	"github.com/satriahrh/adam-smith/build/ent/predicate"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 )
 
 // OutboundDealQuery is the builder for querying OutboundDeal entities.
@@ -25,7 +26,9 @@ type OutboundDealQuery struct {
 	order      []OrderFunc
 	predicates []predicate.OutboundDeal
 	// eager-loading edges.
-	withVariation   *VariationQuery
+	withVariant     *VariantQuery
+	withParent      *OutboundDealQuery
+	withChildren    *OutboundDealQuery
 	withTransaction *OutboundTransactionQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
@@ -57,9 +60,9 @@ func (odq *OutboundDealQuery) Order(o ...OrderFunc) *OutboundDealQuery {
 	return odq
 }
 
-// QueryVariation chains the current query on the variation edge.
-func (odq *OutboundDealQuery) QueryVariation() *VariationQuery {
-	query := &VariationQuery{config: odq.config}
+// QueryVariant chains the current query on the variant edge.
+func (odq *OutboundDealQuery) QueryVariant() *VariantQuery {
+	query := &VariantQuery{config: odq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := odq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -70,8 +73,52 @@ func (odq *OutboundDealQuery) QueryVariation() *VariationQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, selector),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, outbounddeal.VariationTable, outbounddeal.VariationColumn),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, outbounddeal.VariantTable, outbounddeal.VariantColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(odq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParent chains the current query on the parent edge.
+func (odq *OutboundDealQuery) QueryParent() *OutboundDealQuery {
+	query := &OutboundDealQuery{config: odq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := odq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := odq.sqlQuery()
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, selector),
+			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, outbounddeal.ParentTable, outbounddeal.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(odq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChildren chains the current query on the children edge.
+func (odq *OutboundDealQuery) QueryChildren() *OutboundDealQuery {
+	query := &OutboundDealQuery{config: odq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := odq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := odq.sqlQuery()
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, selector),
+			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, outbounddeal.ChildrenTable, outbounddeal.ChildrenColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(odq.driver.Dialect(), step)
 		return fromU, nil
@@ -123,8 +170,8 @@ func (odq *OutboundDealQuery) FirstX(ctx context.Context) *OutboundDeal {
 }
 
 // FirstID returns the first OutboundDeal id in the query. Returns *NotFoundError when no id was found.
-func (odq *OutboundDealQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (odq *OutboundDealQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = odq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -136,7 +183,7 @@ func (odq *OutboundDealQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (odq *OutboundDealQuery) FirstIDX(ctx context.Context) int {
+func (odq *OutboundDealQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := odq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -170,8 +217,8 @@ func (odq *OutboundDealQuery) OnlyX(ctx context.Context) *OutboundDeal {
 }
 
 // OnlyID returns the only OutboundDeal id in the query, returns an error if not exactly one id was returned.
-func (odq *OutboundDealQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (odq *OutboundDealQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = odq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -187,7 +234,7 @@ func (odq *OutboundDealQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (odq *OutboundDealQuery) OnlyIDX(ctx context.Context) int {
+func (odq *OutboundDealQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := odq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -213,8 +260,8 @@ func (odq *OutboundDealQuery) AllX(ctx context.Context) []*OutboundDeal {
 }
 
 // IDs executes the query and returns a list of OutboundDeal ids.
-func (odq *OutboundDealQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (odq *OutboundDealQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := odq.Select(outbounddeal.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -222,7 +269,7 @@ func (odq *OutboundDealQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (odq *OutboundDealQuery) IDsX(ctx context.Context) []int {
+func (odq *OutboundDealQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := odq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -276,7 +323,9 @@ func (odq *OutboundDealQuery) Clone() *OutboundDealQuery {
 		offset:          odq.offset,
 		order:           append([]OrderFunc{}, odq.order...),
 		predicates:      append([]predicate.OutboundDeal{}, odq.predicates...),
-		withVariation:   odq.withVariation.Clone(),
+		withVariant:     odq.withVariant.Clone(),
+		withParent:      odq.withParent.Clone(),
+		withChildren:    odq.withChildren.Clone(),
 		withTransaction: odq.withTransaction.Clone(),
 		// clone intermediate query.
 		sql:  odq.sql.Clone(),
@@ -284,14 +333,36 @@ func (odq *OutboundDealQuery) Clone() *OutboundDealQuery {
 	}
 }
 
-//  WithVariation tells the query-builder to eager-loads the nodes that are connected to
-// the "variation" edge. The optional arguments used to configure the query builder of the edge.
-func (odq *OutboundDealQuery) WithVariation(opts ...func(*VariationQuery)) *OutboundDealQuery {
-	query := &VariationQuery{config: odq.config}
+//  WithVariant tells the query-builder to eager-loads the nodes that are connected to
+// the "variant" edge. The optional arguments used to configure the query builder of the edge.
+func (odq *OutboundDealQuery) WithVariant(opts ...func(*VariantQuery)) *OutboundDealQuery {
+	query := &VariantQuery{config: odq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	odq.withVariation = query
+	odq.withVariant = query
+	return odq
+}
+
+//  WithParent tells the query-builder to eager-loads the nodes that are connected to
+// the "parent" edge. The optional arguments used to configure the query builder of the edge.
+func (odq *OutboundDealQuery) WithParent(opts ...func(*OutboundDealQuery)) *OutboundDealQuery {
+	query := &OutboundDealQuery{config: odq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	odq.withParent = query
+	return odq
+}
+
+//  WithChildren tells the query-builder to eager-loads the nodes that are connected to
+// the "children" edge. The optional arguments used to configure the query builder of the edge.
+func (odq *OutboundDealQuery) WithChildren(opts ...func(*OutboundDealQuery)) *OutboundDealQuery {
+	query := &OutboundDealQuery{config: odq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	odq.withChildren = query
 	return odq
 }
 
@@ -373,12 +444,14 @@ func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, erro
 		nodes       = []*OutboundDeal{}
 		withFKs     = odq.withFKs
 		_spec       = odq.querySpec()
-		loadedTypes = [2]bool{
-			odq.withVariation != nil,
+		loadedTypes = [4]bool{
+			odq.withVariant != nil,
+			odq.withParent != nil,
+			odq.withChildren != nil,
 			odq.withTransaction != nil,
 		}
 	)
-	if odq.withVariation != nil || odq.withTransaction != nil {
+	if odq.withVariant != nil || odq.withParent != nil || odq.withTransaction != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -408,16 +481,16 @@ func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, erro
 		return nodes, nil
 	}
 
-	if query := odq.withVariation; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*OutboundDeal)
+	if query := odq.withVariant; query != nil {
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*OutboundDeal)
 		for i := range nodes {
-			if fk := nodes[i].outbound_deal_variation; fk != nil {
+			if fk := nodes[i].outbound_deal_variant; fk != nil {
 				ids = append(ids, *fk)
 				nodeids[*fk] = append(nodeids[*fk], nodes[i])
 			}
 		}
-		query.Where(variation.IDIn(ids...))
+		query.Where(variant.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -425,17 +498,71 @@ func (odq *OutboundDealQuery) sqlAll(ctx context.Context) ([]*OutboundDeal, erro
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_variation" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_variant" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Variation = n
+				nodes[i].Edges.Variant = n
 			}
 		}
 	}
 
+	if query := odq.withParent; query != nil {
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*OutboundDeal)
+		for i := range nodes {
+			if fk := nodes[i].outbound_deal_children; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(outbounddeal.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_children" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Parent = n
+			}
+		}
+	}
+
+	if query := odq.withChildren; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uint64]*OutboundDeal)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Children = []*OutboundDeal{}
+		}
+		query.withFKs = true
+		query.Where(predicate.OutboundDeal(func(s *sql.Selector) {
+			s.Where(sql.InValues(outbounddeal.ChildrenColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.outbound_deal_children
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "outbound_deal_children" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_children" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Children = append(node.Edges.Children, n)
+		}
+	}
+
 	if query := odq.withTransaction; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*OutboundDeal)
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*OutboundDeal)
 		for i := range nodes {
 			if fk := nodes[i].outbound_transaction_deals; fk != nil {
 				ids = append(ids, *fk)
@@ -480,7 +607,7 @@ func (odq *OutboundDealQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   outbounddeal.Table,
 			Columns: outbounddeal.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		},

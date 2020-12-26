@@ -17,7 +17,7 @@ import (
 type Product struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Sku holds the value of the "sku" field.
 	Sku string `json:"sku,omitempty"`
 	// Name holds the value of the "name" field.
@@ -27,17 +27,17 @@ type Product struct {
 	// Images holds the value of the "images" field.
 	Images schema.ProductImages `json:"images,omitempty"`
 	// Marketplaces holds the value of the "marketplaces" field.
-	Marketplaces schema.ProductMarketplace `json:"marketplaces,omitempty"`
+	Marketplaces schema.ProductMarketplaces `json:"marketplaces,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
 	Edges          ProductEdges `json:"edges"`
-	brand_products *int
+	brand_products *uint64
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// Variations holds the value of the variations edge.
-	Variations []*Variation
+	// Variants holds the value of the variants edge.
+	Variants []*Variant
 	// Brand holds the value of the brand edge.
 	Brand *Brand
 	// loadedTypes holds the information for reporting if a
@@ -45,13 +45,13 @@ type ProductEdges struct {
 	loadedTypes [2]bool
 }
 
-// VariationsOrErr returns the Variations value or an error if the edge
+// VariantsOrErr returns the Variants value or an error if the edge
 // was not loaded in eager-loading.
-func (e ProductEdges) VariationsOrErr() ([]*Variation, error) {
+func (e ProductEdges) VariantsOrErr() ([]*Variant, error) {
 	if e.loadedTypes[0] {
-		return e.Variations, nil
+		return e.Variants, nil
 	}
-	return nil, &NotLoadedError{edge: "variations"}
+	return nil, &NotLoadedError{edge: "variants"}
 }
 
 // BrandOrErr returns the Brand value or an error if the edge
@@ -97,7 +97,7 @@ func (pr *Product) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	pr.ID = int(value.Int64)
+	pr.ID = uint64(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field sku", values[0])
@@ -138,16 +138,16 @@ func (pr *Product) assignValues(values ...interface{}) error {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field brand_products", value)
 		} else if value.Valid {
-			pr.brand_products = new(int)
-			*pr.brand_products = int(value.Int64)
+			pr.brand_products = new(uint64)
+			*pr.brand_products = uint64(value.Int64)
 		}
 	}
 	return nil
 }
 
-// QueryVariations queries the variations edge of the Product.
-func (pr *Product) QueryVariations() *VariationQuery {
-	return (&ProductClient{config: pr.config}).QueryVariations(pr)
+// QueryVariants queries the variants edge of the Product.
+func (pr *Product) QueryVariants() *VariantQuery {
+	return (&ProductClient{config: pr.config}).QueryVariants(pr)
 }
 
 // QueryBrand queries the brand edge of the Product.

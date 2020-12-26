@@ -9,28 +9,28 @@ import (
 )
 
 // ID filters vertices based on their identifier.
-func ID(id int) predicate.Product {
+func ID(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Product {
+func IDEQ(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Product {
+func IDNEQ(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Product {
+func IDIn(ids ...uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -47,7 +47,7 @@ func IDIn(ids ...int) predicate.Product {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Product {
+func IDNotIn(ids ...uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -64,28 +64,28 @@ func IDNotIn(ids ...int) predicate.Product {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Product {
+func IDGT(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Product {
+func IDGTE(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Product {
+func IDLT(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Product {
+func IDLTE(id uint64) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -327,25 +327,25 @@ func NameContainsFold(v string) predicate.Product {
 	})
 }
 
-// HasVariations applies the HasEdge predicate on the "variations" edge.
-func HasVariations() predicate.Product {
+// HasVariants applies the HasEdge predicate on the "variants" edge.
+func HasVariants() predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, VariationsTable, VariationsColumn),
+			sqlgraph.To(VariantsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VariantsTable, VariantsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasVariationsWith applies the HasEdge predicate on the "variations" edge with a given conditions (other predicates).
-func HasVariationsWith(preds ...predicate.Variation) predicate.Product {
+// HasVariantsWith applies the HasEdge predicate on the "variants" edge with a given conditions (other predicates).
+func HasVariantsWith(preds ...predicate.Variant) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(VariationsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, VariationsTable, VariationsColumn),
+			sqlgraph.To(VariantsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VariantsTable, VariantsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

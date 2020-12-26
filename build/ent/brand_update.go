@@ -34,14 +34,14 @@ func (bu *BrandUpdate) SetName(s string) *BrandUpdate {
 }
 
 // AddProductIDs adds the products edge to Product by ids.
-func (bu *BrandUpdate) AddProductIDs(ids ...int) *BrandUpdate {
+func (bu *BrandUpdate) AddProductIDs(ids ...uint64) *BrandUpdate {
 	bu.mutation.AddProductIDs(ids...)
 	return bu
 }
 
 // AddProducts adds the products edges to Product.
 func (bu *BrandUpdate) AddProducts(p ...*Product) *BrandUpdate {
-	ids := make([]int, len(p))
+	ids := make([]uint64, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -60,14 +60,14 @@ func (bu *BrandUpdate) ClearProducts() *BrandUpdate {
 }
 
 // RemoveProductIDs removes the products edge to Product by ids.
-func (bu *BrandUpdate) RemoveProductIDs(ids ...int) *BrandUpdate {
+func (bu *BrandUpdate) RemoveProductIDs(ids ...uint64) *BrandUpdate {
 	bu.mutation.RemoveProductIDs(ids...)
 	return bu
 }
 
 // RemoveProducts removes products edges to Product.
 func (bu *BrandUpdate) RemoveProducts(p ...*Product) *BrandUpdate {
-	ids := make([]int, len(p))
+	ids := make([]uint64, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -147,7 +147,7 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   brand.Table,
 			Columns: brand.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: brand.FieldID,
 			},
 		},
@@ -175,7 +175,7 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -191,7 +191,7 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -210,7 +210,7 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -245,14 +245,14 @@ func (buo *BrandUpdateOne) SetName(s string) *BrandUpdateOne {
 }
 
 // AddProductIDs adds the products edge to Product by ids.
-func (buo *BrandUpdateOne) AddProductIDs(ids ...int) *BrandUpdateOne {
+func (buo *BrandUpdateOne) AddProductIDs(ids ...uint64) *BrandUpdateOne {
 	buo.mutation.AddProductIDs(ids...)
 	return buo
 }
 
 // AddProducts adds the products edges to Product.
 func (buo *BrandUpdateOne) AddProducts(p ...*Product) *BrandUpdateOne {
-	ids := make([]int, len(p))
+	ids := make([]uint64, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -271,14 +271,14 @@ func (buo *BrandUpdateOne) ClearProducts() *BrandUpdateOne {
 }
 
 // RemoveProductIDs removes the products edge to Product by ids.
-func (buo *BrandUpdateOne) RemoveProductIDs(ids ...int) *BrandUpdateOne {
+func (buo *BrandUpdateOne) RemoveProductIDs(ids ...uint64) *BrandUpdateOne {
 	buo.mutation.RemoveProductIDs(ids...)
 	return buo
 }
 
 // RemoveProducts removes products edges to Product.
 func (buo *BrandUpdateOne) RemoveProducts(p ...*Product) *BrandUpdateOne {
-	ids := make([]int, len(p))
+	ids := make([]uint64, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -358,7 +358,7 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 			Table:   brand.Table,
 			Columns: brand.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: brand.FieldID,
 			},
 		},
@@ -384,7 +384,7 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -400,7 +400,7 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -419,7 +419,7 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},

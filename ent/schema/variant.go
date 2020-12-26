@@ -4,7 +4,6 @@ import (
 	"github.com/facebook/ent"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
-	"github.com/facebook/ent/schema/index"
 )
 
 // Variant holds the schema definition for the Variant entity.
@@ -13,29 +12,29 @@ type Variant struct {
 }
 
 // Fields of the Variant.
-func (v Variant) Fields() []ent.Field {
+func (Variant) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("type").
-			Values(v.EnumType()...),
-		field.String("value"),
+		field.Strings("images").
+			Optional(),
+		field.Uint32("stock").
+			Default(0),
+		field.Uint32("price").
+			Default(0),
 	}
 }
 
 // Edges of the Variant.
 func (Variant) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("variations", Variation.Type),
+		edge.To("children", Variant.Type).
+			From("parent").
+			Unique(),
+		edge.To("variation", Variation.Type).
+			Unique(),
+		edge.From("product", Product.Type).
+			Ref("variants").
+			Unique(),
+		edge.From("outbound_deals", OutboundDeal.Type).
+			Ref("variant"),
 	}
-}
-
-// Indexes of the Variant.
-func (Variant) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("value"),
-	}
-}
-
-// EnumType enum of the field type
-func (Variant) EnumType() []string {
-	return []string{"color", "size"}
 }

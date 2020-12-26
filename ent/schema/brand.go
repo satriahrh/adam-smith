@@ -14,6 +14,10 @@ type Brand struct {
 // Fields of the Brand.
 func (Brand) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("code").
+			NotEmpty().
+			Unique().
+			Immutable(),
 		field.String("name").
 			NotEmpty(),
 	}

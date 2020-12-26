@@ -20,6 +20,12 @@ type BrandCreate struct {
 	hooks    []Hook
 }
 
+// SetCode sets the code field.
+func (bc *BrandCreate) SetCode(s string) *BrandCreate {
+	bc.mutation.SetCode(s)
+	return bc
+}
+
 // SetName sets the name field.
 func (bc *BrandCreate) SetName(s string) *BrandCreate {
 	bc.mutation.SetName(s)
@@ -27,14 +33,14 @@ func (bc *BrandCreate) SetName(s string) *BrandCreate {
 }
 
 // AddProductIDs adds the products edge to Product by ids.
-func (bc *BrandCreate) AddProductIDs(ids ...int) *BrandCreate {
+func (bc *BrandCreate) AddProductIDs(ids ...uint64) *BrandCreate {
 	bc.mutation.AddProductIDs(ids...)
 	return bc
 }
 
 // AddProducts adds the products edges to Product.
 func (bc *BrandCreate) AddProducts(p ...*Product) *BrandCreate {
-	ids := make([]int, len(p))
+	ids := make([]uint64, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -92,6 +98,14 @@ func (bc *BrandCreate) SaveX(ctx context.Context) *Brand {
 
 // check runs all checks and user-defined validators on the builder.
 func (bc *BrandCreate) check() error {
+	if _, ok := bc.mutation.Code(); !ok {
+		return &ValidationError{Name: "code", err: errors.New("ent: missing required field \"code\"")}
+	}
+	if v, ok := bc.mutation.Code(); ok {
+		if err := brand.CodeValidator(v); err != nil {
+			return &ValidationError{Name: "code", err: fmt.Errorf("ent: validator failed for field \"code\": %w", err)}
+		}
+	}
 	if _, ok := bc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New("ent: missing required field \"name\"")}
 	}
@@ -112,7 +126,7 @@ func (bc *BrandCreate) sqlSave(ctx context.Context) (*Brand, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -122,11 +136,19 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: brand.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: brand.FieldID,
 			},
 		}
 	)
+	if value, ok := bc.mutation.Code(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: brand.FieldCode,
+		})
+		_node.Code = value
+	}
 	if value, ok := bc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -144,7 +166,7 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: product.FieldID,
 				},
 			},
@@ -197,7 +219,7 @@ func (bcb *BrandCreateBulk) Save(ctx context.Context) ([]*Brand, error) {
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

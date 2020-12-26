@@ -69,7 +69,7 @@ func (osd *OutboundShippingDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: outboundshipping.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundshipping.FieldID,
 			},
 		},

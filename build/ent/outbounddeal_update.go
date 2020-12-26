@@ -12,7 +12,7 @@ import (
 	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
 	"github.com/satriahrh/adam-smith/build/ent/outboundtransaction"
 	"github.com/satriahrh/adam-smith/build/ent/predicate"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 )
 
 // OutboundDealUpdate is the builder for updating OutboundDeal entities.
@@ -54,33 +54,67 @@ func (odu *OutboundDealUpdate) AddAmount(u uint) *OutboundDealUpdate {
 	return odu
 }
 
-// SetVariationID sets the variation edge to Variation by id.
-func (odu *OutboundDealUpdate) SetVariationID(id int) *OutboundDealUpdate {
-	odu.mutation.SetVariationID(id)
+// SetVariantID sets the variant edge to Variant by id.
+func (odu *OutboundDealUpdate) SetVariantID(id uint64) *OutboundDealUpdate {
+	odu.mutation.SetVariantID(id)
 	return odu
 }
 
-// SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (odu *OutboundDealUpdate) SetNillableVariationID(id *int) *OutboundDealUpdate {
+// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
+func (odu *OutboundDealUpdate) SetNillableVariantID(id *uint64) *OutboundDealUpdate {
 	if id != nil {
-		odu = odu.SetVariationID(*id)
+		odu = odu.SetVariantID(*id)
 	}
 	return odu
 }
 
-// SetVariation sets the variation edge to Variation.
-func (odu *OutboundDealUpdate) SetVariation(v *Variation) *OutboundDealUpdate {
-	return odu.SetVariationID(v.ID)
+// SetVariant sets the variant edge to Variant.
+func (odu *OutboundDealUpdate) SetVariant(v *Variant) *OutboundDealUpdate {
+	return odu.SetVariantID(v.ID)
+}
+
+// SetParentID sets the parent edge to OutboundDeal by id.
+func (odu *OutboundDealUpdate) SetParentID(id uint64) *OutboundDealUpdate {
+	odu.mutation.SetParentID(id)
+	return odu
+}
+
+// SetNillableParentID sets the parent edge to OutboundDeal by id if the given value is not nil.
+func (odu *OutboundDealUpdate) SetNillableParentID(id *uint64) *OutboundDealUpdate {
+	if id != nil {
+		odu = odu.SetParentID(*id)
+	}
+	return odu
+}
+
+// SetParent sets the parent edge to OutboundDeal.
+func (odu *OutboundDealUpdate) SetParent(o *OutboundDeal) *OutboundDealUpdate {
+	return odu.SetParentID(o.ID)
+}
+
+// AddChildIDs adds the children edge to OutboundDeal by ids.
+func (odu *OutboundDealUpdate) AddChildIDs(ids ...uint64) *OutboundDealUpdate {
+	odu.mutation.AddChildIDs(ids...)
+	return odu
+}
+
+// AddChildren adds the children edges to OutboundDeal.
+func (odu *OutboundDealUpdate) AddChildren(o ...*OutboundDeal) *OutboundDealUpdate {
+	ids := make([]uint64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return odu.AddChildIDs(ids...)
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (odu *OutboundDealUpdate) SetTransactionID(id int) *OutboundDealUpdate {
+func (odu *OutboundDealUpdate) SetTransactionID(id uint64) *OutboundDealUpdate {
 	odu.mutation.SetTransactionID(id)
 	return odu
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (odu *OutboundDealUpdate) SetNillableTransactionID(id *int) *OutboundDealUpdate {
+func (odu *OutboundDealUpdate) SetNillableTransactionID(id *uint64) *OutboundDealUpdate {
 	if id != nil {
 		odu = odu.SetTransactionID(*id)
 	}
@@ -97,10 +131,37 @@ func (odu *OutboundDealUpdate) Mutation() *OutboundDealMutation {
 	return odu.mutation
 }
 
-// ClearVariation clears the "variation" edge to type Variation.
-func (odu *OutboundDealUpdate) ClearVariation() *OutboundDealUpdate {
-	odu.mutation.ClearVariation()
+// ClearVariant clears the "variant" edge to type Variant.
+func (odu *OutboundDealUpdate) ClearVariant() *OutboundDealUpdate {
+	odu.mutation.ClearVariant()
 	return odu
+}
+
+// ClearParent clears the "parent" edge to type OutboundDeal.
+func (odu *OutboundDealUpdate) ClearParent() *OutboundDealUpdate {
+	odu.mutation.ClearParent()
+	return odu
+}
+
+// ClearChildren clears all "children" edges to type OutboundDeal.
+func (odu *OutboundDealUpdate) ClearChildren() *OutboundDealUpdate {
+	odu.mutation.ClearChildren()
+	return odu
+}
+
+// RemoveChildIDs removes the children edge to OutboundDeal by ids.
+func (odu *OutboundDealUpdate) RemoveChildIDs(ids ...uint64) *OutboundDealUpdate {
+	odu.mutation.RemoveChildIDs(ids...)
+	return odu
+}
+
+// RemoveChildren removes children edges to OutboundDeal.
+func (odu *OutboundDealUpdate) RemoveChildren(o ...*OutboundDeal) *OutboundDealUpdate {
+	ids := make([]uint64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return odu.RemoveChildIDs(ids...)
 }
 
 // ClearTransaction clears the "transaction" edge to type OutboundTransaction.
@@ -166,7 +227,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   outbounddeal.Table,
 			Columns: outbounddeal.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		},
@@ -206,33 +267,122 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: outbounddeal.FieldAmount,
 		})
 	}
-	if odu.mutation.VariationCleared() {
+	if odu.mutation.VariantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: []string{outbounddeal.VariationColumn},
+			Table:   outbounddeal.VariantTable,
+			Columns: []string{outbounddeal.VariantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := odu.mutation.VariationIDs(); len(nodes) > 0 {
+	if nodes := odu.mutation.VariantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: []string{outbounddeal.VariationColumn},
+			Table:   outbounddeal.VariantTable,
+			Columns: []string{outbounddeal.VariantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if odu.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   outbounddeal.ParentTable,
+			Columns: []string{outbounddeal.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := odu.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   outbounddeal.ParentTable,
+			Columns: []string{outbounddeal.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if odu.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := odu.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !odu.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := odu.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
 				},
 			},
 		}
@@ -250,7 +400,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -266,7 +416,7 @@ func (odu *OutboundDealUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -320,33 +470,67 @@ func (oduo *OutboundDealUpdateOne) AddAmount(u uint) *OutboundDealUpdateOne {
 	return oduo
 }
 
-// SetVariationID sets the variation edge to Variation by id.
-func (oduo *OutboundDealUpdateOne) SetVariationID(id int) *OutboundDealUpdateOne {
-	oduo.mutation.SetVariationID(id)
+// SetVariantID sets the variant edge to Variant by id.
+func (oduo *OutboundDealUpdateOne) SetVariantID(id uint64) *OutboundDealUpdateOne {
+	oduo.mutation.SetVariantID(id)
 	return oduo
 }
 
-// SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (oduo *OutboundDealUpdateOne) SetNillableVariationID(id *int) *OutboundDealUpdateOne {
+// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
+func (oduo *OutboundDealUpdateOne) SetNillableVariantID(id *uint64) *OutboundDealUpdateOne {
 	if id != nil {
-		oduo = oduo.SetVariationID(*id)
+		oduo = oduo.SetVariantID(*id)
 	}
 	return oduo
 }
 
-// SetVariation sets the variation edge to Variation.
-func (oduo *OutboundDealUpdateOne) SetVariation(v *Variation) *OutboundDealUpdateOne {
-	return oduo.SetVariationID(v.ID)
+// SetVariant sets the variant edge to Variant.
+func (oduo *OutboundDealUpdateOne) SetVariant(v *Variant) *OutboundDealUpdateOne {
+	return oduo.SetVariantID(v.ID)
+}
+
+// SetParentID sets the parent edge to OutboundDeal by id.
+func (oduo *OutboundDealUpdateOne) SetParentID(id uint64) *OutboundDealUpdateOne {
+	oduo.mutation.SetParentID(id)
+	return oduo
+}
+
+// SetNillableParentID sets the parent edge to OutboundDeal by id if the given value is not nil.
+func (oduo *OutboundDealUpdateOne) SetNillableParentID(id *uint64) *OutboundDealUpdateOne {
+	if id != nil {
+		oduo = oduo.SetParentID(*id)
+	}
+	return oduo
+}
+
+// SetParent sets the parent edge to OutboundDeal.
+func (oduo *OutboundDealUpdateOne) SetParent(o *OutboundDeal) *OutboundDealUpdateOne {
+	return oduo.SetParentID(o.ID)
+}
+
+// AddChildIDs adds the children edge to OutboundDeal by ids.
+func (oduo *OutboundDealUpdateOne) AddChildIDs(ids ...uint64) *OutboundDealUpdateOne {
+	oduo.mutation.AddChildIDs(ids...)
+	return oduo
+}
+
+// AddChildren adds the children edges to OutboundDeal.
+func (oduo *OutboundDealUpdateOne) AddChildren(o ...*OutboundDeal) *OutboundDealUpdateOne {
+	ids := make([]uint64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return oduo.AddChildIDs(ids...)
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (oduo *OutboundDealUpdateOne) SetTransactionID(id int) *OutboundDealUpdateOne {
+func (oduo *OutboundDealUpdateOne) SetTransactionID(id uint64) *OutboundDealUpdateOne {
 	oduo.mutation.SetTransactionID(id)
 	return oduo
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (oduo *OutboundDealUpdateOne) SetNillableTransactionID(id *int) *OutboundDealUpdateOne {
+func (oduo *OutboundDealUpdateOne) SetNillableTransactionID(id *uint64) *OutboundDealUpdateOne {
 	if id != nil {
 		oduo = oduo.SetTransactionID(*id)
 	}
@@ -363,10 +547,37 @@ func (oduo *OutboundDealUpdateOne) Mutation() *OutboundDealMutation {
 	return oduo.mutation
 }
 
-// ClearVariation clears the "variation" edge to type Variation.
-func (oduo *OutboundDealUpdateOne) ClearVariation() *OutboundDealUpdateOne {
-	oduo.mutation.ClearVariation()
+// ClearVariant clears the "variant" edge to type Variant.
+func (oduo *OutboundDealUpdateOne) ClearVariant() *OutboundDealUpdateOne {
+	oduo.mutation.ClearVariant()
 	return oduo
+}
+
+// ClearParent clears the "parent" edge to type OutboundDeal.
+func (oduo *OutboundDealUpdateOne) ClearParent() *OutboundDealUpdateOne {
+	oduo.mutation.ClearParent()
+	return oduo
+}
+
+// ClearChildren clears all "children" edges to type OutboundDeal.
+func (oduo *OutboundDealUpdateOne) ClearChildren() *OutboundDealUpdateOne {
+	oduo.mutation.ClearChildren()
+	return oduo
+}
+
+// RemoveChildIDs removes the children edge to OutboundDeal by ids.
+func (oduo *OutboundDealUpdateOne) RemoveChildIDs(ids ...uint64) *OutboundDealUpdateOne {
+	oduo.mutation.RemoveChildIDs(ids...)
+	return oduo
+}
+
+// RemoveChildren removes children edges to OutboundDeal.
+func (oduo *OutboundDealUpdateOne) RemoveChildren(o ...*OutboundDeal) *OutboundDealUpdateOne {
+	ids := make([]uint64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return oduo.RemoveChildIDs(ids...)
 }
 
 // ClearTransaction clears the "transaction" edge to type OutboundTransaction.
@@ -432,7 +643,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Table:   outbounddeal.Table,
 			Columns: outbounddeal.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		},
@@ -470,33 +681,122 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Column: outbounddeal.FieldAmount,
 		})
 	}
-	if oduo.mutation.VariationCleared() {
+	if oduo.mutation.VariantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: []string{outbounddeal.VariationColumn},
+			Table:   outbounddeal.VariantTable,
+			Columns: []string{outbounddeal.VariantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := oduo.mutation.VariationIDs(); len(nodes) > 0 {
+	if nodes := oduo.mutation.VariantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: []string{outbounddeal.VariationColumn},
+			Table:   outbounddeal.VariantTable,
+			Columns: []string{outbounddeal.VariantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if oduo.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   outbounddeal.ParentTable,
+			Columns: []string{outbounddeal.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := oduo.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   outbounddeal.ParentTable,
+			Columns: []string{outbounddeal.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if oduo.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := oduo.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !oduo.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := oduo.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
 				},
 			},
 		}
@@ -514,7 +814,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -530,7 +830,7 @@ func (oduo *OutboundDealUpdateOne) sqlSave(ctx context.Context) (_node *Outbound
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},

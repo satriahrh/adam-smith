@@ -11,7 +11,7 @@ import (
 	"github.com/facebook/ent/schema/field"
 	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
 	"github.com/satriahrh/adam-smith/build/ent/outboundtransaction"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 )
 
 // OutboundDealCreate is the builder for creating a OutboundDeal entity.
@@ -33,33 +33,67 @@ func (odc *OutboundDealCreate) SetAmount(u uint) *OutboundDealCreate {
 	return odc
 }
 
-// SetVariationID sets the variation edge to Variation by id.
-func (odc *OutboundDealCreate) SetVariationID(id int) *OutboundDealCreate {
-	odc.mutation.SetVariationID(id)
+// SetVariantID sets the variant edge to Variant by id.
+func (odc *OutboundDealCreate) SetVariantID(id uint64) *OutboundDealCreate {
+	odc.mutation.SetVariantID(id)
 	return odc
 }
 
-// SetNillableVariationID sets the variation edge to Variation by id if the given value is not nil.
-func (odc *OutboundDealCreate) SetNillableVariationID(id *int) *OutboundDealCreate {
+// SetNillableVariantID sets the variant edge to Variant by id if the given value is not nil.
+func (odc *OutboundDealCreate) SetNillableVariantID(id *uint64) *OutboundDealCreate {
 	if id != nil {
-		odc = odc.SetVariationID(*id)
+		odc = odc.SetVariantID(*id)
 	}
 	return odc
 }
 
-// SetVariation sets the variation edge to Variation.
-func (odc *OutboundDealCreate) SetVariation(v *Variation) *OutboundDealCreate {
-	return odc.SetVariationID(v.ID)
+// SetVariant sets the variant edge to Variant.
+func (odc *OutboundDealCreate) SetVariant(v *Variant) *OutboundDealCreate {
+	return odc.SetVariantID(v.ID)
+}
+
+// SetParentID sets the parent edge to OutboundDeal by id.
+func (odc *OutboundDealCreate) SetParentID(id uint64) *OutboundDealCreate {
+	odc.mutation.SetParentID(id)
+	return odc
+}
+
+// SetNillableParentID sets the parent edge to OutboundDeal by id if the given value is not nil.
+func (odc *OutboundDealCreate) SetNillableParentID(id *uint64) *OutboundDealCreate {
+	if id != nil {
+		odc = odc.SetParentID(*id)
+	}
+	return odc
+}
+
+// SetParent sets the parent edge to OutboundDeal.
+func (odc *OutboundDealCreate) SetParent(o *OutboundDeal) *OutboundDealCreate {
+	return odc.SetParentID(o.ID)
+}
+
+// AddChildIDs adds the children edge to OutboundDeal by ids.
+func (odc *OutboundDealCreate) AddChildIDs(ids ...uint64) *OutboundDealCreate {
+	odc.mutation.AddChildIDs(ids...)
+	return odc
+}
+
+// AddChildren adds the children edges to OutboundDeal.
+func (odc *OutboundDealCreate) AddChildren(o ...*OutboundDeal) *OutboundDealCreate {
+	ids := make([]uint64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return odc.AddChildIDs(ids...)
 }
 
 // SetTransactionID sets the transaction edge to OutboundTransaction by id.
-func (odc *OutboundDealCreate) SetTransactionID(id int) *OutboundDealCreate {
+func (odc *OutboundDealCreate) SetTransactionID(id uint64) *OutboundDealCreate {
 	odc.mutation.SetTransactionID(id)
 	return odc
 }
 
 // SetNillableTransactionID sets the transaction edge to OutboundTransaction by id if the given value is not nil.
-func (odc *OutboundDealCreate) SetNillableTransactionID(id *int) *OutboundDealCreate {
+func (odc *OutboundDealCreate) SetNillableTransactionID(id *uint64) *OutboundDealCreate {
 	if id != nil {
 		odc = odc.SetTransactionID(*id)
 	}
@@ -140,7 +174,7 @@ func (odc *OutboundDealCreate) sqlSave(ctx context.Context) (*OutboundDeal, erro
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -150,7 +184,7 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 		_spec = &sqlgraph.CreateSpec{
 			Table: outbounddeal.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outbounddeal.FieldID,
 			},
 		}
@@ -171,17 +205,55 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 		})
 		_node.Amount = value
 	}
-	if nodes := odc.mutation.VariationIDs(); len(nodes) > 0 {
+	if nodes := odc.mutation.VariantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   outbounddeal.VariationTable,
-			Columns: []string{outbounddeal.VariationColumn},
+			Table:   outbounddeal.VariantTable,
+			Columns: []string{outbounddeal.VariantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := odc.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   outbounddeal.ParentTable,
+			Columns: []string{outbounddeal.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := odc.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   outbounddeal.ChildrenTable,
+			Columns: []string{outbounddeal.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: outbounddeal.FieldID,
 				},
 			},
 		}
@@ -199,7 +271,7 @@ func (odc *OutboundDealCreate) createSpec() (*OutboundDeal, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: outboundtransaction.FieldID,
 				},
 			},
@@ -252,7 +324,7 @@ func (odcb *OutboundDealCreateBulk) Save(ctx context.Context) ([]*OutboundDeal, 
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

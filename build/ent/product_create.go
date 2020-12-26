@@ -11,7 +11,7 @@ import (
 	"github.com/facebook/ent/schema/field"
 	"github.com/satriahrh/adam-smith/build/ent/brand"
 	"github.com/satriahrh/adam-smith/build/ent/product"
-	"github.com/satriahrh/adam-smith/build/ent/variation"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/ent/schema"
 )
 
@@ -47,34 +47,34 @@ func (pc *ProductCreate) SetImages(si schema.ProductImages) *ProductCreate {
 }
 
 // SetMarketplaces sets the marketplaces field.
-func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplace) *ProductCreate {
+func (pc *ProductCreate) SetMarketplaces(sm schema.ProductMarketplaces) *ProductCreate {
 	pc.mutation.SetMarketplaces(sm)
 	return pc
 }
 
-// AddVariationIDs adds the variations edge to Variation by ids.
-func (pc *ProductCreate) AddVariationIDs(ids ...int) *ProductCreate {
-	pc.mutation.AddVariationIDs(ids...)
+// AddVariantIDs adds the variants edge to Variant by ids.
+func (pc *ProductCreate) AddVariantIDs(ids ...uint64) *ProductCreate {
+	pc.mutation.AddVariantIDs(ids...)
 	return pc
 }
 
-// AddVariations adds the variations edges to Variation.
-func (pc *ProductCreate) AddVariations(v ...*Variation) *ProductCreate {
-	ids := make([]int, len(v))
+// AddVariants adds the variants edges to Variant.
+func (pc *ProductCreate) AddVariants(v ...*Variant) *ProductCreate {
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
-	return pc.AddVariationIDs(ids...)
+	return pc.AddVariantIDs(ids...)
 }
 
 // SetBrandID sets the brand edge to Brand by id.
-func (pc *ProductCreate) SetBrandID(id int) *ProductCreate {
+func (pc *ProductCreate) SetBrandID(id uint64) *ProductCreate {
 	pc.mutation.SetBrandID(id)
 	return pc
 }
 
 // SetNillableBrandID sets the brand edge to Brand by id if the given value is not nil.
-func (pc *ProductCreate) SetNillableBrandID(id *int) *ProductCreate {
+func (pc *ProductCreate) SetNillableBrandID(id *uint64) *ProductCreate {
 	if id != nil {
 		pc = pc.SetBrandID(*id)
 	}
@@ -164,7 +164,7 @@ func (pc *ProductCreate) sqlSave(ctx context.Context) (*Product, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	_node.ID = uint64(id)
 	return _node, nil
 }
 
@@ -174,7 +174,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: product.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: product.FieldID,
 			},
 		}
@@ -219,17 +219,17 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		})
 		_node.Marketplaces = value
 	}
-	if nodes := pc.mutation.VariationsIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.VariantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   product.VariationsTable,
-			Columns: []string{product.VariationsColumn},
+			Table:   product.VariantsTable,
+			Columns: []string{product.VariantsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: variation.FieldID,
+					Type:   field.TypeUint64,
+					Column: variant.FieldID,
 				},
 			},
 		}
@@ -247,7 +247,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: brand.FieldID,
 				},
 			},
@@ -300,7 +300,7 @@ func (pcb *ProductCreateBulk) Save(ctx context.Context) ([]*Product, error) {
 					return nil, err
 				}
 				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
+				nodes[i].ID = uint64(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

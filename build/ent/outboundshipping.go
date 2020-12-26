@@ -15,7 +15,7 @@ import (
 type OutboundShipping struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Courier holds the value of the "courier" field.
 	Courier outboundshipping.Courier `json:"courier,omitempty"`
 	// CourierTrackingCode holds the value of the "courier_tracking_code" field.
@@ -37,7 +37,7 @@ type OutboundShipping struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OutboundShippingQuery when eager-loading is set.
 	Edges                         OutboundShippingEdges `json:"edges"`
-	outbound_transaction_shipping *int
+	outbound_transaction_shipping *uint64
 }
 
 // OutboundShippingEdges holds the relations/edges for other nodes in the graph.
@@ -96,7 +96,7 @@ func (os *OutboundShipping) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	os.ID = int(value.Int64)
+	os.ID = uint64(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field courier", values[0])
@@ -148,8 +148,8 @@ func (os *OutboundShipping) assignValues(values ...interface{}) error {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field outbound_transaction_shipping", value)
 		} else if value.Valid {
-			os.outbound_transaction_shipping = new(int)
-			*os.outbound_transaction_shipping = int(value.Int64)
+			os.outbound_transaction_shipping = new(uint64)
+			*os.outbound_transaction_shipping = uint64(value.Int64)
 		}
 	}
 	return nil

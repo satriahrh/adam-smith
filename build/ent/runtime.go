@@ -4,6 +4,7 @@ package ent
 
 import (
 	"github.com/satriahrh/adam-smith/build/ent/brand"
+	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/build/ent/variation"
 	"github.com/satriahrh/adam-smith/ent/schema"
 )
@@ -14,18 +15,32 @@ import (
 func init() {
 	brandFields := schema.Brand{}.Fields()
 	_ = brandFields
+	// brandDescCode is the schema descriptor for code field.
+	brandDescCode := brandFields[0].Descriptor()
+	// brand.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	brand.CodeValidator = brandDescCode.Validators[0].(func(string) error)
 	// brandDescName is the schema descriptor for name field.
-	brandDescName := brandFields[0].Descriptor()
+	brandDescName := brandFields[1].Descriptor()
 	// brand.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	brand.NameValidator = brandDescName.Validators[0].(func(string) error)
+	variantFields := schema.Variant{}.Fields()
+	_ = variantFields
+	// variantDescStock is the schema descriptor for stock field.
+	variantDescStock := variantFields[1].Descriptor()
+	// variant.DefaultStock holds the default value on creation for the stock field.
+	variant.DefaultStock = variantDescStock.Default.(uint32)
+	// variantDescPrice is the schema descriptor for price field.
+	variantDescPrice := variantFields[2].Descriptor()
+	// variant.DefaultPrice holds the default value on creation for the price field.
+	variant.DefaultPrice = variantDescPrice.Default.(uint32)
 	variationFields := schema.Variation{}.Fields()
 	_ = variationFields
-	// variationDescStock is the schema descriptor for stock field.
-	variationDescStock := variationFields[1].Descriptor()
-	// variation.DefaultStock holds the default value on creation for the stock field.
-	variation.DefaultStock = variationDescStock.Default.(uint8)
-	// variationDescPrice is the schema descriptor for price field.
-	variationDescPrice := variationFields[2].Descriptor()
-	// variation.DefaultPrice holds the default value on creation for the price field.
-	variation.DefaultPrice = variationDescPrice.Default.(uint)
+	// variationDescType is the schema descriptor for type field.
+	variationDescType := variationFields[0].Descriptor()
+	// variation.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	variation.TypeValidator = variationDescType.Validators[0].(func(string) error)
+	// variationDescValue is the schema descriptor for value field.
+	variationDescValue := variationFields[1].Descriptor()
+	// variation.ValueValidator is a validator for the "value" field. It is called by the builders before save.
+	variation.ValueValidator = variationDescValue.Validators[0].(func(string) error)
 }

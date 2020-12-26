@@ -199,7 +199,7 @@ func (c *BrandClient) UpdateOne(b *Brand) *BrandUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *BrandClient) UpdateOneID(id int) *BrandUpdateOne {
+func (c *BrandClient) UpdateOneID(id uint64) *BrandUpdateOne {
 	mutation := newBrandMutation(c.config, OpUpdateOne, withBrandID(id))
 	return &BrandUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -216,7 +216,7 @@ func (c *BrandClient) DeleteOne(b *Brand) *BrandDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *BrandClient) DeleteOneID(id int) *BrandDeleteOne {
+func (c *BrandClient) DeleteOneID(id uint64) *BrandDeleteOne {
 	builder := c.Delete().Where(brand.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -229,12 +229,12 @@ func (c *BrandClient) Query() *BrandQuery {
 }
 
 // Get returns a Brand entity by its id.
-func (c *BrandClient) Get(ctx context.Context, id int) (*Brand, error) {
+func (c *BrandClient) Get(ctx context.Context, id uint64) (*Brand, error) {
 	return c.Query().Where(brand.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *BrandClient) GetX(ctx context.Context, id int) *Brand {
+func (c *BrandClient) GetX(ctx context.Context, id uint64) *Brand {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -303,7 +303,7 @@ func (c *OutboundDealClient) UpdateOne(od *OutboundDeal) *OutboundDealUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *OutboundDealClient) UpdateOneID(id int) *OutboundDealUpdateOne {
+func (c *OutboundDealClient) UpdateOneID(id uint64) *OutboundDealUpdateOne {
 	mutation := newOutboundDealMutation(c.config, OpUpdateOne, withOutboundDealID(id))
 	return &OutboundDealUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -320,7 +320,7 @@ func (c *OutboundDealClient) DeleteOne(od *OutboundDeal) *OutboundDealDeleteOne 
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *OutboundDealClient) DeleteOneID(id int) *OutboundDealDeleteOne {
+func (c *OutboundDealClient) DeleteOneID(id uint64) *OutboundDealDeleteOne {
 	builder := c.Delete().Where(outbounddeal.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -333,12 +333,12 @@ func (c *OutboundDealClient) Query() *OutboundDealQuery {
 }
 
 // Get returns a OutboundDeal entity by its id.
-func (c *OutboundDealClient) Get(ctx context.Context, id int) (*OutboundDeal, error) {
+func (c *OutboundDealClient) Get(ctx context.Context, id uint64) (*OutboundDeal, error) {
 	return c.Query().Where(outbounddeal.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *OutboundDealClient) GetX(ctx context.Context, id int) *OutboundDeal {
+func (c *OutboundDealClient) GetX(ctx context.Context, id uint64) *OutboundDeal {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -346,15 +346,47 @@ func (c *OutboundDealClient) GetX(ctx context.Context, id int) *OutboundDeal {
 	return obj
 }
 
-// QueryVariation queries the variation edge of a OutboundDeal.
-func (c *OutboundDealClient) QueryVariation(od *OutboundDeal) *VariationQuery {
-	query := &VariationQuery{config: c.config}
+// QueryVariant queries the variant edge of a OutboundDeal.
+func (c *OutboundDealClient) QueryVariant(od *OutboundDeal) *VariantQuery {
+	query := &VariantQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := od.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, id),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, outbounddeal.VariationTable, outbounddeal.VariationColumn),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, outbounddeal.VariantTable, outbounddeal.VariantColumn),
+		)
+		fromV = sqlgraph.Neighbors(od.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParent queries the parent edge of a OutboundDeal.
+func (c *OutboundDealClient) QueryParent(od *OutboundDeal) *OutboundDealQuery {
+	query := &OutboundDealQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := od.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, id),
+			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, outbounddeal.ParentTable, outbounddeal.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(od.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildren queries the children edge of a OutboundDeal.
+func (c *OutboundDealClient) QueryChildren(od *OutboundDeal) *OutboundDealQuery {
+	query := &OutboundDealQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := od.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(outbounddeal.Table, outbounddeal.FieldID, id),
+			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, outbounddeal.ChildrenTable, outbounddeal.ChildrenColumn),
 		)
 		fromV = sqlgraph.Neighbors(od.driver.Dialect(), step)
 		return fromV, nil
@@ -423,7 +455,7 @@ func (c *OutboundShippingClient) UpdateOne(os *OutboundShipping) *OutboundShippi
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *OutboundShippingClient) UpdateOneID(id int) *OutboundShippingUpdateOne {
+func (c *OutboundShippingClient) UpdateOneID(id uint64) *OutboundShippingUpdateOne {
 	mutation := newOutboundShippingMutation(c.config, OpUpdateOne, withOutboundShippingID(id))
 	return &OutboundShippingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -440,7 +472,7 @@ func (c *OutboundShippingClient) DeleteOne(os *OutboundShipping) *OutboundShippi
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *OutboundShippingClient) DeleteOneID(id int) *OutboundShippingDeleteOne {
+func (c *OutboundShippingClient) DeleteOneID(id uint64) *OutboundShippingDeleteOne {
 	builder := c.Delete().Where(outboundshipping.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -453,12 +485,12 @@ func (c *OutboundShippingClient) Query() *OutboundShippingQuery {
 }
 
 // Get returns a OutboundShipping entity by its id.
-func (c *OutboundShippingClient) Get(ctx context.Context, id int) (*OutboundShipping, error) {
+func (c *OutboundShippingClient) Get(ctx context.Context, id uint64) (*OutboundShipping, error) {
 	return c.Query().Where(outboundshipping.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *OutboundShippingClient) GetX(ctx context.Context, id int) *OutboundShipping {
+func (c *OutboundShippingClient) GetX(ctx context.Context, id uint64) *OutboundShipping {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -527,7 +559,7 @@ func (c *OutboundTransactionClient) UpdateOne(ot *OutboundTransaction) *Outbound
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *OutboundTransactionClient) UpdateOneID(id int) *OutboundTransactionUpdateOne {
+func (c *OutboundTransactionClient) UpdateOneID(id uint64) *OutboundTransactionUpdateOne {
 	mutation := newOutboundTransactionMutation(c.config, OpUpdateOne, withOutboundTransactionID(id))
 	return &OutboundTransactionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -544,7 +576,7 @@ func (c *OutboundTransactionClient) DeleteOne(ot *OutboundTransaction) *Outbound
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *OutboundTransactionClient) DeleteOneID(id int) *OutboundTransactionDeleteOne {
+func (c *OutboundTransactionClient) DeleteOneID(id uint64) *OutboundTransactionDeleteOne {
 	builder := c.Delete().Where(outboundtransaction.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -557,12 +589,12 @@ func (c *OutboundTransactionClient) Query() *OutboundTransactionQuery {
 }
 
 // Get returns a OutboundTransaction entity by its id.
-func (c *OutboundTransactionClient) Get(ctx context.Context, id int) (*OutboundTransaction, error) {
+func (c *OutboundTransactionClient) Get(ctx context.Context, id uint64) (*OutboundTransaction, error) {
 	return c.Query().Where(outboundtransaction.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *OutboundTransactionClient) GetX(ctx context.Context, id int) *OutboundTransaction {
+func (c *OutboundTransactionClient) GetX(ctx context.Context, id uint64) *OutboundTransaction {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -647,7 +679,7 @@ func (c *ProductClient) UpdateOne(pr *Product) *ProductUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProductClient) UpdateOneID(id int) *ProductUpdateOne {
+func (c *ProductClient) UpdateOneID(id uint64) *ProductUpdateOne {
 	mutation := newProductMutation(c.config, OpUpdateOne, withProductID(id))
 	return &ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -664,7 +696,7 @@ func (c *ProductClient) DeleteOne(pr *Product) *ProductDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *ProductClient) DeleteOneID(id int) *ProductDeleteOne {
+func (c *ProductClient) DeleteOneID(id uint64) *ProductDeleteOne {
 	builder := c.Delete().Where(product.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -677,12 +709,12 @@ func (c *ProductClient) Query() *ProductQuery {
 }
 
 // Get returns a Product entity by its id.
-func (c *ProductClient) Get(ctx context.Context, id int) (*Product, error) {
+func (c *ProductClient) Get(ctx context.Context, id uint64) (*Product, error) {
 	return c.Query().Where(product.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProductClient) GetX(ctx context.Context, id int) *Product {
+func (c *ProductClient) GetX(ctx context.Context, id uint64) *Product {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -690,15 +722,15 @@ func (c *ProductClient) GetX(ctx context.Context, id int) *Product {
 	return obj
 }
 
-// QueryVariations queries the variations edge of a Product.
-func (c *ProductClient) QueryVariations(pr *Product) *VariationQuery {
-	query := &VariationQuery{config: c.config}
+// QueryVariants queries the variants edge of a Product.
+func (c *ProductClient) QueryVariants(pr *Product) *VariantQuery {
+	query := &VariantQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, product.VariationsTable, product.VariationsColumn),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, product.VariantsTable, product.VariantsColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -767,7 +799,7 @@ func (c *VariantClient) UpdateOne(v *Variant) *VariantUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *VariantClient) UpdateOneID(id int) *VariantUpdateOne {
+func (c *VariantClient) UpdateOneID(id uint64) *VariantUpdateOne {
 	mutation := newVariantMutation(c.config, OpUpdateOne, withVariantID(id))
 	return &VariantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -784,7 +816,7 @@ func (c *VariantClient) DeleteOne(v *Variant) *VariantDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *VariantClient) DeleteOneID(id int) *VariantDeleteOne {
+func (c *VariantClient) DeleteOneID(id uint64) *VariantDeleteOne {
 	builder := c.Delete().Where(variant.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -797,12 +829,12 @@ func (c *VariantClient) Query() *VariantQuery {
 }
 
 // Get returns a Variant entity by its id.
-func (c *VariantClient) Get(ctx context.Context, id int) (*Variant, error) {
+func (c *VariantClient) Get(ctx context.Context, id uint64) (*Variant, error) {
 	return c.Query().Where(variant.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *VariantClient) GetX(ctx context.Context, id int) *Variant {
+func (c *VariantClient) GetX(ctx context.Context, id uint64) *Variant {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -810,15 +842,79 @@ func (c *VariantClient) GetX(ctx context.Context, id int) *Variant {
 	return obj
 }
 
-// QueryVariations queries the variations edge of a Variant.
-func (c *VariantClient) QueryVariations(v *Variant) *VariationQuery {
+// QueryParent queries the parent edge of a Variant.
+func (c *VariantClient) QueryParent(v *Variant) *VariantQuery {
+	query := &VariantQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(variant.Table, variant.FieldID, id),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, variant.ParentTable, variant.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildren queries the children edge of a Variant.
+func (c *VariantClient) QueryChildren(v *Variant) *VariantQuery {
+	query := &VariantQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(variant.Table, variant.FieldID, id),
+			sqlgraph.To(variant.Table, variant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, variant.ChildrenTable, variant.ChildrenColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVariation queries the variation edge of a Variant.
+func (c *VariantClient) QueryVariation(v *Variant) *VariationQuery {
 	query := &VariationQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variant.Table, variant.FieldID, id),
 			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, variant.VariationsTable, variant.VariationsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, variant.VariationTable, variant.VariationColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProduct queries the product edge of a Variant.
+func (c *VariantClient) QueryProduct(v *Variant) *ProductQuery {
+	query := &ProductQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(variant.Table, variant.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, variant.ProductTable, variant.ProductColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOutboundDeals queries the outbound_deals edge of a Variant.
+func (c *VariantClient) QueryOutboundDeals(v *Variant) *OutboundDealQuery {
+	query := &OutboundDealQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(variant.Table, variant.FieldID, id),
+			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, variant.OutboundDealsTable, variant.OutboundDealsColumn),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil
@@ -871,7 +967,7 @@ func (c *VariationClient) UpdateOne(v *Variation) *VariationUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *VariationClient) UpdateOneID(id int) *VariationUpdateOne {
+func (c *VariationClient) UpdateOneID(id uint64) *VariationUpdateOne {
 	mutation := newVariationMutation(c.config, OpUpdateOne, withVariationID(id))
 	return &VariationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -888,7 +984,7 @@ func (c *VariationClient) DeleteOne(v *Variation) *VariationDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *VariationClient) DeleteOneID(id int) *VariationDeleteOne {
+func (c *VariationClient) DeleteOneID(id uint64) *VariationDeleteOne {
 	builder := c.Delete().Where(variation.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -901,12 +997,12 @@ func (c *VariationClient) Query() *VariationQuery {
 }
 
 // Get returns a Variation entity by its id.
-func (c *VariationClient) Get(ctx context.Context, id int) (*Variation, error) {
+func (c *VariationClient) Get(ctx context.Context, id uint64) (*Variation, error) {
 	return c.Query().Where(variation.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *VariationClient) GetX(ctx context.Context, id int) *Variation {
+func (c *VariationClient) GetX(ctx context.Context, id uint64) *Variation {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -914,79 +1010,15 @@ func (c *VariationClient) GetX(ctx context.Context, id int) *Variation {
 	return obj
 }
 
-// QueryParent queries the parent edge of a Variation.
-func (c *VariationClient) QueryParent(v *Variation) *VariationQuery {
-	query := &VariationQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := v.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, id),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, variation.ParentTable, variation.ParentColumn),
-		)
-		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryChildren queries the children edge of a Variation.
-func (c *VariationClient) QueryChildren(v *Variation) *VariationQuery {
-	query := &VariationQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := v.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, id),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, variation.ChildrenTable, variation.ChildrenColumn),
-		)
-		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryProduct queries the product edge of a Variation.
-func (c *VariationClient) QueryProduct(v *Variation) *ProductQuery {
-	query := &ProductQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := v.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, id),
-			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, variation.ProductTable, variation.ProductColumn),
-		)
-		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryVariant queries the variant edge of a Variation.
-func (c *VariationClient) QueryVariant(v *Variation) *VariantQuery {
+// QueryVariants queries the variants edge of a Variation.
+func (c *VariationClient) QueryVariants(v *Variation) *VariantQuery {
 	query := &VariantQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variation.Table, variation.FieldID, id),
 			sqlgraph.To(variant.Table, variant.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, variation.VariantTable, variation.VariantPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryOutboundDeals queries the outbound_deals edge of a Variation.
-func (c *VariationClient) QueryOutboundDeals(v *Variation) *OutboundDealQuery {
-	query := &OutboundDealQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := v.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, id),
-			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, variation.OutboundDealsTable, variation.OutboundDealsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, variation.VariantsTable, variation.VariantsColumn),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil

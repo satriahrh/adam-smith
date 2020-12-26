@@ -17,7 +17,7 @@ import (
 type OutboundTransaction struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Channel holds the value of the "channel" field.
 	Channel outboundtransaction.Channel `json:"channel,omitempty"`
 	// Invoice holds the value of the "invoice" field.
@@ -89,7 +89,7 @@ func (ot *OutboundTransaction) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	ot.ID = int(value.Int64)
+	ot.ID = uint64(value.Int64)
 	values = values[1:]
 	if value, ok := values[0].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field channel", values[0])

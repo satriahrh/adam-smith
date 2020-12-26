@@ -99,8 +99,8 @@ func (osq *OutboundShippingQuery) FirstX(ctx context.Context) *OutboundShipping 
 }
 
 // FirstID returns the first OutboundShipping id in the query. Returns *NotFoundError when no id was found.
-func (osq *OutboundShippingQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (osq *OutboundShippingQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = osq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -112,7 +112,7 @@ func (osq *OutboundShippingQuery) FirstID(ctx context.Context) (id int, err erro
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (osq *OutboundShippingQuery) FirstIDX(ctx context.Context) int {
+func (osq *OutboundShippingQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := osq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -146,8 +146,8 @@ func (osq *OutboundShippingQuery) OnlyX(ctx context.Context) *OutboundShipping {
 }
 
 // OnlyID returns the only OutboundShipping id in the query, returns an error if not exactly one id was returned.
-func (osq *OutboundShippingQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (osq *OutboundShippingQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = osq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -163,7 +163,7 @@ func (osq *OutboundShippingQuery) OnlyID(ctx context.Context) (id int, err error
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (osq *OutboundShippingQuery) OnlyIDX(ctx context.Context) int {
+func (osq *OutboundShippingQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := osq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -189,8 +189,8 @@ func (osq *OutboundShippingQuery) AllX(ctx context.Context) []*OutboundShipping 
 }
 
 // IDs executes the query and returns a list of OutboundShipping ids.
-func (osq *OutboundShippingQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (osq *OutboundShippingQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := osq.Select(outboundshipping.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (osq *OutboundShippingQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (osq *OutboundShippingQuery) IDsX(ctx context.Context) []int {
+func (osq *OutboundShippingQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := osq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -372,8 +372,8 @@ func (osq *OutboundShippingQuery) sqlAll(ctx context.Context) ([]*OutboundShippi
 	}
 
 	if query := osq.withTransaction; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*OutboundShipping)
+		ids := make([]uint64, 0, len(nodes))
+		nodeids := make(map[uint64][]*OutboundShipping)
 		for i := range nodes {
 			if fk := nodes[i].outbound_transaction_shipping; fk != nil {
 				ids = append(ids, *fk)
@@ -418,7 +418,7 @@ func (osq *OutboundShippingQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   outboundshipping.Table,
 			Columns: outboundshipping.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: outboundshipping.FieldID,
 			},
 		},

@@ -12,9 +12,7 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
-	"github.com/satriahrh/adam-smith/build/ent/outbounddeal"
 	"github.com/satriahrh/adam-smith/build/ent/predicate"
-	"github.com/satriahrh/adam-smith/build/ent/product"
 	"github.com/satriahrh/adam-smith/build/ent/variant"
 	"github.com/satriahrh/adam-smith/build/ent/variation"
 )
@@ -27,12 +25,7 @@ type VariationQuery struct {
 	order      []OrderFunc
 	predicates []predicate.Variation
 	// eager-loading edges.
-	withParent        *VariationQuery
-	withChildren      *VariationQuery
-	withProduct       *ProductQuery
-	withVariant       *VariantQuery
-	withOutboundDeals *OutboundDealQuery
-	withFKs           bool
+	withVariants *VariantQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,74 +55,8 @@ func (vq *VariationQuery) Order(o ...OrderFunc) *VariationQuery {
 	return vq
 }
 
-// QueryParent chains the current query on the parent edge.
-func (vq *VariationQuery) QueryParent() *VariationQuery {
-	query := &VariationQuery{config: vq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := vq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := vq.sqlQuery()
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, selector),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, variation.ParentTable, variation.ParentColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryChildren chains the current query on the children edge.
-func (vq *VariationQuery) QueryChildren() *VariationQuery {
-	query := &VariationQuery{config: vq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := vq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := vq.sqlQuery()
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, selector),
-			sqlgraph.To(variation.Table, variation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, variation.ChildrenTable, variation.ChildrenColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryProduct chains the current query on the product edge.
-func (vq *VariationQuery) QueryProduct() *ProductQuery {
-	query := &ProductQuery{config: vq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := vq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := vq.sqlQuery()
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, selector),
-			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, variation.ProductTable, variation.ProductColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryVariant chains the current query on the variant edge.
-func (vq *VariationQuery) QueryVariant() *VariantQuery {
+// QueryVariants chains the current query on the variants edge.
+func (vq *VariationQuery) QueryVariants() *VariantQuery {
 	query := &VariantQuery{config: vq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := vq.prepareQuery(ctx); err != nil {
@@ -142,29 +69,7 @@ func (vq *VariationQuery) QueryVariant() *VariantQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(variation.Table, variation.FieldID, selector),
 			sqlgraph.To(variant.Table, variant.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, variation.VariantTable, variation.VariantPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryOutboundDeals chains the current query on the outbound_deals edge.
-func (vq *VariationQuery) QueryOutboundDeals() *OutboundDealQuery {
-	query := &OutboundDealQuery{config: vq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := vq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := vq.sqlQuery()
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(variation.Table, variation.FieldID, selector),
-			sqlgraph.To(outbounddeal.Table, outbounddeal.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, variation.OutboundDealsTable, variation.OutboundDealsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, variation.VariantsTable, variation.VariantsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -194,8 +99,8 @@ func (vq *VariationQuery) FirstX(ctx context.Context) *Variation {
 }
 
 // FirstID returns the first Variation id in the query. Returns *NotFoundError when no id was found.
-func (vq *VariationQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (vq *VariationQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = vq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -207,7 +112,7 @@ func (vq *VariationQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (vq *VariationQuery) FirstIDX(ctx context.Context) int {
+func (vq *VariationQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := vq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -241,8 +146,8 @@ func (vq *VariationQuery) OnlyX(ctx context.Context) *Variation {
 }
 
 // OnlyID returns the only Variation id in the query, returns an error if not exactly one id was returned.
-func (vq *VariationQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (vq *VariationQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = vq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -258,7 +163,7 @@ func (vq *VariationQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (vq *VariationQuery) OnlyIDX(ctx context.Context) int {
+func (vq *VariationQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := vq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -284,8 +189,8 @@ func (vq *VariationQuery) AllX(ctx context.Context) []*Variation {
 }
 
 // IDs executes the query and returns a list of Variation ids.
-func (vq *VariationQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (vq *VariationQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := vq.Select(variation.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -293,7 +198,7 @@ func (vq *VariationQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (vq *VariationQuery) IDsX(ctx context.Context) []int {
+func (vq *VariationQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := vq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -342,74 +247,26 @@ func (vq *VariationQuery) Clone() *VariationQuery {
 		return nil
 	}
 	return &VariationQuery{
-		config:            vq.config,
-		limit:             vq.limit,
-		offset:            vq.offset,
-		order:             append([]OrderFunc{}, vq.order...),
-		predicates:        append([]predicate.Variation{}, vq.predicates...),
-		withParent:        vq.withParent.Clone(),
-		withChildren:      vq.withChildren.Clone(),
-		withProduct:       vq.withProduct.Clone(),
-		withVariant:       vq.withVariant.Clone(),
-		withOutboundDeals: vq.withOutboundDeals.Clone(),
+		config:       vq.config,
+		limit:        vq.limit,
+		offset:       vq.offset,
+		order:        append([]OrderFunc{}, vq.order...),
+		predicates:   append([]predicate.Variation{}, vq.predicates...),
+		withVariants: vq.withVariants.Clone(),
 		// clone intermediate query.
 		sql:  vq.sql.Clone(),
 		path: vq.path,
 	}
 }
 
-//  WithParent tells the query-builder to eager-loads the nodes that are connected to
-// the "parent" edge. The optional arguments used to configure the query builder of the edge.
-func (vq *VariationQuery) WithParent(opts ...func(*VariationQuery)) *VariationQuery {
-	query := &VariationQuery{config: vq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	vq.withParent = query
-	return vq
-}
-
-//  WithChildren tells the query-builder to eager-loads the nodes that are connected to
-// the "children" edge. The optional arguments used to configure the query builder of the edge.
-func (vq *VariationQuery) WithChildren(opts ...func(*VariationQuery)) *VariationQuery {
-	query := &VariationQuery{config: vq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	vq.withChildren = query
-	return vq
-}
-
-//  WithProduct tells the query-builder to eager-loads the nodes that are connected to
-// the "product" edge. The optional arguments used to configure the query builder of the edge.
-func (vq *VariationQuery) WithProduct(opts ...func(*ProductQuery)) *VariationQuery {
-	query := &ProductQuery{config: vq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	vq.withProduct = query
-	return vq
-}
-
-//  WithVariant tells the query-builder to eager-loads the nodes that are connected to
-// the "variant" edge. The optional arguments used to configure the query builder of the edge.
-func (vq *VariationQuery) WithVariant(opts ...func(*VariantQuery)) *VariationQuery {
+//  WithVariants tells the query-builder to eager-loads the nodes that are connected to
+// the "variants" edge. The optional arguments used to configure the query builder of the edge.
+func (vq *VariationQuery) WithVariants(opts ...func(*VariantQuery)) *VariationQuery {
 	query := &VariantQuery{config: vq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	vq.withVariant = query
-	return vq
-}
-
-//  WithOutboundDeals tells the query-builder to eager-loads the nodes that are connected to
-// the "outbound_deals" edge. The optional arguments used to configure the query builder of the edge.
-func (vq *VariationQuery) WithOutboundDeals(opts ...func(*OutboundDealQuery)) *VariationQuery {
-	query := &OutboundDealQuery{config: vq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	vq.withOutboundDeals = query
+	vq.withVariants = query
 	return vq
 }
 
@@ -419,12 +276,12 @@ func (vq *VariationQuery) WithOutboundDeals(opts ...func(*OutboundDealQuery)) *V
 // Example:
 //
 //	var v []struct {
-//		Images []string `json:"images,omitempty"`
+//		Type string `json:"type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Variation.Query().
-//		GroupBy(variation.FieldImages).
+//		GroupBy(variation.FieldType).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -445,11 +302,11 @@ func (vq *VariationQuery) GroupBy(field string, fields ...string) *VariationGrou
 // Example:
 //
 //	var v []struct {
-//		Images []string `json:"images,omitempty"`
+//		Type string `json:"type,omitempty"`
 //	}
 //
 //	client.Variation.Query().
-//		Select(variation.FieldImages).
+//		Select(variation.FieldType).
 //		Scan(ctx, &v)
 //
 func (vq *VariationQuery) Select(field string, fields ...string) *VariationSelect {
@@ -478,29 +335,15 @@ func (vq *VariationQuery) prepareQuery(ctx context.Context) error {
 func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 	var (
 		nodes       = []*Variation{}
-		withFKs     = vq.withFKs
 		_spec       = vq.querySpec()
-		loadedTypes = [5]bool{
-			vq.withParent != nil,
-			vq.withChildren != nil,
-			vq.withProduct != nil,
-			vq.withVariant != nil,
-			vq.withOutboundDeals != nil,
+		loadedTypes = [1]bool{
+			vq.withVariants != nil,
 		}
 	)
-	if vq.withParent != nil || vq.withProduct != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, variation.ForeignKeys...)
-	}
 	_spec.ScanValues = func() []interface{} {
 		node := &Variation{config: vq.config}
 		nodes = append(nodes, node)
 		values := node.scanValues()
-		if withFKs {
-			values = append(values, node.fkValues()...)
-		}
 		return values
 	}
 	_spec.Assign = func(values ...interface{}) error {
@@ -518,175 +361,32 @@ func (vq *VariationQuery) sqlAll(ctx context.Context) ([]*Variation, error) {
 		return nodes, nil
 	}
 
-	if query := vq.withParent; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Variation)
-		for i := range nodes {
-			if fk := nodes[i].variation_children; fk != nil {
-				ids = append(ids, *fk)
-				nodeids[*fk] = append(nodeids[*fk], nodes[i])
-			}
-		}
-		query.Where(variation.IDIn(ids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "variation_children" returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Parent = n
-			}
-		}
-	}
-
-	if query := vq.withChildren; query != nil {
+	if query := vq.withVariants; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Variation)
+		nodeids := make(map[uint64]*Variation)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Children = []*Variation{}
+			nodes[i].Edges.Variants = []*Variant{}
 		}
 		query.withFKs = true
-		query.Where(predicate.Variation(func(s *sql.Selector) {
-			s.Where(sql.InValues(variation.ChildrenColumn, fks...))
+		query.Where(predicate.Variant(func(s *sql.Selector) {
+			s.Where(sql.InValues(variation.VariantsColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.variation_children
+			fk := n.variant_variation
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "variation_children" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "variant_variation" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "variation_children" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "variant_variation" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.Children = append(node.Edges.Children, n)
-		}
-	}
-
-	if query := vq.withProduct; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Variation)
-		for i := range nodes {
-			if fk := nodes[i].product_variations; fk != nil {
-				ids = append(ids, *fk)
-				nodeids[*fk] = append(nodeids[*fk], nodes[i])
-			}
-		}
-		query.Where(product.IDIn(ids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "product_variations" returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Product = n
-			}
-		}
-	}
-
-	if query := vq.withVariant; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Variation, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Variant = []*Variant{}
-		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Variation)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   variation.VariantTable,
-				Columns: variation.VariantPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(variation.VariantPrimaryKey[1], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, vq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "variant": %v`, err)
-		}
-		query.Where(variant.IDIn(edgeids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected "variant" node returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Variant = append(nodes[i].Edges.Variant, n)
-			}
-		}
-	}
-
-	if query := vq.withOutboundDeals; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Variation)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.OutboundDeals = []*OutboundDeal{}
-		}
-		query.withFKs = true
-		query.Where(predicate.OutboundDeal(func(s *sql.Selector) {
-			s.Where(sql.InValues(variation.OutboundDealsColumn, fks...))
-		}))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			fk := n.outbound_deal_variation
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "outbound_deal_variation" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "outbound_deal_variation" returned %v for node %v`, *fk, n.ID)
-			}
-			node.Edges.OutboundDeals = append(node.Edges.OutboundDeals, n)
+			node.Edges.Variants = append(node.Edges.Variants, n)
 		}
 	}
 
@@ -712,7 +412,7 @@ func (vq *VariationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   variation.Table,
 			Columns: variation.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: variation.FieldID,
 			},
 		},
