@@ -3,6 +3,7 @@ package management
 import (
 	"context"
 	"fmt"
+	"github.com/satriahrh/adam-smith/internal/instrumentations"
 
 	"github.com/satriahrh/adam-smith/build/proto"
 	"github.com/satriahrh/adam-smith/internal/helper"
@@ -21,7 +22,7 @@ func (m *management) AddVariation(ctx context.Context, variation *proto.Variatio
 		SetValue(variation.GetValue()).
 		Save(ctx)
 	if err != nil {
-		m.logger.Error("Error when creating variation", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+		instrumentations.Logger.Error("Error when creating variation", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return errorParseFromDictionary(err)
 	}
 	variation.Id = createdVariation.ID

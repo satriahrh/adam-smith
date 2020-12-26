@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/satriahrh/adam-smith/internal/helper"
+	"github.com/satriahrh/adam-smith/internal/instrumentations"
 
 	"github.com/satriahrh/adam-smith/build/proto"
 	"go.uber.org/zap"
@@ -26,7 +27,7 @@ func (m *management) UpdateBrand(ctx context.Context, protoBrand *proto.Brand) (
 		SetName(protoBrand.GetName()).
 		Exec(ctx)
 	if err != nil {
-		m.logger.Error("Error when updating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+		instrumentations.Logger.Error("Error when updating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 	}
 	return
 }

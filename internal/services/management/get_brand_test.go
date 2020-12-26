@@ -12,7 +12,7 @@ func (s *Suite) TestGetBrand() {
 				WithArgs(123).
 				WillReturnRows(sqlmock.NewRows([]string{"id", "code", "name"}))
 			_, err := s.subject.GetBrand(s.context, 123, "")
-			s.EqualError(err, "no brand found with given id/code")
+			s.EqualError(err, "brand not found with given id/code")
 		})
 		s.Run("Succeed", func() {
 			s.sqlmock.ExpectQuery("SELECT (.+) FROM `brands`").
@@ -36,7 +36,7 @@ func (s *Suite) TestGetBrand() {
 				WithArgs("savan").
 				WillReturnRows(sqlmock.NewRows([]string{"id", "code", "name"}))
 			_, err := s.subject.GetBrand(s.context, 0, "savan")
-			s.EqualError(err, "no brand found with given id/code")
+			s.EqualError(err, "brand not found with given id/code")
 		})
 		s.Run("Succeed", func() {
 			s.sqlmock.ExpectQuery("SELECT (.+) FROM `brands`").

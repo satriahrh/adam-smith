@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/satriahrh/adam-smith/internal/instrumentations"
 
 	"github.com/satriahrh/adam-smith/build/ent"
 	"github.com/satriahrh/adam-smith/build/ent/brand"
@@ -25,11 +26,11 @@ func (m *management) GetBrand(ctx context.Context, brandID uint64, brandCode str
 	var retrievedBrand *ent.Brand
 	if brandID != 0 {
 		if retrievedBrand, err = m.ent.Brand.Get(ctx, brandID); err != nil {
-			m.logger.Error("Error getting brand by ID", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+			instrumentations.Logger.Error("Error getting brand by ID", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		}
 	} else {
 		if retrievedBrand, err = m.ent.Brand.Query().Where(brand.CodeEQ(brandCode)).First(ctx); err != nil {
-			m.logger.Error("Error getting brand by Code", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+			instrumentations.Logger.Error("Error getting brand by Code", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		}
 	}
 

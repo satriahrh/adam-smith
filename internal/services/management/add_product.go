@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/satriahrh/adam-smith/internal/instrumentations"
 
 	"github.com/satriahrh/adam-smith/build/proto"
 	"github.com/satriahrh/adam-smith/ent/schema"
@@ -24,7 +25,7 @@ func (m *management) AddProduct(ctx context.Context, brandID uint64, product *pr
 		).
 		Save(ctx)
 	if err != nil {
-		m.logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+		instrumentations.Logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return err
 	}
 	product.Id = createdProduct.ID

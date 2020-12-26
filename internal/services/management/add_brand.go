@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/satriahrh/adam-smith/internal/helper"
+	"github.com/satriahrh/adam-smith/internal/instrumentations"
 
 	"github.com/satriahrh/adam-smith/build/proto"
 	"go.uber.org/zap"
@@ -21,7 +22,7 @@ func (m *management) AddBrand(ctx context.Context, brand *proto.Brand) error {
 		SetName(brand.Name).
 		Save(ctx)
 	if err != nil {
-		m.logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
+		instrumentations.Logger.Error("Error when creating brand", zap.Any("action_id", ctx.Value("ActionID")), zap.Error(err))
 		return errorParseFromDictionary(err)
 	}
 
